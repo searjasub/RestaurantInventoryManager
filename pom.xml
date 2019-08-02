@@ -3,4 +3,11 @@
   <groupId>PRO100</groupId>
   <artifactId>RestaurantTracker</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-core</artifactId>
+      <version>3.4.3</version>
+    </dependency>
+  </dependencies>
 </project>
