@@ -1,6 +1,8 @@
 package controllers;
 
+import javafx.collections.ObservableList;
 import models.Ingredient;
+import models.OrderedItem;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,8 +37,8 @@ public class InventoryTrackerController {
 
     }
 
-    public void reviewOrderedItems(){
-
+    public ObservableList<OrderedItem> reviewOrderedItems(){
+    return null;
     }
 
 }
