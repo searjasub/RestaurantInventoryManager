@@ -4,10 +4,11 @@ import models.Employee;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class EmployeeController {
 
-    HashMap<Integer, Employee> empsCollection = new HashMap<Integer, Employee>();
+    Map<Integer, Employee> empsCollection = new HashMap<>();
 
     public void AddEmployee(int id, String name, double hourlyPay, String occupation) {
 
