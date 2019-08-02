@@ -21,15 +21,16 @@ public class FinancialTracker {
 	InventoryTrackerController tracker = new InventoryTrackerController();
 	
 	
-//	public void init(){
-//		//Method to get all inventory items and set them to the ObservableList needed
-//		master = tracker.getAllItems();
-//
-//
-//		myPagination.setPageFactory(this::createPage);
-//	}
+	public void init(){
+		//Method to get all inventory items and set them to the ObservableList needed
+		master = tracker.reviewOrderedItems();
 
 
+		myPagination.setPageFactory(this::createPage);
+	}
+
+
+	@SuppressWarnings("unchecked")
 	public Node createPage(int pageIndex) {
 		int first = pageIndex * pageSize;
 		int last = Math.min(first + pageSize, master.size());
