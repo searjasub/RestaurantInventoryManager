@@ -13,7 +13,7 @@ public class Employee {
     private String password;
     private String occupation;
     private int id;
-    private int weekyHours;
+    private int weeklyHours;
 
     public Employee(int id, String name, String password, String occupation, double hourlyPay) {
         setId(id);
@@ -79,12 +79,12 @@ public class Employee {
         this.id = id;
     }
 
-    public int getWeekyHours() {
-        return weekyHours;
+    public int getWeeklyHours() {
+        return weeklyHours;
     }
 
-    public void setWeekyHours(int weekyHours) {
-        this.weekyHours = weekyHours;
+    public void setWeeklyHours(int weeklyHours) {
+        this.weeklyHours = weeklyHours;
     }
 
     public double getHourlyPay() {
