@@ -1,18 +1,10 @@
 package controllers;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.layout.GridPane;
 import models.Employee;
 
 import java.util.Date;
@@ -25,8 +17,6 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 
 import models.OrderedItem;
-import simpson.joseph.contactdatabase.Contact;
-
 import org.bson.Document;
 import java.util.Arrays;
 import com.mongodb.Block;
@@ -38,7 +28,6 @@ import static com.mongodb.client.model.Updates.*;
 import com.mongodb.client.result.UpdateResult;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class AdministrativeController {
 
@@ -46,8 +35,8 @@ public class AdministrativeController {
 
     HashMap<Integer, Employee> empsCollection = new HashMap<Integer, Employee>();
 
-    public void AddEmployee(Employee e) {
-    	
+    public void AddEmployee(int id, String name, double hourlyPay, String occupation,String password) {
+
     }
 
     public void deleteEmployee(int id) {
@@ -81,74 +70,7 @@ public class AdministrativeController {
     public void fillEmpCollection() {
 
     }
-    
-    
-    
-    public void onAddEmployeeButton() {
-    	Dialog<Employee> dialog = new Dialog<>();
-		dialog.setTitle("Contact Dialog");
-		dialog.setHeaderText("Please Input Employee Data");
-
-		ButtonType loginButtonType = new ButtonType("Add", ButtonData.OK_DONE);
-		dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-
-		GridPane grid = new GridPane();
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(20, 150, 10, 10));
-
-		TextField name = new TextField();
-		name.setPromptText("Name");
-		TextField password = new TextField();
-		password.setPromptText("Password");
-		TextField occupation = new TextField();
-		occupation.setPromptText("Occupation");
-
-		grid.add(new Label("First Name:"), 0, 0);
-		grid.add(name, 1, 0);
-		grid.add(new Label("Last Name:"), 0, 1);
-		grid.add(password, 1, 1);
-		grid.add(new Label("Primary Email:"), 0, 2);
-		grid.add(occupation, 1, 2);
-
-		Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
-		loginButton.setDisable(true);
-
-		name.textProperty().addListener((observable, oldValue, newValue) -> {
-			loginButton.setDisable(newValue.trim().isEmpty());
-		});
-
-		dialog.getDialogPane().setContent(grid);
-
-		Platform.runLater(() -> name.requestFocus());
-
-		dialog.setResultConverter(dialogButton -> {
-			if (dialogButton == loginButtonType) {
-				Employee e = new Employee();
-				
-				e.setName(name.getText().trim());
-				e.setPassword(password.getText().trim());
-				e.setOccupation(occupation.getText().trim());
-				
-				return e;
-			}
-			return null;
-		});
-
-		Optional<Employee> result = dialog.showAndWait();
-		
-		
-		if(result.isPresent()) {
-			AddEmployee(result.get());
-		}
-
-    }
-    
-    
-    
-    
-    
-    //Financial Controller
+    //Basic idea of what this should be
 
     Pagination myPagination = new Pagination();
 
