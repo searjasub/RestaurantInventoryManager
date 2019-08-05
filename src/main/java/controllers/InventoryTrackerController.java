@@ -32,10 +32,12 @@ public class InventoryTrackerController {
 
     public void addItem(String ingredientName, int itemId, Date prepDate, Date expDate, int caloriePerServing,
     int amount, int individualCost, int bulkCost, int bulkAmount) {
-
+        collection.insertOne(new Document("ingredientName", ingredientName).append("ingredientID", itemId).append("prepDate", prepDate)
+        .append("expDate", expDate).append("caloriePerServing", caloriePerServing).append("amount", amount).append("individualCost", individualCost)
+        .append("bulkCost", bulkCost).append("bulkAmount", bulkAmount));
     }
 
-    public void deleteItem(int itemId, int amount) {
+    public void deleteItem(int itemId) {
         System.out.println(collection.deleteOne(eq("ingredientID", itemId)));
     }
 
