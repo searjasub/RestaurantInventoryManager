@@ -38,4 +38,18 @@ public class FinancialTracker {
 
 		return table;
 	}
+	
+	
+	//Methods to add:
+	
+	//Method(s) that allow the user to switch between seeing only Assets, Liabilities, and Capital investments as well as a view that allows them to see all three
+	//Should be in chronological order
+
+	//Method that allows the user to click on the name of an item, and then view all items of that type along with their asset/liability values and the dates 
+	//they were put in and their expiration date
+	
+	
+	
+	
+	
 }
