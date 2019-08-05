@@ -30,7 +30,8 @@ public class InventoryTrackerController {
     MongoDatabase database = mc.getDatabase("Restaurants");
     MongoCollection<Document> collection = database.getCollection("Inventory");
 
-    public void addItem(int itemId) {
+    public void addItem(String ingredientName, int itemId, Date prepDate, Date expDate, int caloriePerServing,
+    int amount, int individualCost, int bulkCost, int bulkAmount) {
 
     }
 
@@ -38,8 +39,8 @@ public class InventoryTrackerController {
         System.out.println(collection.deleteOne(eq("ingredientID", itemId)));
     }
 
-    public void updateItem(int itemId, String updateField) {
-        collection.updateOne(eq("id", itemId), new Document("$set", new Document(updateField, 110)));
+    public void updateItem(int itemId, String updateField, String updateValue) {
+        collection.updateOne(eq("ingredientID", itemId), new Document("$set", new Document(updateField, updateValue)));
     }
 
     public void getItemData(int itemId) {
