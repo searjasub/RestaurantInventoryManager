@@ -2,11 +2,29 @@
 
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="controllers.MainStageController"
             prefHeight="400.0" prefWidth="600.0">
 
     <Button text="TESTING"/>
+
+    <top>
+        <MenuBar fx:id="topMenu">
+            <menus>
+                <Menu text="File">
+                    <items>
+                        <MenuItem onAction="#onMenuItemExit" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    <center>
+
+    </center>
 
 </BorderPane>

@@ -15,6 +15,9 @@ public class Employee {
     private int id;
     private int weeklyHours;
 
+    public Employee() {
+    }
+
     public Employee(int id, String name, String password, String occupation, double hourlyPay) {
         setId(id);
         setName(name);
