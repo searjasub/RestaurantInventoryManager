@@ -1,5 +1,5 @@
 package enums;
 
-public enum IngredientTags {
+public enum IngredientTag {
  VEGAN, VEGETARIAN
 }

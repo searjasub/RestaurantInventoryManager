@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -19,14 +20,24 @@ import javafx.scene.control.Pagination;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import models.Employee;
 import models.OrderedItem;
 
 public class AdministrativeController {
 
     MongoClient mc = new MongoClient();
-
     HashMap<Integer, Employee> empsCollection = new HashMap<Integer, Employee>();
+    private Stage primaryStage;
+    private Scene adminScene;
+    private MainStageController mainController;
+
+	void setPrimaryScene(Stage primaryStage, Scene adminScene, MainStageController mainStageController) {
+		this.primaryStage = primaryStage;
+		this.adminScene = adminScene;
+		this.mainController = mainStageController;
+	}
+
 
     public void AddEmployee(Employee e) {
 
@@ -160,7 +171,9 @@ public class AdministrativeController {
     }
 
 
-    //Methods to add:
+
+
+	//Methods to add:
 
     //Method(s) that allow the user to switch between seeing only Assets, Liabilities, and Capital investments as well as a view that allows them to see all three
     //Should be in chronological order
