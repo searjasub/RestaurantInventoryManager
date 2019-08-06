@@ -1,37 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.AnchorPane?>
-
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <Pagination prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-   </center>
-   <top>
-      <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-        <items>
-          <Button mnemonicParsing="false" text="Add" />
-            <Button mnemonicParsing="false" text="Delete" />
-            <Pane prefHeight="31.0" prefWidth="76.0" />
-            <HBox prefHeight="31.0" prefWidth="377.0">
-               <children>
-                  <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="84.0" text="Admin" />
-                  <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="99.0" text="Inventory" />
-                  <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="71.0" text="POS" />
-               </children>
-            </HBox>
-        </items>
-      </ToolBar>
-   </top>
-   <bottom>
-      <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-        <items>
-            <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="73.0" text="All" />
-            <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="112.0" text="Clocked In" />
-        </items>
-      </ToolBar>
-   </bottom>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+            prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.AdministrativeController">
+    <center>
+        <Pagination prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+    </center>
+    <top>
+        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <items>
+                <Button mnemonicParsing="false" text="Add"/>
+                <Button mnemonicParsing="false" text="Delete"/>
+                <Pane prefHeight="31.0" prefWidth="76.0"/>
+                <HBox prefHeight="31.0" prefWidth="377.0">
+                    <children>
+                        <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="84.0" text="Admin"/>
+                        <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="99.0" text="Inventory"/>
+                        <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="71.0" text="POS"/>
+                    </children>
+                </HBox>
+            </items>
+        </ToolBar>
+    </top>
+    <bottom>
+        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <items>
+                <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="73.0" text="All"/>
+                <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="112.0" text="Clocked In"/>
+            </items>
+        </ToolBar>
+    </bottom>
 </BorderPane>
