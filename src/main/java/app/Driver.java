@@ -27,8 +27,10 @@ public class Driver extends Application {
             c.setPrimaryStage(primaryStage, scene);
             primaryStage.setTitle("Restaurant Inventory Manager");
             primaryStage.setScene(scene);
-            primaryStage.setMinWidth(400);
-            primaryStage.setMinHeight(400);
+            primaryStage.setMinWidth(530);
+            primaryStage.setMinHeight(250);
+            primaryStage.setMaxHeight(250);
+            primaryStage.setMaxWidth(530);
             primaryStage.show();
         } catch (NumberFormatException | IOException e) {
             e.printStackTrace();

@@ -4,7 +4,7 @@ import models.Meal;
 
 import java.util.ArrayList;
 
-public class OrderController {
+public class POSController {
 
     private static double salesTax;
     ArrayList<Meal> meals = new ArrayList<Meal>();
@@ -17,7 +17,7 @@ public class OrderController {
     }
 
     public static void setSalesTax(double salesTax) {
-        OrderController.salesTax = salesTax;
+        POSController.salesTax = salesTax;
     }
 
     public void splitTab() {
