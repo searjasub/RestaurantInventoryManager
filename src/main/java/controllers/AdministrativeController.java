@@ -1,8 +1,8 @@
 package controllers;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
+
+import com.mongodb.BasicDBObject;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -72,11 +72,16 @@ public class AdministrativeController {
     }
 
     public void clockOut(int id, Date time) {
-
+		collection.updateOne(eq("employeID", id), new Document("$set", new Document("clockOut", time)));
     }
 
     public void login(int id, String password) {
-
+		BasicDBObject andQuery = new BasicDBObject();
+		List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
+		obj.add(new BasicDBObject("employeID", id));
+		obj.add(new BasicDBObject("password", password));
+		andQuery.put("$and", obj);
+		collection.find(andQuery);
     }
 
     public void fillEmpCollection() {
