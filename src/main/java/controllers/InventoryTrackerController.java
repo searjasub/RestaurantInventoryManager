@@ -3,27 +3,15 @@ package controllers;
 import javafx.collections.ObservableList;
 import models.Ingredient;
 import models.OrderedItem;
-
 import java.util.ArrayList;
 import java.util.Date;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.ServerAddress;
-
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
-
 import org.bson.Document;
-import java.util.Arrays;
 import com.mongodb.Block;
-
-import com.mongodb.client.MongoCursor;
 import static com.mongodb.client.model.Filters.*;
-import com.mongodb.client.result.DeleteResult;
-import static com.mongodb.client.model.Updates.*;
-import com.mongodb.client.result.UpdateResult;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class InventoryTrackerController {
     MongoClient mc = new MongoClient("localHost");
@@ -37,16 +25,16 @@ public class InventoryTrackerController {
         .append("bulkCost", bulkCost).append("bulkAmount", bulkAmount));
     }
 
-    public void deleteItem(int itemId) {
-        System.out.println(collection.deleteOne(eq("ingredientID", itemId)));
+    public void deleteItem(String itemName) {
+        collection.deleteOne(eq("name", itemName));
     }
 
     public void updateItem(int itemId, String updateField, String updateValue) {
         collection.updateOne(eq("ingredientID", itemId), new Document("$set", new Document(updateField, updateValue)));
     }
 
-    public void getItemData(int itemId) {
-        collection.find(eq("ingredientID", itemId)).forEach(printBlock);
+    public void getItemData(String itemName) {
+        collection.find(eq("name", itemName)).forEach(printBlock);
     }
 
     public ArrayList<Ingredient> soonToExpire() {

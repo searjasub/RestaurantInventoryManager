@@ -3,9 +3,6 @@ package controllers;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
-
-import com.mongodb.MongoClient;
-
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,35 +18,45 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import models.Employee;
 import models.OrderedItem;
+import org.bson.Document;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+import com.mongodb.Block;
+import static com.mongodb.client.model.Filters.*;
 
 public class AdministrativeController {
 
     MongoClient mc = new MongoClient();
+	MongoDatabase database = mc.getDatabase("Restaurants");
+	MongoCollection<Document> collection = database.getCollection("Employees");
 
     HashMap<Integer, Employee> empsCollection = new HashMap<Integer, Employee>();
 
     public void AddEmployee(Employee e) {
-
+		collection.insertOne(new Document("name", e.getName()).append("employeID", e.getId()).append("password", e.getPassword())
+		.append("hourlyPay", e.getHourlyPay()).append("occupation", e.getOccupation()));
     }
 
     public void deleteEmployee(int id) {
-
+		collection.deleteOne(eq("employeID", id));
     }
 
-    public void updateEmployee(int id) {
-
+    public void updateEmployee(int id, String updateField, String updateValue) {
+		collection.updateOne(eq("employeID", id), new Document("$set", new Document(updateField, updateValue)));
     }
 
     public void startBreak(Date time, int id) {
-
+		collection.updateOne(eq("employeID", id), new Document("$set", new Document("breakStart", time)));
     }
 
     public void endBreak(Date time, int id) {
-
+		collection.updateOne(eq("employeID", id), new Document("$set", new Document("breakEnd", time)));
     }
 
     public void clockIn(int id, Date time) {
-
+		collection.updateOne(eq("employeID", id), new Document("$set", new Document("clockIn", time)));
     }
 
     public void clockOut(int id, Date time) {
