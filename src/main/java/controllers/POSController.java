@@ -1,5 +1,7 @@
 package controllers;
 
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import models.Meal;
 
 import java.util.ArrayList;
@@ -7,10 +9,21 @@ import java.util.ArrayList;
 public class POSController {
 
     private static double salesTax;
-    ArrayList<Meal> meals = new ArrayList<Meal>();
+    private ArrayList<Meal> meals = new ArrayList<Meal>();
     private double totalCost;
     private double tip;
     private int orderNumber;
+    private Stage primaryStage;
+    private Scene scene;
+    private MainStageController mainController;
+
+    void setPrimaryStage(Stage primaryStage, Scene tmp, MainStageController mainStageController) {
+        this.primaryStage = primaryStage;
+        this.scene = tmp;
+        this.mainController = mainStageController;
+
+
+    }
 
     public static double getSalesTax() {
         return salesTax;
@@ -67,6 +80,7 @@ public class POSController {
     public void setOrderNumber(int orderNumber) {
         this.orderNumber = orderNumber;
     }
+
 
 
 }

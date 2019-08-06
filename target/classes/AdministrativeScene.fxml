@@ -10,20 +10,15 @@
         <Pagination prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
     </center>
     <top>
-        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-            <items>
-                <Button mnemonicParsing="false" text="Add"/>
-                <Button mnemonicParsing="false" text="Delete"/>
-                <Pane prefHeight="31.0" prefWidth="76.0"/>
-                <HBox prefHeight="31.0" prefWidth="377.0">
-                    <children>
-                        <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="84.0" text="Admin"/>
-                        <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="99.0" text="Inventory"/>
-                        <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="71.0" text="POS"/>
-                    </children>
-                </HBox>
-            </items>
-        </ToolBar>
+        <MenuBar fx:id="menu">
+            <menus>
+                <Menu text="File">
+                    <items>
+                        <MenuItem onAction="#onMenuItemExit" text="Exit" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
     </top>
     <bottom>
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
