@@ -45,7 +45,6 @@ public class AdministrativeController {
 		this.mainController = mainStageController;
 	}
 
-
     public void AddEmployee(Employee e) {
 		collection.insertOne(new Document("name", e.getName()).append("employeID", e.getId()).append("password", e.getPassword())
 		.append("hourlyPay", e.getHourlyPay()).append("occupation", e.getOccupation()));
