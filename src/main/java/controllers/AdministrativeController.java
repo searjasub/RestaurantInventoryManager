@@ -31,6 +31,9 @@ import static com.mongodb.client.model.Filters.*;
 public class AdministrativeController {
 
 	public MenuBar menu;
+	public RadioButton radioAll;
+	public RadioButton radioClockedIn;
+
 	private MongoClient mc = new MongoClient();
 	private MongoDatabase database = mc.getDatabase("Restaurants");
 	private MongoCollection<Document> collection = database.getCollection("Employees");
@@ -60,6 +63,11 @@ public class AdministrativeController {
 		toggleGroup.getToggles().add(admin);
 		toggleGroup.getToggles().add(inventory);
 		toggleGroup.getToggles().add(pos);
+
+		ToggleGroup radioToggleGroup = new ToggleGroup();
+		radioToggleGroup.getToggles().add(radioAll);
+		radioToggleGroup.getToggles().add(radioClockedIn);
+		radioAll.setSelected(true);
 
 		menuOptions.getItems().add(admin);
 		menuOptions.getItems().add(inventory);

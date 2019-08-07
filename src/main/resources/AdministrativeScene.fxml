@@ -23,8 +23,8 @@
     <bottom>
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
-                <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="73.0" text="All"/>
-                <RadioButton mnemonicParsing="false" prefHeight="21.0" prefWidth="112.0" text="Clocked In"/>
+                <RadioButton fx:id="radioAll" mnemonicParsing="false" prefHeight="21.0" prefWidth="73.0" text="All"/>
+                <RadioButton fx:id="radioClockedIn" mnemonicParsing="false" prefHeight="21.0" prefWidth="112.0" text="Clocked In"/>
             </items>
         </ToolBar>
     </bottom>
