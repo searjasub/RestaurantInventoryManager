@@ -1,28 +1,88 @@
 package controllers;
 
+import com.mongodb.Block;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import models.Employee;
 import models.Ingredient;
 import models.OrderedItem;
+import org.bson.Document;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
-import com.mongodb.Block;
-import static com.mongodb.client.model.Filters.*;
+import java.util.HashMap;
+
+import static com.mongodb.client.model.Filters.eq;
 
 
 public class InventoryTrackerController {
-    MongoClient mc = new MongoClient("localHost");
-    MongoDatabase database = mc.getDatabase("Restaurants");
-    MongoCollection<Document> collection = database.getCollection("Inventory");
+
+    public MenuBar menu;
+    private MongoClient mc = new MongoClient("localHost");
+    private MongoDatabase database = mc.getDatabase("Restaurants");
+    private MongoCollection<Document> collection = database.getCollection("Inventory");
+    private Block<Document> printBlock = System.out::println;
+    private AdministrativeController controller;
+    private Stage primaryStage;
+    private Scene inventoryScene;
+    private MainStageController mainController;
+    private RadioMenuItem admin;
+    private RadioMenuItem inventory;
+    private RadioMenuItem pos;
+    private Menu menuOptions;
+
+
+    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, Menu menuOptions, HashMap<Integer, Employee> employeesCollection) {
+        this.primaryStage = primaryStage;
+        this.inventoryScene = inventoryScene;
+        this.mainController = mainController;
+        this.admin = admin;
+        this.inventory = inventory;
+        this.pos = pos;
+        this.menuOptions = menuOptions;
+        menu.getMenus().add(menuOptions);
+        primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
+
+        admin.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
+                BorderPane root = null;
+                try {
+                    root = loader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                AdministrativeController adminController = loader.getController();
+
+
+                inventory.setSelected(true);
+                adminController.setPrimaryScene(primaryStage, inventoryScene, mainController, employeesCollection, admin);
+                primaryStage.setMaxWidth(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(new Scene(root, 600, 600));
+            }
+        });
+
+    }
 
     public void addItem(String ingredientName, int itemId, Date prepDate, Date expDate, int caloriePerServing,
-    int amount, int individualCost, int bulkCost, int bulkAmount) {
+                        int amount, int individualCost, int bulkCost, int bulkAmount) {
         collection.insertOne(new Document("ingredientName", ingredientName).append("ingredientID", itemId).append("prepDate", prepDate)
-        .append("expDate", expDate).append("caloriePerServing", caloriePerServing).append("amount", amount).append("individualCost", individualCost)
-        .append("bulkCost", bulkCost).append("bulkAmount", bulkAmount));
+                .append("expDate", expDate).append("caloriePerServing", caloriePerServing).append("amount", amount).append("individualCost", individualCost)
+                .append("bulkCost", bulkCost).append("bulkAmount", bulkAmount));
     }
 
     public void deleteItem(String itemName) {
@@ -49,16 +109,13 @@ public class InventoryTrackerController {
 
     }
 
-    public ObservableList<OrderedItem> reviewOrderedItems(){
-    return null;
+    public ObservableList<OrderedItem> reviewOrderedItems() {
+        return null;
     }
 
+    public void onMenuItemExit(ActionEvent actionEvent) {
 
-    Block<Document> printBlock = new Block<Document>() {
-        @Override
-        public void apply(final Document document) {
-            System.out.println(document);
-        }
-    };
+    }
+
 
 }

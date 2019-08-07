@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.IOException;
 import java.util.*;
 
 import com.mongodb.BasicDBObject;
@@ -8,11 +9,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import models.Employee;
@@ -45,13 +48,14 @@ public class AdministrativeController {
 		this.adminScene = adminScene;
 		this.mainController = mainStageController;
 		this.empsCollection = employeesCollection;
-
+		primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
 		Menu menuOptions = new Menu("View");
 
 		this.admin = admin;
 		inventory = new RadioMenuItem("Inventory");
 		pos = new RadioMenuItem("POS");
 
+		admin.setSelected(true);
 		ToggleGroup toggleGroup = new ToggleGroup();
 		toggleGroup.getToggles().add(admin);
 		toggleGroup.getToggles().add(inventory);
@@ -76,6 +80,22 @@ public class AdministrativeController {
 			@Override
 			public void handle(ActionEvent event) {
 				//MOVE TO DIFFERENT SCENE AND CONTROLLER
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
+                BorderPane root = null;
+                Scene administrativeScene = null;
+                try {
+                    root = loader.load();
+                    administrativeScene = new Scene(root, 600, 600);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                InventoryTrackerController inventoryController = loader.getController();
+
+                inventory.setSelected(true);
+                inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, menuOptions, employeesCollection);
+                primaryStage.setMaxWidth(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(administrativeScene);
 			}
 		});
 	}
@@ -219,7 +239,7 @@ public class AdministrativeController {
     }
 
 	public void onMenuItemExit(ActionEvent actionEvent) {
-
+        primaryStage.close();
 	}
 
 

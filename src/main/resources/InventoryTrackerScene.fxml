@@ -7,26 +7,37 @@
             prefWidth="690.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="controllers.InventoryTrackerController">
     <top>
-        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-            <items>
-                <Button mnemonicParsing="false" text="Inventory"/>
-                <Button mnemonicParsing="false" text="Deliveries"/>
-                <Button mnemonicParsing="false" text="Sales"/>
-                <Button mnemonicParsing="false" text="Soon Expired"/>
-                <Pane prefHeight="31.0" prefWidth="18.0"/>
-                <HBox prefHeight="0.0" prefWidth="295.0">
-                    <children>
-                        <RadioButton mnemonicParsing="false" text="Admin"/>
-                        <RadioButton mnemonicParsing="false" text="Inventory"/>
-                        <RadioButton mnemonicParsing="false" text="POS"/>
-                    </children>
-                    <opaqueInsets>
-                        <Insets right="5.0"/>
-                    </opaqueInsets>
-                </HBox>
-            </items>
-        </ToolBar>
+        <MenuBar fx:id="menu">
+            <menus>
+                <Menu text="File">
+                    <items>
+                        <MenuItem onAction="#onMenuItemExit" text="Exit" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
     </top>
+<!--    <top>-->
+<!--        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">-->
+<!--            <items>-->
+<!--                <Button mnemonicParsing="false" text="Inventory"/>-->
+<!--                <Button mnemonicParsing="false" text="Deliveries"/>-->
+<!--                <Button mnemonicParsing="false" text="Sales"/>-->
+<!--                <Button mnemonicParsing="false" text="Soon Expired"/>-->
+<!--                <Pane prefHeight="31.0" prefWidth="18.0"/>-->
+<!--                <HBox prefHeight="0.0" prefWidth="295.0">-->
+<!--                    <children>-->
+<!--                        <RadioButton mnemonicParsing="false" text="Admin"/>-->
+<!--                        <RadioButton mnemonicParsing="false" text="Inventory"/>-->
+<!--                        <RadioButton mnemonicParsing="false" text="POS"/>-->
+<!--                    </children>-->
+<!--                    <opaqueInsets>-->
+<!--                        <Insets right="5.0"/>-->
+<!--                    </opaqueInsets>-->
+<!--                </HBox>-->
+<!--            </items>-->
+<!--        </ToolBar>-->
+<!--    </top>-->
     <opaqueInsets>
         <Insets right="5.0"/>
     </opaqueInsets>
