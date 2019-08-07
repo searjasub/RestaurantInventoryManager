@@ -1,21 +1,21 @@
 package controllers;
 
+import java.io.IOException;
 import java.util.*;
 
 import com.mongodb.BasicDBObject;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.Pagination;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import models.Employee;
@@ -30,19 +30,74 @@ import static com.mongodb.client.model.Filters.*;
 
 public class AdministrativeController {
 
-    MongoClient mc = new MongoClient();
-	MongoDatabase database = mc.getDatabase("Restaurants");
-	MongoCollection<Document> collection = database.getCollection("Employees");
+	public MenuBar menu;
+	private MongoClient mc = new MongoClient();
+	private MongoDatabase database = mc.getDatabase("Restaurants");
+	private MongoCollection<Document> collection = database.getCollection("Employees");
 
-    HashMap<Integer, Employee> empsCollection = new HashMap<Integer, Employee>();
+	private HashMap<Integer, Employee> empsCollection;
     private Stage primaryStage;
     private Scene adminScene;
     private MainStageController mainController;
+	private RadioMenuItem admin;
+	private RadioMenuItem inventory;
+	private RadioMenuItem pos;
 
-	void setPrimaryScene(Stage primaryStage, Scene adminScene, MainStageController mainStageController) {
+	void setPrimaryScene(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, RadioMenuItem admin) {
 		this.primaryStage = primaryStage;
 		this.adminScene = adminScene;
 		this.mainController = mainStageController;
+		this.empsCollection = employeesCollection;
+		primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
+		Menu menuOptions = new Menu("View");
+
+		this.admin = admin;
+		inventory = new RadioMenuItem("Inventory");
+		pos = new RadioMenuItem("POS");
+
+		admin.setSelected(true);
+		ToggleGroup toggleGroup = new ToggleGroup();
+		toggleGroup.getToggles().add(admin);
+		toggleGroup.getToggles().add(inventory);
+		toggleGroup.getToggles().add(pos);
+
+		menuOptions.getItems().add(admin);
+		menuOptions.getItems().add(inventory);
+		menuOptions.getItems().add(pos);
+
+		Menu employeesMenu = new Menu("Employees");
+
+		MenuItem addEmployee = new Menu("Add");
+		MenuItem deleteEmployee = new Menu("Delete");
+
+		employeesMenu.getItems().add(addEmployee);
+		employeesMenu.getItems().add(deleteEmployee);
+
+		menu.getMenus().add(menuOptions);
+		menu.getMenus().add(employeesMenu);
+
+		inventory.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				//MOVE TO DIFFERENT SCENE AND CONTROLLER
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
+                BorderPane root = null;
+                Scene administrativeScene = null;
+                try {
+                    root = loader.load();
+                    administrativeScene = new Scene(root, 600, 600);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                InventoryTrackerController inventoryController = loader.getController();
+
+                inventory.setSelected(true);
+                inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, menuOptions, employeesCollection);
+                primaryStage.setMaxWidth(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(administrativeScene);
+			}
+		});
 	}
 
     public void AddEmployee(Employee e) {
@@ -182,7 +237,9 @@ public class AdministrativeController {
         return table;
     }
 
-
+	public void onMenuItemExit(ActionEvent actionEvent) {
+        primaryStage.close();
+	}
 
 
 	//Methods to add:

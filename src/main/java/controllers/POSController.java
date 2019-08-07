@@ -3,6 +3,8 @@ package controllers;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import models.Meal;
 import org.bson.Document;
 
@@ -17,10 +19,21 @@ public class POSController {
     MongoCollection<Document> collection = database.getCollection("Meals");
 
     private static double salesTax;
-    ArrayList<Meal> meals = new ArrayList<Meal>();
+    private ArrayList<Meal> meals = new ArrayList<Meal>();
     private double totalCost;
     private double tip;
     private int orderNumber;
+    private Stage primaryStage;
+    private Scene scene;
+    private MainStageController mainController;
+
+    void setPrimaryStage(Stage primaryStage, Scene tmp, MainStageController mainStageController) {
+        this.primaryStage = primaryStage;
+        this.scene = tmp;
+        this.mainController = mainStageController;
+
+
+    }
 
     public static double getSalesTax() {
         return salesTax;
@@ -77,6 +90,7 @@ public class POSController {
     public void setOrderNumber(int orderNumber) {
         this.orderNumber = orderNumber;
     }
+
 
 
 }
