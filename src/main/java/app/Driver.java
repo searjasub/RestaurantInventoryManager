@@ -1,6 +1,6 @@
 package app;
 
-import controllers.MainStageController;
+import controller.MainStageController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
