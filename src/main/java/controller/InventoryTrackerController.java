@@ -43,16 +43,18 @@ public class InventoryTrackerController {
     private Menu menuOptions;
 
 
-    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, Menu menuOptions, MenuBar menu, HashMap<Integer, Employee> employeesCollection) {
+    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, Menu menuOptions, HashMap<Integer, Employee> employeesCollection) {
         this.primaryStage = primaryStage;
         this.inventoryScene = inventoryScene;
         this.mainController = mainController;
         this.admin = admin;
         this.inventory = inventory;
         this.pos = pos;
+
+
         this.menuOptions = menuOptions;
-        this.menu = menu;
-        this.menu.getMenus().add(this.menuOptions);
+
+        menu.getMenus().add(this.menuOptions);
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
         admin.setOnAction(event -> {
@@ -63,6 +65,7 @@ public class InventoryTrackerController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             AdministrativeController adminController = loader.getController();
             inventory.setSelected(true);
             adminController.setPrimaryStage(primaryStage, inventoryScene, mainController, employeesCollection, admin);
@@ -81,13 +84,7 @@ public class InventoryTrackerController {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                POSController posController = loader.getController();
-
-                pos.setSelected(true);
-                posController.setPrimaryStage(primaryStage, posScene, mainController, admin, inventory, pos, menuOptions, menu, employeesCollection);
-                primaryStage.setMaxWidth(600);
-                primaryStage.setMaxHeight(600);
-                primaryStage.setScene(posScene);
+            AdministrativeController.switchWindow(primaryStage, mainController, employeesCollection, admin, menuOptions, loader, posScene, pos, inventory, menu);
 
         });
 

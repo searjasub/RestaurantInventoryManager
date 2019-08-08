@@ -101,7 +101,7 @@ public class AdministrativeController {
 			InventoryTrackerController inventoryController = loader.getController();
 
 			inventory.setSelected(true);
-			inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, menuOptions, menu, employeesCollection);
+			inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, menuOptions, employeesCollection);
 			primaryStage.setMaxWidth(600);
 			primaryStage.setMaxHeight(600);
 			primaryStage.setScene(administrativeScene);
@@ -145,18 +145,21 @@ public class AdministrativeController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			POSController posController = loader.getController();
-
-			pos.setSelected(true);
-			posController.setPrimaryStage(primaryStage, posScene, mainStageController, admin, inventory, pos, menuOptions, menu, employeesCollection);
-			primaryStage.setMaxWidth(600);
-			primaryStage.setMaxHeight(600);
-			primaryStage.setScene(posScene);
+			switchWindow(primaryStage, mainStageController, employeesCollection, admin, menuOptions, loader, posScene, pos, inventory, menu);
 
 		});
 	}
 
-    public void AddEmployee(Employee e) {
+	static void switchWindow(Stage primaryStage, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, RadioMenuItem admin, Menu menuOptions, FXMLLoader loader, Scene posScene, RadioMenuItem pos, RadioMenuItem inventory, MenuBar menu) {
+		POSController posController = loader.getController();
+		pos.setSelected(true);
+		posController.setPrimaryStage(primaryStage, posScene, mainStageController, admin, inventory, pos, menuOptions, menu, employeesCollection);
+		primaryStage.setMaxWidth(600);
+		primaryStage.setMaxHeight(600);
+		primaryStage.setScene(posScene);
+	}
+
+	public void AddEmployee(Employee e) {
 		collection.insertOne(new Document("name", e.getName()).append("employeID", e.getId()).append("password", e.getPassword())
 		.append("hourlyPay", e.getHourlyPay()).append("occupation", e.getOccupation()));
     }
@@ -258,8 +261,13 @@ public class AdministrativeController {
 		}
 
     }
-    
-    
-    
-   
+
+
+	public void onMenuItemExit(ActionEvent actionEvent) {
+		primaryStage.close();
+	}
+
+	public void allShow(ActionEvent actionEvent) {
+
+	}
 }

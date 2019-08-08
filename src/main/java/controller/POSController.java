@@ -115,7 +115,7 @@ public class POSController {
             InventoryTrackerController inventoryController = loader.getController();
 
             inventory.setSelected(true);
-            inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, admin, inventory, pos, menuOptions, menu, employeesCollection);
+            inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, admin, inventory, pos, menuOptions, employeesCollection);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(scene);

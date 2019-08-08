@@ -57,7 +57,7 @@ public class FinanceController {
 		// Method to get all inventory items and set them to the ObservableList needed
 		master = tracker.reviewOrderedItems();
 
-		myPagination.setPageFactory(this::createPage);
+//		myPagination.setPageFactory(this::createPage);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -69,9 +69,9 @@ public class FinanceController {
 		return table;
 	}
 
-	public void onMenuItemExit(ActionEvent actionEvent) {
-		primaryStage.close();
-	}
+//	public void onMenuItemExit(ActionEvent actionEvent) {
+//		primaryStage.close();
+//	}
 
 	// Methods to add:
 
