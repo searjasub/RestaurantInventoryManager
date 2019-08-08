@@ -1,4 +1,4 @@
-package controllers;
+package controller;
 
 import java.io.IOException;
 import java.util.*;
@@ -8,7 +8,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -24,8 +23,7 @@ import org.bson.Document;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
-import org.bson.Document;
-import com.mongodb.Block;
+
 import static com.mongodb.client.model.Filters.*;
 
 public class AdministrativeController {
@@ -46,14 +44,14 @@ public class AdministrativeController {
 	private RadioMenuItem inventory;
 	private RadioMenuItem pos;
 
-	void setPrimaryScene(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, RadioMenuItem admin) {
+	void setPrimaryStage(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, RadioMenuItem admin) {
 		this.primaryStage = primaryStage;
 		this.adminScene = adminScene;
 		this.mainController = mainStageController;
 		this.empsCollection = employeesCollection;
 		primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
-		Menu menuOptions = new Menu("View");
 
+		Menu menuOptions = new Menu("View");
 		this.admin = admin;
 		inventory = new RadioMenuItem("Inventory");
 		pos = new RadioMenuItem("POS");
@@ -84,27 +82,43 @@ public class AdministrativeController {
 		menu.getMenus().add(menuOptions);
 		menu.getMenus().add(employeesMenu);
 
-		inventory.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				//MOVE TO DIFFERENT SCENE AND CONTROLLER
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
-                BorderPane root = null;
-                Scene administrativeScene = null;
-                try {
-                    root = loader.load();
-                    administrativeScene = new Scene(root, 600, 600);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                InventoryTrackerController inventoryController = loader.getController();
-
-                inventory.setSelected(true);
-                inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, menuOptions, employeesCollection);
-                primaryStage.setMaxWidth(600);
-                primaryStage.setMaxHeight(600);
-                primaryStage.setScene(administrativeScene);
+		inventory.setOnAction(event -> {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
+			BorderPane root;
+			Scene administrativeScene = null;
+			try {
+				root = loader.load();
+				administrativeScene = new Scene(root, 600, 600);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+			InventoryTrackerController inventoryController = loader.getController();
+
+			inventory.setSelected(true);
+			inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, menuOptions, menu, employeesCollection);
+			primaryStage.setMaxWidth(600);
+			primaryStage.setMaxHeight(600);
+			primaryStage.setScene(administrativeScene);
+		});
+
+		pos.setOnAction(event -> {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
+			BorderPane root;
+			Scene posScene = null;
+			try {
+				root = loader.load();
+				posScene = new Scene(root, 600, 600);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			POSController posController = loader.getController();
+
+			pos.setSelected(true);
+			posController.setPrimaryStage(primaryStage, posScene, mainStageController, admin, inventory, pos, menuOptions, menu, employeesCollection);
+			primaryStage.setMaxWidth(600);
+			primaryStage.setMaxHeight(600);
+			primaryStage.setScene(posScene);
+
 		});
 	}
 

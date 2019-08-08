@@ -1,4 +1,4 @@
-package controllers;
+package controller;
 
 import com.mongodb.Block;
 import com.mongodb.MongoClient;
@@ -6,7 +6,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -44,7 +43,7 @@ public class InventoryTrackerController {
     private Menu menuOptions;
 
 
-    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, Menu menuOptions, HashMap<Integer, Employee> employeesCollection) {
+    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, Menu menuOptions, MenuBar menu, HashMap<Integer, Employee> employeesCollection) {
         this.primaryStage = primaryStage;
         this.inventoryScene = inventoryScene;
         this.mainController = mainController;
@@ -52,28 +51,44 @@ public class InventoryTrackerController {
         this.inventory = inventory;
         this.pos = pos;
         this.menuOptions = menuOptions;
-        menu.getMenus().add(menuOptions);
+        this.menu = menu;
+        this.menu.getMenus().add(this.menuOptions);
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
-        admin.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
-                BorderPane root = null;
+        admin.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
+            BorderPane root = null;
+            try {
+                root = loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            AdministrativeController adminController = loader.getController();
+            inventory.setSelected(true);
+            adminController.setPrimaryStage(primaryStage, inventoryScene, mainController, employeesCollection, admin);
+            primaryStage.setMaxWidth(600);
+            primaryStage.setMaxHeight(600);
+            primaryStage.setScene(new Scene(root, 600, 600));
+        });
+
+        pos.setOnAction(event -> {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
+                Scene posScene = null;
+                BorderPane root;
                 try {
                     root = loader.load();
+                    posScene = new Scene(root, 600, 600);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                AdministrativeController adminController = loader.getController();
+                POSController posController = loader.getController();
 
-
-                inventory.setSelected(true);
-                adminController.setPrimaryScene(primaryStage, inventoryScene, mainController, employeesCollection, admin);
+                pos.setSelected(true);
+                posController.setPrimaryStage(primaryStage, posScene, mainController, admin, inventory, pos, menuOptions, menu, employeesCollection);
                 primaryStage.setMaxWidth(600);
                 primaryStage.setMaxHeight(600);
-                primaryStage.setScene(new Scene(root, 600, 600));
-            }
+                primaryStage.setScene(posScene);
+
         });
 
     }

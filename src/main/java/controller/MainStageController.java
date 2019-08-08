@@ -1,4 +1,4 @@
-package controllers;
+package controller;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -69,7 +69,7 @@ public class MainStageController {
             Scene administrativeScene = new Scene(root, 600, 600);
 
             admin.setSelected(true);
-            adminController.setPrimaryScene(primaryStage, tmp, this, employeeCollection, admin);
+            adminController.setPrimaryStage(primaryStage, tmp, this, employeeCollection, admin);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(administrativeScene);

@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0"
             prefWidth="690.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="controllers.InventoryTrackerController">
+            fx:controller="controller.InventoryTrackerController">
     <top>
         <MenuBar fx:id="menu">
             <menus>
