@@ -3,11 +3,10 @@ package controller;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import models.Employee;
+import model.Employee;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,7 +19,6 @@ public class MainStageController {
     private Stage primaryStage;
     private Scene scene;
     private HashMap<Integer, Employee> employeeCollection = new HashMap<>();
-    private RadioMenuItem admin = new RadioMenuItem("Admin");
 
     public MainStageController() {
 
@@ -68,8 +66,7 @@ public class MainStageController {
             AdministrativeController adminController = loader.getController();
             Scene administrativeScene = new Scene(root, 600, 600);
 
-            admin.setSelected(true);
-            adminController.setPrimaryStage(primaryStage, tmp, this, employeeCollection, admin);
+            adminController.setPrimaryStage(primaryStage, tmp, this, employeeCollection, true);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(administrativeScene);
@@ -80,7 +77,7 @@ public class MainStageController {
             POSController posController = loader.getController();
             Scene posScene = new Scene(root, 600, 600);
 
-            posController.setPrimaryStage(primaryStage, tmp, this, null, null, null, null );
+            posController.setPrimaryStage(primaryStage, tmp, this, employeeCollection);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);

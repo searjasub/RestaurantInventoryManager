@@ -9,10 +9,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import models.Employee;
-import models.Meal;
+import model.Employee;
+import model.Meal;
 import org.bson.Document;
 
 import java.io.IOException;
@@ -26,7 +27,6 @@ public class POSController {
     private static double salesTax;
     public BorderPane borderPane;
     public MenuBar menuBar;
-    public Menu menu;
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Meals");
@@ -59,20 +59,31 @@ public class POSController {
 //    }
 
 
-    void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, HashMap<Integer, Employee> employeesCollection) {
+    void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection) {
         this.primaryStage = primaryStage;
         this.scene = posScene;
         this.mainController = mainStageController;
-        this.admin = admin;
-        this.inventory = inventory;
-        this.pos = pos;
         this.empsCollection = employeesCollection;
-        this.menuBar = menuBar;
-        this.menu = menu;
         this.primaryStage.setTitle("Inventory Tracker Manager - POS");
 
+        Menu viewMenu = new Menu("View");
+        RadioMenuItem admin = new RadioMenuItem("Admin");
+        RadioMenuItem inventory = new RadioMenuItem("Inventory");
+        RadioMenuItem pos = new RadioMenuItem("POS");
+        RadioMenuItem finance = new RadioMenuItem("Finance");
 
-        this.menuBar.getMenus().add(this.menu);
+        viewMenu.getItems().add(admin);
+        viewMenu.getItems().add(inventory);
+        viewMenu.getItems().add(pos);
+        viewMenu.getItems().add(finance);
+
+        ToggleGroup toggleGroup = new ToggleGroup();
+        toggleGroup.getToggles().add(admin);
+        toggleGroup.getToggles().add(inventory);
+        toggleGroup.getToggles().add(pos);
+        toggleGroup.getToggles().add(finance);
+
+        this.menuBar.getMenus().add(viewMenu);
 
         admin.setOnAction(event -> {
 
@@ -85,7 +96,7 @@ public class POSController {
             }
             AdministrativeController adminController = loader.getController();
             admin.setSelected(true);
-            adminController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, admin);
+            adminController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, true);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(new Scene(root, 600, 600));
@@ -104,7 +115,7 @@ public class POSController {
             InventoryTrackerController inventoryController = loader.getController();
 
             inventory.setSelected(true);
-            inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, admin, inventory, pos, employeesCollection);
+            inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, employeesCollection);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(scene);

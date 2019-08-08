@@ -18,9 +18,6 @@
                         <MenuItem onAction="#onMenuItemExit" text="Exit"/>
                     </items>
                 </Menu>
-                <Menu fx:id="menu">
-
-                </Menu>
             </menus>
         </MenuBar>
     </top>

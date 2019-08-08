@@ -14,9 +14,9 @@ import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import models.Employee;
-import models.Ingredient;
-import models.OrderedItem;
+import model.Employee;
+import model.Ingredient;
+import model.OrderedItem;
 import org.bson.Document;
 
 import java.io.IOException;
@@ -38,37 +38,33 @@ public class InventoryTrackerController {
     private Stage primaryStage;
     private Scene inventoryScene;
     private MainStageController mainController;
-    private RadioMenuItem admin;
-    private RadioMenuItem inventory;
-    private RadioMenuItem pos;
-    private RadioMenuItem finance;
 
 
-    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, HashMap<Integer, Employee> employeesCollection) {
+    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, HashMap<Integer, Employee> employeesCollection) {
         this.primaryStage = primaryStage;
         this.inventoryScene = inventoryScene;
         this.mainController = mainController;
-        this.admin = admin;
-        this.inventory = inventory;
-        this.pos = pos;
+        primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
-        menu = new MenuBar();
+        Menu viewMenu = new Menu("View");
+        RadioMenuItem admin = new RadioMenuItem("Admin");
+        RadioMenuItem inventory = new RadioMenuItem("Inventory");
+        RadioMenuItem pos = new RadioMenuItem("POS");
+        RadioMenuItem finance = new RadioMenuItem("Finance");
 
+        viewMenu.getItems().add(admin);
+        viewMenu.getItems().add(inventory);
+        viewMenu.getItems().add(pos);
+        viewMenu.getItems().add(finance);
 
         ToggleGroup toggleGroup = new ToggleGroup();
-        toggleGroup.getToggles().add(this.admin);
-        toggleGroup.getToggles().add(this.inventory);
-        toggleGroup.getToggles().add(this.pos);
-//        toggleGroup.getToggles().add(this.finance);
+        toggleGroup.getToggles().add(admin);
+        toggleGroup.getToggles().add(inventory);
+        toggleGroup.getToggles().add(pos);
+        toggleGroup.getToggles().add(finance);
 
-        Menu menuOptions = new Menu();
-        menuOptions.getItems().add(admin);
-        menuOptions.getItems().add(inventory);
-        menuOptions.getItems().add(pos);
-//        menuOptions.getItems().add(finance);
 
-        menu.getMenus().add(menuOptions);
-        primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
+        menu.getMenus().add(viewMenu);
 
         admin.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
@@ -81,7 +77,7 @@ public class InventoryTrackerController {
 
             AdministrativeController adminController = loader.getController();
             inventory.setSelected(true);
-            adminController.setPrimaryStage(primaryStage, inventoryScene, mainController, employeesCollection, admin);
+            adminController.setPrimaryStage(primaryStage, inventoryScene, mainController, employeesCollection, true);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(new Scene(root, 600, 600));
@@ -99,7 +95,7 @@ public class InventoryTrackerController {
             }
             POSController posController = loader.getController();
             pos.setSelected(true);
-            posController.setPrimaryStage(primaryStage, posScene, mainController, admin, inventory, pos, employeesCollection);
+            posController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
