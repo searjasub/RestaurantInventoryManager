@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -22,6 +23,7 @@ import models.OrderedItem;
 import org.bson.Document;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
+
 import com.mongodb.client.MongoCollection;
 
 import static com.mongodb.client.model.Filters.*;
@@ -43,6 +45,7 @@ public class AdministrativeController {
 	private RadioMenuItem admin;
 	private RadioMenuItem inventory;
 	private RadioMenuItem pos;
+	private RadioMenuItem finance;
 
 	void setPrimaryStage(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, RadioMenuItem admin) {
 		this.primaryStage = primaryStage;
@@ -55,12 +58,14 @@ public class AdministrativeController {
 		this.admin = admin;
 		inventory = new RadioMenuItem("Inventory");
 		pos = new RadioMenuItem("POS");
+		finance = new RadioMenuItem("Finance");
 
 		admin.setSelected(true);
 		ToggleGroup toggleGroup = new ToggleGroup();
 		toggleGroup.getToggles().add(admin);
 		toggleGroup.getToggles().add(inventory);
 		toggleGroup.getToggles().add(pos);
+		toggleGroup.getToggles().add(finance);
 
 		ToggleGroup radioToggleGroup = new ToggleGroup();
 		radioToggleGroup.getToggles().add(radioAll);
@@ -70,6 +75,7 @@ public class AdministrativeController {
 		menuOptions.getItems().add(admin);
 		menuOptions.getItems().add(inventory);
 		menuOptions.getItems().add(pos);
+		menuOptions.getItems().add(finance);
 
 		Menu employeesMenu = new Menu("Employees");
 
@@ -100,6 +106,34 @@ public class AdministrativeController {
 			primaryStage.setMaxHeight(600);
 			primaryStage.setScene(administrativeScene);
 		});
+		
+		finance.setOnAction(new EventHandler<ActionEvent>(){
+
+			@Override
+			public void handle(ActionEvent event) {
+				FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
+                BorderPane root = null;
+                Scene administrativeScene = null;
+                try {
+                    root = loader.load();
+                    administrativeScene = new Scene(root, 600, 600);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+               FinanceController financeCon = loader.getController();
+
+                finance.setSelected(true);
+                financeCon.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, menuOptions, employeesCollection);
+                primaryStage.setMaxWidth(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(administrativeScene);
+				
+			}
+		
+				
+		});
+		
+		
 
 		pos.setOnAction(event -> {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
@@ -227,48 +261,5 @@ public class AdministrativeController {
     
     
     
-    
-    //Basic idea of what this should be
-
-    Pagination myPagination = new Pagination();
-
-    TableView table = new TableView();
-
-    ObservableList<OrderedItem> master = FXCollections.observableArrayList();
-
-    int pageSize = 50;
-
-    InventoryTrackerController tracker = new InventoryTrackerController();
-
-
-    public void init(){
-        //Method to get all inventory items and set them to the ObservableList needed
-        master = tracker.reviewOrderedItems();
-
-
-        myPagination.setPageFactory(this::createPage);
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public Node createPage(int pageIndex) {
-        int first = pageIndex * pageSize;
-        int last = Math.min(first + pageSize, master.size());
-        table.setItems(FXCollections.observableArrayList(master.subList(first, last)));
-
-        return table;
-    }
-
-	public void onMenuItemExit(ActionEvent actionEvent) {
-        primaryStage.close();
-	}
-
-
-	//Methods to add:
-
-    //Method(s) that allow the user to switch between seeing only Assets, Liabilities, and Capital investments as well as a view that allows them to see all three
-    //Should be in chronological order
-
-    //Method that allows the user to click on the name of an item, and then view all items of that type along with their asset/liability values and the dates
-    //they were put in and their expiration date
+   
 }
