@@ -10,7 +10,7 @@
         <Pagination prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
     </center>
     <top>
-        <MenuBar fx:id="menu">
+        <MenuBar fx:id="menuBar">
             <menus>
                 <Menu text="File">
                     <items>

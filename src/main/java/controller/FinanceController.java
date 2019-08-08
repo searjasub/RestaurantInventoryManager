@@ -29,7 +29,7 @@ import models.OrderedItem;
 
 public class FinanceController {
 
-	public MenuBar menu;
+	public MenuBar menuBar;
 	private MongoClient mc = new MongoClient("localHost");
 	private MongoDatabase database = mc.getDatabase("Restaurants");
 	private MongoCollection<Document> collection = database.getCollection("Inventory");
@@ -41,25 +41,25 @@ public class FinanceController {
 	private RadioMenuItem pos;
 	private RadioMenuItem inventory;
 	private RadioMenuItem admin;
-	private Menu menuOptions;
+	private Menu menu;
 	
 	TableView table = initTable();
 
 	private Pagination myPagination;
 
 	public void setPrimaryScene(Stage primaryStage, Scene administrativeScene, MainStageController mainStageController,
-			RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, Menu menuOptions,
-			MenuBar menu, HashMap<Integer, Employee> employeesCollection) {
+								RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos,
+								HashMap<Integer, Employee> employeesCollection) {
 		this.primaryStage = primaryStage;
 		this.financeScene = administrativeScene;
 		this.mainCon = mainStageController;
 		this.admin = admin;
 		this.inventory = inventory;
 		this.pos = pos;
-		this.menuOptions = menuOptions;
 		this.menu = menu;
-		this.menu.getMenus().add(menuOptions);
-		
+		this.menuBar = menuBar;
+
+		this.menuBar.getMenus().add(menu);
 		this.primaryStage.setTitle("Restaurant Inventory Manager - Finance");
 		
 		admin.setOnAction(event -> {
@@ -91,7 +91,7 @@ public class FinanceController {
                 POSController posController = loader.getController();
 
                 pos.setSelected(true);
-                posController.setPrimaryStage(primaryStage, posScene, mainCon, admin, inventory, pos, menuOptions, menu, employeesCollection);
+                posController.setPrimaryStage(primaryStage, posScene, mainCon, admin, inventory, pos, employeesCollection);
                 primaryStage.setMaxWidth(600);
                 primaryStage.setMaxHeight(600);
                 primaryStage.setScene(posScene);

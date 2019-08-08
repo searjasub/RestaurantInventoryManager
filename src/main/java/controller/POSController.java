@@ -9,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import models.Employee;
@@ -26,8 +25,8 @@ public class POSController {
 
     private static double salesTax;
     public BorderPane borderPane;
-    public MenuBar topMenu;
-    private Menu menuOptions;
+    public MenuBar menuBar;
+    public Menu menu;
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Meals");
@@ -51,16 +50,16 @@ public class POSController {
         POSController.salesTax = salesTax;
     }
 
-    void setPrimaryStage(Stage primaryStage, Scene tmp, MainStageController mainStageController) {
-        this.primaryStage = primaryStage;
-        this.scene = tmp;
-        this.mainController = mainStageController;
+//    void setPrimaryStage(Stage primaryStage, Scene tmp, MainStageController mainStageController) {
+//        this.primaryStage = primaryStage;
+//        this.scene = tmp;
+//        this.mainController = mainStageController;
+//
+//        primaryStage.setTitle("Inventory Tracker Manager - POS");
+//    }
 
-        primaryStage.setTitle("Inventory Tracker Manager - POS");
-    }
 
-
-    void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, Menu menuOptions, MenuBar menu, HashMap<Integer, Employee> employeesCollection) {
+    void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, HashMap<Integer, Employee> employeesCollection) {
         this.primaryStage = primaryStage;
         this.scene = posScene;
         this.mainController = mainStageController;
@@ -68,22 +67,12 @@ public class POSController {
         this.inventory = inventory;
         this.pos = pos;
         this.empsCollection = employeesCollection;
-        this.menuOptions = menuOptions;
-        this.topMenu = menu;
-        primaryStage.setTitle("Inventory Tracker Manager - POS");
+        this.menuBar = menuBar;
+        this.menu = menu;
+        this.primaryStage.setTitle("Inventory Tracker Manager - POS");
 
-        Menu options = new Menu("View");
-        ToggleGroup toggleGroup = new ToggleGroup();
-        pos.setSelected(true);
-        toggleGroup.getToggles().add(admin);
-        toggleGroup.getToggles().add(inventory);
-        toggleGroup.getToggles().add(pos);
 
-        menuOptions.getItems().add(admin);
-        menuOptions.getItems().add(inventory);
-        menuOptions.getItems().add(pos);
-
-        menu.getMenus().add(options);
+        this.menuBar.getMenus().add(this.menu);
 
         admin.setOnAction(event -> {
 
@@ -115,14 +104,10 @@ public class POSController {
             InventoryTrackerController inventoryController = loader.getController();
 
             inventory.setSelected(true);
-            inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, admin, inventory, pos, menuOptions, employeesCollection);
+            inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, admin, inventory, pos, employeesCollection);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(scene);
-        });
-
-        admin.setOnAction(event -> {
-
         });
 
     }

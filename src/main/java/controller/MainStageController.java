@@ -80,7 +80,7 @@ public class MainStageController {
             POSController posController = loader.getController();
             Scene posScene = new Scene(root, 600, 600);
 
-            posController.setPrimaryStage(primaryStage, tmp, this);
+            posController.setPrimaryStage(primaryStage, tmp, this, null, null, null, null );
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);

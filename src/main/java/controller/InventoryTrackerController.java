@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import models.Employee;
@@ -40,10 +41,10 @@ public class InventoryTrackerController {
     private RadioMenuItem admin;
     private RadioMenuItem inventory;
     private RadioMenuItem pos;
-    private Menu menuOptions;
+    private RadioMenuItem finance;
 
 
-    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, Menu menuOptions, HashMap<Integer, Employee> employeesCollection) {
+    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, HashMap<Integer, Employee> employeesCollection) {
         this.primaryStage = primaryStage;
         this.inventoryScene = inventoryScene;
         this.mainController = mainController;
@@ -51,10 +52,22 @@ public class InventoryTrackerController {
         this.inventory = inventory;
         this.pos = pos;
 
+        menu = new MenuBar();
 
-        this.menuOptions = menuOptions;
 
-        menu.getMenus().add(this.menuOptions);
+        ToggleGroup toggleGroup = new ToggleGroup();
+        toggleGroup.getToggles().add(this.admin);
+        toggleGroup.getToggles().add(this.inventory);
+        toggleGroup.getToggles().add(this.pos);
+//        toggleGroup.getToggles().add(this.finance);
+
+        Menu menuOptions = new Menu();
+        menuOptions.getItems().add(admin);
+        menuOptions.getItems().add(inventory);
+        menuOptions.getItems().add(pos);
+//        menuOptions.getItems().add(finance);
+
+        menu.getMenus().add(menuOptions);
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
         admin.setOnAction(event -> {
@@ -75,19 +88,23 @@ public class InventoryTrackerController {
         });
 
         pos.setOnAction(event -> {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
-                Scene posScene = null;
-                BorderPane root;
-                try {
-                    root = loader.load();
-                    posScene = new Scene(root, 600, 600);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            AdministrativeController.switchWindow(primaryStage, mainController, employeesCollection, admin, menuOptions, loader, posScene, pos, inventory, menu);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
+            Scene posScene = null;
+            BorderPane root;
+            try {
+                root = loader.load();
+                posScene = new Scene(root, 600, 600);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            POSController posController = loader.getController();
+            pos.setSelected(true);
+            posController.setPrimaryStage(primaryStage, posScene, mainController, admin, inventory, pos, employeesCollection);
+            primaryStage.setMaxWidth(600);
+            primaryStage.setMaxHeight(600);
+            primaryStage.setScene(posScene);
 
         });
-
     }
 
     public void addItem(String ingredientName, int itemId, Date prepDate, Date expDate, int caloriePerServing,

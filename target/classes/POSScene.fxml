@@ -11,12 +11,15 @@
             fx:id="borderPane">
 
     <top>
-        <MenuBar fx:id="topMenu">
+        <MenuBar fx:id="menuBar">
             <menus>
                 <Menu text="File">
                     <items>
                         <MenuItem onAction="#onMenuItemExit" text="Exit"/>
                     </items>
+                </Menu>
+                <Menu fx:id="menu">
+
                 </Menu>
             </menus>
         </MenuBar>

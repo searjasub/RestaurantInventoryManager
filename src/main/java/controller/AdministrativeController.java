@@ -5,8 +5,6 @@ import java.util.*;
 
 import com.mongodb.BasicDBObject;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -19,7 +17,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import models.Employee;
-import models.OrderedItem;
 import org.bson.Document;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -30,7 +27,7 @@ import static com.mongodb.client.model.Filters.*;
 
 public class AdministrativeController {
 
-	public MenuBar menu;
+	public MenuBar menuBar;
 	public RadioButton radioAll;
 	public RadioButton radioClockedIn;
 
@@ -54,13 +51,12 @@ public class AdministrativeController {
 		this.empsCollection = employeesCollection;
 		primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
 
-		Menu menuOptions = new Menu("View");
+		Menu menuView = new Menu("View");
 		this.admin = admin;
 		inventory = new RadioMenuItem("Inventory");
 		pos = new RadioMenuItem("POS");
 		finance = new RadioMenuItem("Finance");
 
-		admin.setSelected(true);
 		ToggleGroup toggleGroup = new ToggleGroup();
 		toggleGroup.getToggles().add(admin);
 		toggleGroup.getToggles().add(inventory);
@@ -70,23 +66,24 @@ public class AdministrativeController {
 		ToggleGroup radioToggleGroup = new ToggleGroup();
 		radioToggleGroup.getToggles().add(radioAll);
 		radioToggleGroup.getToggles().add(radioClockedIn);
-		radioAll.setSelected(true);
 
-		menuOptions.getItems().add(admin);
-		menuOptions.getItems().add(inventory);
-		menuOptions.getItems().add(pos);
-		menuOptions.getItems().add(finance);
+		radioAll.setSelected(true);
+		admin.setSelected(true);
+
+		menuView.getItems().add(admin);
+		menuView.getItems().add(inventory);
+		menuView.getItems().add(pos);
+		menuView.getItems().add(finance);
 
 		Menu employeesMenu = new Menu("Employees");
-
 		MenuItem addEmployee = new Menu("Add");
 		MenuItem deleteEmployee = new Menu("Delete");
 
 		employeesMenu.getItems().add(addEmployee);
 		employeesMenu.getItems().add(deleteEmployee);
 
-		menu.getMenus().add(menuOptions);
-		menu.getMenus().add(employeesMenu);
+		menuBar.getMenus().add(menuView);
+		menuBar.getMenus().add(employeesMenu);
 
 		inventory.setOnAction(event -> {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
@@ -101,7 +98,7 @@ public class AdministrativeController {
 			InventoryTrackerController inventoryController = loader.getController();
 
 			inventory.setSelected(true);
-			inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, menuOptions, employeesCollection);
+			inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, employeesCollection);
 			primaryStage.setMaxWidth(600);
 			primaryStage.setMaxHeight(600);
 			primaryStage.setScene(administrativeScene);
@@ -123,14 +120,11 @@ public class AdministrativeController {
                FinanceController financeCon = loader.getController();
 
                 finance.setSelected(true);
-                financeCon.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, menuOptions, employeesCollection);
+                financeCon.setPrimaryScene(primaryStage, administrativeScene, mainStageController, admin, inventory, pos, employeesCollection);
                 primaryStage.setMaxWidth(600);
                 primaryStage.setMaxHeight(600);
                 primaryStage.setScene(administrativeScene);
-				
 			}
-		
-				
 		});
 		
 		
@@ -145,19 +139,16 @@ public class AdministrativeController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			switchWindow(primaryStage, mainStageController, employeesCollection, admin, menuOptions, loader, posScene, pos, inventory, menu);
-
+			POSController posController = loader.getController();
+			this.pos.setSelected(true);
+			posController.setPrimaryStage(primaryStage, posScene,mainStageController,admin,inventory,pos, employeesCollection);
+			primaryStage.setMaxWidth(600);
+			primaryStage.setMaxHeight(600);
+			primaryStage.setScene(posScene);
 		});
 	}
 
-	static void switchWindow(Stage primaryStage, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, RadioMenuItem admin, Menu menuOptions, FXMLLoader loader, Scene posScene, RadioMenuItem pos, RadioMenuItem inventory, MenuBar menu) {
-		POSController posController = loader.getController();
-		pos.setSelected(true);
-		posController.setPrimaryStage(primaryStage, posScene, mainStageController, admin, inventory, pos, menuOptions, menu, employeesCollection);
-		primaryStage.setMaxWidth(600);
-		primaryStage.setMaxHeight(600);
-		primaryStage.setScene(posScene);
-	}
+
 
 	public void AddEmployee(Employee e) {
 		collection.insertOne(new Document("name", e.getName()).append("employeID", e.getId()).append("password", e.getPassword())
