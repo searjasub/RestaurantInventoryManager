@@ -26,7 +26,7 @@ public class POSController {
 
     private static double salesTax;
     public BorderPane borderPane;
-    private MenuBar menu;
+    public MenuBar topMenu;
     private Menu menuOptions;
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
@@ -51,7 +51,7 @@ public class POSController {
         POSController.salesTax = salesTax;
     }
 
-    public void setPrimaryStage(Stage primaryStage, Scene tmp, MainStageController mainStageController) {
+    void setPrimaryStage(Stage primaryStage, Scene tmp, MainStageController mainStageController) {
         this.primaryStage = primaryStage;
         this.scene = tmp;
         this.mainController = mainStageController;
@@ -69,7 +69,7 @@ public class POSController {
         this.pos = pos;
         this.empsCollection = employeesCollection;
         this.menuOptions = menuOptions;
-        this.menu = menu;
+        this.topMenu = menu;
         primaryStage.setTitle("Inventory Tracker Manager - POS");
 
         Menu options = new Menu("View");
