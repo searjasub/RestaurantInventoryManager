@@ -24,7 +24,8 @@ public class FinanceController {
 
     public MenuBar menuBar;
     TableView table = initTable();
-    ObservableList<OrderedItem> master = FXCollections.observableArrayList();
+    ObservableList<FinanceItem> master = FXCollections.observableArrayList();
+    ObservableList<OrderedItem> ordered = FXCollections.observableArrayList();
     int pageSize = 50;
     InventoryTrackerController tracker = new InventoryTrackerController();
     private MongoClient mc = new MongoClient("localHost");
@@ -104,14 +105,14 @@ public class FinanceController {
 
     }
 
-    private TableView initTable() {
-        table = new TableView();
+    private TableView<FinanceItem> initTable() {
+        table = new TableView<FinanceItem>();
         table.setEditable(true);
 
-        TableColumn id = new TableColumn();
+        TableColumn<FinanceItem, Integer> id = new TableColumn<FinanceItem, Integer>();
         id.setText("ID");
 
-        TableColumn name = new TableColumn();
+        TableColumn<FinanceItem, String> name = new TableColumn<FinanceItem, String>();
 
 
         return table;
@@ -119,7 +120,7 @@ public class FinanceController {
 
     public void init() {
         // Method to get all inventory items and set them to the ObservableList needed
-        master = tracker.reviewOrderedItems();
+       ordered = tracker.reviewOrderedItems();
 
         myPagination.setPageFactory(this::createPage);
     }
@@ -147,5 +148,53 @@ public class FinanceController {
     // Method that allows the user to click on the name of an item, and then view
     // all items of that type along with their asset/liability values and the dates
     // they were put in and their expiration date
+    
+    
+    
+    public static class FinanceItem {
+    	public enum financeType{
+    		ASSET, LIABILITY, CAPITAL
+    	}
+    	
+    	private int id;
+    	
+    	public int getId() {
+			return id;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public int getAmount() {
+			return amount;
+		}
+
+		public void setAmount(int amount) {
+			this.amount = amount;
+		}
+
+		public financeType getType() {
+			return type;
+		}
+
+		public void setType(financeType type) {
+			this.type = type;
+		}
+
+		private String name;
+    	
+    	private int amount;
+    	
+    	private financeType type;
+    }
 
 }
