@@ -70,7 +70,6 @@ public class AdministrativeController {
             MenuItem deleteEmployee = new Menu("Delete");
             employeesMenu.getItems().add(addEmployee);
             employeesMenu.getItems().add(deleteEmployee);
-            radioAll.setSelected(true);
 
             menuBar.getMenus().add(viewMenu);
             menuBar.getMenus().add(employeesMenu);
@@ -78,6 +77,7 @@ public class AdministrativeController {
 			ToggleGroup radioToggleGroup = new ToggleGroup();
 			radioToggleGroup.getToggles().add(radioAll);
 			radioToggleGroup.getToggles().add(radioClockedIn);
+            radioAll.setSelected(true);
 
 			inventory.setOnAction(event -> {
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
