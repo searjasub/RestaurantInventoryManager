@@ -1,5 +1,6 @@
 package controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.bson.Document;
@@ -12,12 +13,16 @@ import com.mongodb.client.MongoDatabase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.Pagination;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import models.Employee;
 import models.OrderedItem;
@@ -29,7 +34,7 @@ public class FinanceController {
 	private MongoDatabase database = mc.getDatabase("Restaurants");
 	private MongoCollection<Document> collection = database.getCollection("Inventory");
 	private Block<Document> printBlock = System.out::println;
-	private Stage primaryController;
+	private Stage primaryStage;
 	private AdministrativeController adminCon;
 	private Scene financeScene;
 	private MainStageController mainCon;
@@ -37,15 +42,78 @@ public class FinanceController {
 	private RadioMenuItem inventory;
 	private RadioMenuItem admin;
 	private Menu menuOptions;
+	
+	TableView table = initTable();
+
+	private Pagination myPagination;
 
 	public void setPrimaryScene(Stage primaryStage, Scene administrativeScene, MainStageController mainStageController,
 			RadioMenuItem admin, RadioMenuItem inventory, RadioMenuItem pos, Menu menuOptions,
-			HashMap<Integer, Employee> employeesCollection) {
-		// TODO Auto-generated method stub
+			MenuBar menu, HashMap<Integer, Employee> employeesCollection) {
+		this.primaryStage = primaryStage;
+		this.financeScene = administrativeScene;
+		this.mainCon = mainStageController;
+		this.admin = admin;
+		this.inventory = inventory;
+		this.pos = pos;
+		this.menuOptions = menuOptions;
+		this.menu = menu;
+		this.menu.getMenus().add(menuOptions);
+		
+		this.primaryStage.setTitle("Restaurant Inventory Manager - Finance");
+		
+		admin.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
+            BorderPane root = null;
+            try {
+                root = loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            AdministrativeController adminController = loader.getController();
+            inventory.setSelected(true);
+            adminController.setPrimaryStage(primaryStage, administrativeScene, mainCon, employeesCollection, admin);
+            primaryStage.setMaxWidth(600);
+            primaryStage.setMaxHeight(600);
+            primaryStage.setScene(new Scene(root, 600, 600));
+        });
+
+        pos.setOnAction(event -> {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
+                Scene posScene = null;
+                BorderPane root;
+                try {
+                    root = loader.load();
+                    posScene = new Scene(root, 600, 600);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                POSController posController = loader.getController();
+
+                pos.setSelected(true);
+                posController.setPrimaryStage(primaryStage, posScene, mainCon, admin, inventory, pos, menuOptions, menu, employeesCollection);
+                primaryStage.setMaxWidth(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(posScene);
+
+        });
 
 	}
 
-	TableView table = new TableView();
+
+	private TableView initTable() {
+		table = new TableView();
+		table.setEditable(true);
+		
+		TableColumn id = new TableColumn();
+		id.setText("ID");
+		
+		TableColumn name = new TableColumn();
+		
+		
+		return table;
+	}
+
 
 	ObservableList<OrderedItem> master = FXCollections.observableArrayList();
 
@@ -57,7 +125,7 @@ public class FinanceController {
 		// Method to get all inventory items and set them to the ObservableList needed
 		master = tracker.reviewOrderedItems();
 
-//		myPagination.setPageFactory(this::createPage);
+		myPagination.setPageFactory(this::createPage);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -69,9 +137,9 @@ public class FinanceController {
 		return table;
 	}
 
-//	public void onMenuItemExit(ActionEvent actionEvent) {
-//		primaryStage.close();
-//	}
+	public void onMenuItemExit(ActionEvent actionEvent) {
+		primaryStage.close();
+	}
 
 	// Methods to add:
 
