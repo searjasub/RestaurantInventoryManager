@@ -5,6 +5,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -48,102 +49,95 @@ public class AdministrativeController {
         this.empsCollection = employeesCollection;
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
 
-        if (isAdmin) {
 
-            Menu viewMenu = new Menu("View");
-            RadioMenuItem admin = new RadioMenuItem("Admin");
-            RadioMenuItem inventory = new RadioMenuItem("Inventory");
-            RadioMenuItem pos = new RadioMenuItem("POS");
-            RadioMenuItem finance = new RadioMenuItem("Finance");
+        Menu viewMenu = new Menu("View");
+        RadioMenuItem admin = new RadioMenuItem("Admin");
+        RadioMenuItem inventory = new RadioMenuItem("Inventory");
+        RadioMenuItem pos = new RadioMenuItem("POS");
+        RadioMenuItem finance = new RadioMenuItem("Finance");
 
-            viewMenu.getItems().add(admin);
-            viewMenu.getItems().add(inventory);
-            viewMenu.getItems().add(pos);
-            viewMenu.getItems().add(finance);
+        viewMenu.getItems().add(admin);
+        viewMenu.getItems().add(inventory);
+        viewMenu.getItems().add(pos);
+        viewMenu.getItems().add(finance);
 
-            ToggleGroup toggleGroup = new ToggleGroup();
-            toggleGroup.getToggles().add(admin);
-            toggleGroup.getToggles().add(inventory);
-            toggleGroup.getToggles().add(pos);
-            toggleGroup.getToggles().add(finance);
-            admin.setSelected(true);
+        ToggleGroup toggleGroup = new ToggleGroup();
+        toggleGroup.getToggles().add(admin);
+        toggleGroup.getToggles().add(inventory);
+        toggleGroup.getToggles().add(pos);
+        toggleGroup.getToggles().add(finance);
+        admin.setSelected(true);
 
-            Menu employeesMenu = new Menu("Employees");
-            MenuItem addEmployee = new Menu("Add");
-            MenuItem deleteEmployee = new Menu("Delete");
-            employeesMenu.getItems().add(addEmployee);
-            employeesMenu.getItems().add(deleteEmployee);
+        Menu employeesMenu = new Menu("Employees");
+        MenuItem addEmployee = new Menu("Add");
+        MenuItem deleteEmployee = new Menu("Delete");
+        employeesMenu.getItems().add(addEmployee);
+        employeesMenu.getItems().add(deleteEmployee);
 
-            menuBar.getMenus().add(viewMenu);
-            menuBar.getMenus().add(employeesMenu);
+        menuBar.getMenus().add(viewMenu);
+        menuBar.getMenus().add(employeesMenu);
 
-			ToggleGroup radioToggleGroup = new ToggleGroup();
-			radioToggleGroup.getToggles().add(radioAll);
-			radioToggleGroup.getToggles().add(radioClockedIn);
-            radioAll.setSelected(true);
+        ToggleGroup radioToggleGroup = new ToggleGroup();
+        radioToggleGroup.getToggles().add(radioAll);
+        radioToggleGroup.getToggles().add(radioClockedIn);
+        radioAll.setSelected(true);
 
-            empsTable.setItems((ObservableList)fillEmpCollection());
+        empsTable.setItems(fillEmpCollection());
 
-			inventory.setOnAction(event -> {
-				FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
-				BorderPane root;
-				Scene administrativeScene = null;
-				try {
-					root = loader.load();
-					administrativeScene = new Scene(root, 600, 600);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				InventoryTrackerController inventoryController = loader.getController();
+        inventory.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
+            BorderPane root;
+            Scene administrativeScene = null;
+            try {
+                root = loader.load();
+                administrativeScene = new Scene(root, 600, 600);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            InventoryTrackerController inventoryController = loader.getController();
 
-				inventory.setSelected(true);
-				inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, employeesCollection);
-				primaryStage.setMaxWidth(600);
-				primaryStage.setMaxHeight(600);
-				primaryStage.setScene(administrativeScene);
-			});
+            inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, employeesCollection);
+            primaryStage.setMaxWidth(600);
+            primaryStage.setMaxHeight(600);
+            primaryStage.setScene(administrativeScene);
+        });
 
-			finance.setOnAction(event -> {
-				FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
-				BorderPane root;
-				Scene financeScene = null;
-				try {
-					root = loader.load();
-					financeScene = new Scene(root, 600, 600);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				FinanceController financeController = loader.getController();
+        finance.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
+            BorderPane root;
+            Scene financeScene = null;
+            try {
+                root = loader.load();
+                financeScene = new Scene(root, 600, 600);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            FinanceController financeController = loader.getController();
 
-				financeController.setPrimaryScene(primaryStage, financeScene, mainStageController, employeesCollection);
-				primaryStage.setMaxWidth(600);
-				primaryStage.setMaxHeight(600);
-				primaryStage.setScene(financeScene);
+            financeController.setPrimaryScene(primaryStage, financeScene, mainStageController, employeesCollection);
+            primaryStage.setMaxWidth(600);
+            primaryStage.setMaxHeight(600);
+            primaryStage.setScene(financeScene);
 
-			});
+        });
 
 
-			pos.setOnAction(event -> {
-				FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
-				BorderPane root;
-				Scene posScene = null;
-				try {
-					root = loader.load();
-					posScene = new Scene(root, 600, 600);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				POSController posController = loader.getController();
-				posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection);
-				primaryStage.setMaxWidth(600);
-				primaryStage.setMaxHeight(600);
-				primaryStage.setScene(posScene);
-			});
-
-        } else {
-
-
-        }
+        pos.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
+            BorderPane root;
+            Scene posScene = null;
+            try {
+                root = loader.load();
+                posScene = new Scene(root, 600, 600);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            POSController posController = loader.getController();
+            posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection, false);
+            primaryStage.setMaxWidth(600);
+            primaryStage.setMaxHeight(600);
+            primaryStage.setScene(posScene);
+        });
     }
 
 
@@ -185,17 +179,17 @@ public class AdministrativeController {
         collection.find(andQuery);
     }
 
-    public List<String> fillEmpCollection() {
-       List<String> emps = new ArrayList();
-        int id = 100001;
+    private ObservableList<String> fillEmpCollection() {
+        ObservableList<String> emps = FXCollections.observableArrayList();
+        int pid = 100001;
 
-        for(int i = 0; i < 4; i++){
-            String idString = ""+id+"";
+        for (int i = 0; i < 4; i++) {
+            String idString = "" + pid + "";
             String meal = collection.find(eq("id", idString)).toString();
             emps.add(meal);
-            id++;
+            pid++;
         }
-    return emps;
+        return emps;
     }
 
 
@@ -268,3 +262,4 @@ public class AdministrativeController {
 
     }
 }
+

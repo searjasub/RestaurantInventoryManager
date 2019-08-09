@@ -3,6 +3,7 @@ package controller;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -60,74 +61,76 @@ public class POSController {
 //    }
 
 
-    void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection) {
+    void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, boolean isAdmin) {
         this.primaryStage = primaryStage;
         this.scene = posScene;
         this.mainController = mainStageController;
         this.empsCollection = employeesCollection;
         this.primaryStage.setTitle("Inventory Tracker Manager - POS");
 
-        Menu viewMenu = new Menu("View");
-        RadioMenuItem admin = new RadioMenuItem("Admin");
-        RadioMenuItem inventory = new RadioMenuItem("Inventory");
-        RadioMenuItem pos = new RadioMenuItem("POS");
-        RadioMenuItem finance = new RadioMenuItem("Finance");
+        if (isAdmin) {
+            Menu viewMenu = new Menu("View");
+            RadioMenuItem admin = new RadioMenuItem("Admin");
+            RadioMenuItem inventory = new RadioMenuItem("Inventory");
+            RadioMenuItem pos = new RadioMenuItem("POS");
+            RadioMenuItem finance = new RadioMenuItem("Finance");
 
-        viewMenu.getItems().add(admin);
-        viewMenu.getItems().add(inventory);
-        viewMenu.getItems().add(pos);
-        viewMenu.getItems().add(finance);
+            viewMenu.getItems().add(admin);
+            viewMenu.getItems().add(inventory);
+            viewMenu.getItems().add(pos);
+            viewMenu.getItems().add(finance);
 
-        ToggleGroup toggleGroup = new ToggleGroup();
-        toggleGroup.getToggles().add(admin);
-        toggleGroup.getToggles().add(inventory);
-        toggleGroup.getToggles().add(pos);
-        toggleGroup.getToggles().add(finance);
+            ToggleGroup toggleGroup = new ToggleGroup();
+            toggleGroup.getToggles().add(admin);
+            toggleGroup.getToggles().add(inventory);
+            toggleGroup.getToggles().add(pos);
+            toggleGroup.getToggles().add(finance);
 
-        mealTable.setItems((ObservableList)fillMealCollection());
+            pos.setSelected(true);
 
-        this.menuBar.getMenus().add(viewMenu);
+            mealTable.setItems(fillMealCollection());
+            this.menuBar.getMenus().add(viewMenu);
 
-        admin.setOnAction(event -> {
+            admin.setOnAction(event -> {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
+                BorderPane root = null;
+                try {
+                    root = loader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                AdministrativeController adminController = loader.getController();
+                admin.setSelected(true);
+                adminController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, true);
+                primaryStage.setMaxWidth(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(new Scene(root, 600, 600));
+            });
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
-            BorderPane root = null;
-            try {
-                root = loader.load();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            AdministrativeController adminController = loader.getController();
-            admin.setSelected(true);
-            adminController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, true);
-            primaryStage.setMaxWidth(600);
-            primaryStage.setMaxHeight(600);
-            primaryStage.setScene(new Scene(root, 600, 600));
-        });
+            inventory.setOnAction(event -> {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
+                BorderPane root;
+                Scene scene = null;
+                try {
+                    root = loader.load();
+                    scene = new Scene(root, 600, 600);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                InventoryTrackerController inventoryController = loader.getController();
 
-        inventory.setOnAction(event -> {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
-            BorderPane root;
-            Scene scene = null;
-            try {
-                root = loader.load();
-                scene = new Scene(root, 600, 600);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            InventoryTrackerController inventoryController = loader.getController();
-
-            inventory.setSelected(true);
-            inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, employeesCollection);
-            primaryStage.setMaxWidth(600);
-            primaryStage.setMaxHeight(600);
-            primaryStage.setScene(scene);
-        });
+                inventory.setSelected(true);
+                inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, employeesCollection);
+                primaryStage.setMaxWidth(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(scene);
+            });
+        }
 
     }
 
-    public List<String> fillMealCollection() {
-        List<String> emps = new ArrayList();
+    private ObservableList<String> fillMealCollection() {
+        ObservableList<String> emps = FXCollections.observableArrayList();
         int id = 100001;
 
         for(int i = 0; i < 4; i++){

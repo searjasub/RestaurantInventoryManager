@@ -4,6 +4,7 @@ import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 
 
 public class InventoryTrackerController {
@@ -43,6 +45,8 @@ public class InventoryTrackerController {
         this.primaryStage = primaryStage;
         this.inventoryScene = inventoryScene;
         this.mainController = mainController;
+
+
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
         Menu viewMenu = new Menu("View");
@@ -62,7 +66,9 @@ public class InventoryTrackerController {
         toggleGroup.getToggles().add(pos);
         toggleGroup.getToggles().add(finance);
 
-        itemTable.setItems((ObservableList)fillInventoryColelction());
+        inventory.setSelected(true);
+
+        itemTable.setItems(fillInventoryCollection());
 
 
         menu.getMenus().add(viewMenu);
@@ -96,7 +102,7 @@ public class InventoryTrackerController {
             }
             POSController posController = loader.getController();
             pos.setSelected(true);
-            posController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection);
+            posController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, true);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
@@ -127,8 +133,8 @@ public class InventoryTrackerController {
         return null;
     }
 
-    public List<String> fillInventoryColelction() {
-        List<String> inventory = new ArrayList();
+    private ObservableList<String> fillInventoryCollection() {
+        ObservableList<String> inventory = FXCollections.observableArrayList();
         int id = 500001;
 
         for(int i = 0; i < 4; i++){

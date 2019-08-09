@@ -20,12 +20,14 @@ import org.bson.Document;
 import java.io.IOException;
 import java.util.HashMap;
 
+import static javafx.collections.FXCollections.observableArrayList;
+
 public class FinanceController {
 
     public MenuBar menuBar;
     TableView table = initTable();
-    ObservableList<FinanceItem> master = FXCollections.observableArrayList();
-    ObservableList<OrderedItem> ordered = FXCollections.observableArrayList();
+    ObservableList<FinanceItem> master = observableArrayList();
+    ObservableList<OrderedItem> ordered = observableArrayList();
     int pageSize = 50;
     InventoryTrackerController tracker = new InventoryTrackerController();
     private MongoClient mc = new MongoClient("localHost");
@@ -96,7 +98,7 @@ public class FinanceController {
             POSController posController = loader.getController();
 
             pos.setSelected(true);
-            posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection);
+            posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection, false);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
@@ -125,11 +127,10 @@ public class FinanceController {
         myPagination.setPageFactory(this::createPage);
     }
 
-    @SuppressWarnings("unchecked")
     public Node createPage(int pageIndex) {
         int first = pageIndex * pageSize;
         int last = Math.min(first + pageSize, master.size());
-        table.setItems(FXCollections.observableArrayList(master.subList(first, last)));
+        table.getItems().add(observableArrayList(master.subList(first, last)));
 
         return table;
     }

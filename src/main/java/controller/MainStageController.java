@@ -72,12 +72,12 @@ public class MainStageController {
             primaryStage.setScene(administrativeScene);
 
         } else {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/POSScene.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
             BorderPane root = loader.load();
             POSController posController = loader.getController();
             Scene posScene = new Scene(root, 600, 600);
 
-            posController.setPrimaryStage(primaryStage, tmp, this, employeeCollection);
+            posController.setPrimaryStage(primaryStage, tmp, this, employeeCollection, false);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
