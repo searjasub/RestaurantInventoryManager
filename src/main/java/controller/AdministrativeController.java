@@ -5,6 +5,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -37,6 +38,8 @@ public class AdministrativeController {
     private Stage primaryStage;
     private Scene adminScene;
     private MainStageController mainController;
+
+    private TableView<String> empsTable = new TableView<>();
 
     void setPrimaryStage(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, boolean isAdmin) {
         this.primaryStage = primaryStage;
@@ -78,6 +81,8 @@ public class AdministrativeController {
 			radioToggleGroup.getToggles().add(radioAll);
 			radioToggleGroup.getToggles().add(radioClockedIn);
             radioAll.setSelected(true);
+
+            empsTable.setItems((ObservableList)fillEmpCollection());
 
 			inventory.setOnAction(event -> {
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
@@ -180,8 +185,17 @@ public class AdministrativeController {
         collection.find(andQuery);
     }
 
-    public void fillEmpCollection() {
+    public List<String> fillEmpCollection() {
+       List<String> emps = new ArrayList();
+        int id = 100001;
 
+        for(int i = 0; i < 4; i++){
+            String idString = ""+id+"";
+            String meal = collection.find(eq("id", idString)).toString();
+            emps.add(meal);
+            id++;
+        }
+    return emps;
     }
 
 

@@ -8,10 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Employee;
@@ -23,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -39,6 +37,7 @@ public class InventoryTrackerController {
     private Scene inventoryScene;
     private MainStageController mainController;
 
+    private TableView<String> itemTable = new TableView<>();
 
     void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, HashMap<Integer, Employee> employeesCollection) {
         this.primaryStage = primaryStage;
@@ -62,6 +61,8 @@ public class InventoryTrackerController {
         toggleGroup.getToggles().add(inventory);
         toggleGroup.getToggles().add(pos);
         toggleGroup.getToggles().add(finance);
+
+        itemTable.setItems((ObservableList)fillInventoryColelction());
 
 
         menu.getMenus().add(viewMenu);
@@ -124,6 +125,19 @@ public class InventoryTrackerController {
 
     public ArrayList<Ingredient> soonToExpire() {
         return null;
+    }
+
+    public List<String> fillInventoryColelction() {
+        List<String> inventory = new ArrayList();
+        int id = 500001;
+
+        for(int i = 0; i < 4; i++){
+            String idString = ""+id+"";
+            String item = collection.find(eq("id", idString)).toString();
+            inventory.add(item);
+            id++;
+        }
+        return inventory;
     }
 
     public void retrieveDailySales() {

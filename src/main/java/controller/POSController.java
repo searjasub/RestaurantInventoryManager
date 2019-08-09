@@ -3,13 +3,11 @@ package controller;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Employee;
@@ -19,6 +17,7 @@ import org.bson.Document;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -41,6 +40,8 @@ public class POSController {
     private RadioMenuItem admin;
     private RadioMenuItem inventory;
     private RadioMenuItem pos;
+
+    private TableView<String> mealTable = new TableView<>();
 
     public static double getSalesTax() {
         return salesTax;
@@ -83,6 +84,8 @@ public class POSController {
         toggleGroup.getToggles().add(pos);
         toggleGroup.getToggles().add(finance);
 
+        mealTable.setItems((ObservableList)fillMealCollection());
+
         this.menuBar.getMenus().add(viewMenu);
 
         admin.setOnAction(event -> {
@@ -121,6 +124,19 @@ public class POSController {
             primaryStage.setScene(scene);
         });
 
+    }
+
+    public List<String> fillMealCollection() {
+        List<String> emps = new ArrayList();
+        int id = 100001;
+
+        for(int i = 0; i < 4; i++){
+            String idString = ""+id+"";
+            String meal = collection.find(eq("id", idString)).toString();
+            emps.add(meal);
+            id++;
+        }
+        return emps;
     }
 
     public void splitTab() {
