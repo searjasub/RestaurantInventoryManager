@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -73,6 +74,64 @@ public class AdministrativeController {
         MenuItem deleteEmployee = new Menu("Delete");
         employeesMenu.getItems().add(addEmployee);
         employeesMenu.getItems().add(deleteEmployee);
+        addEmployee.setOnAction(event -> {
+            Dialog<Employee> dialog = new Dialog<>();
+            dialog.setTitle("Contact Dialog");
+            dialog.setHeaderText("Please Input Employee Data");
+
+            ButtonType loginButtonType = new ButtonType("Add", ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            TextField name = new TextField();
+            name.setPromptText("Name");
+            TextField password = new TextField();
+            password.setPromptText("Password");
+            TextField occupation = new TextField();
+            occupation.setPromptText("Occupation");
+
+            grid.add(new Label("First Name:"), 0, 0);
+            grid.add(name, 1, 0);
+            grid.add(new Label("Last Name:"), 0, 1);
+            grid.add(password, 1, 1);
+            grid.add(new Label("Primary Email:"), 0, 2);
+            grid.add(occupation, 1, 2);
+
+            Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+            loginButton.setDisable(true);
+
+            name.textProperty().addListener((observable, oldValue, newValue) -> {
+                loginButton.setDisable(newValue.trim().isEmpty());
+            });
+
+            dialog.getDialogPane().setContent(grid);
+
+            Platform.runLater(() -> name.requestFocus());
+
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == loginButtonType) {
+                    Employee e = new Employee();
+
+                    e.setName(name.getText().trim());
+                    e.setPassword(password.getText().trim());
+                    e.setOccupation(occupation.getText().trim());
+
+                    return e;
+                }
+                return null;
+            });
+
+            Optional<Employee> result = dialog.showAndWait();
+
+
+            if (result.isPresent()) {
+                AddEmployee(result.get());
+            }
+        });
 
         menuBar.getMenus().add(viewMenu);
         menuBar.getMenus().add(employeesMenu);
@@ -190,67 +249,6 @@ public class AdministrativeController {
             pid++;
         }
         return emps;
-    }
-
-
-    public void onAddEmployeeButton() {
-        Dialog<Employee> dialog = new Dialog<>();
-        dialog.setTitle("Contact Dialog");
-        dialog.setHeaderText("Please Input Employee Data");
-
-        ButtonType loginButtonType = new ButtonType("Add", ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        TextField name = new TextField();
-        name.setPromptText("Name");
-        TextField password = new TextField();
-        password.setPromptText("Password");
-        TextField occupation = new TextField();
-        occupation.setPromptText("Occupation");
-
-        grid.add(new Label("First Name:"), 0, 0);
-        grid.add(name, 1, 0);
-        grid.add(new Label("Last Name:"), 0, 1);
-        grid.add(password, 1, 1);
-        grid.add(new Label("Primary Email:"), 0, 2);
-        grid.add(occupation, 1, 2);
-
-        Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
-        loginButton.setDisable(true);
-
-        name.textProperty().addListener((observable, oldValue, newValue) -> {
-            loginButton.setDisable(newValue.trim().isEmpty());
-        });
-
-        dialog.getDialogPane().setContent(grid);
-
-        Platform.runLater(() -> name.requestFocus());
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == loginButtonType) {
-                Employee e = new Employee();
-
-                e.setName(name.getText().trim());
-                e.setPassword(password.getText().trim());
-                e.setOccupation(occupation.getText().trim());
-
-                return e;
-            }
-            return null;
-        });
-
-        Optional<Employee> result = dialog.showAndWait();
-
-
-        if (result.isPresent()) {
-            AddEmployee(result.get());
-        }
-
     }
 
 
