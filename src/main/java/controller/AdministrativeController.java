@@ -110,7 +110,7 @@ public class AdministrativeController {
 
             dialog.getDialogPane().setContent(grid);
 
-            Platform.runLater(() -> name.requestFocus());
+            Platform.runLater(name::requestFocus);
 
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == loginButtonType) {
@@ -141,7 +141,7 @@ public class AdministrativeController {
         radioToggleGroup.getToggles().add(radioClockedIn);
         radioAll.setSelected(true);
 
-        empsTable.setItems(fillEmpCollection());
+        empsTable.getItems().addAll(fillEmpCollection());
 
         inventory.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
