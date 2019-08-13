@@ -1,5 +1,7 @@
 package model;
 
+import javafx.beans.property.*;
+
 import java.util.Date;
 
 public class Employee {
@@ -8,17 +10,17 @@ public class Employee {
     private Date clockOut;
     private Date breakStart;
     private Date breakEnd;
-    private double hourlyPay;
-    private String name;
-    private String password;
-    private String occupation;
-    private int id;
-    private int weeklyHours;
+    private StringProperty hourlyPay;
+    private StringProperty name;
+    private StringProperty password;
+    private StringProperty occupation;
+    private StringProperty id;
+    private StringProperty weeklyHours;
 
     public Employee() {
     }
 
-    public Employee(int id, String name, String password, String occupation, double hourlyPay) {
+    public Employee(String id, String name, String password, String occupation, String hourlyPay) {
         setId(id);
         setName(name);
         setPassword(password);
@@ -59,52 +61,97 @@ public class Employee {
     }
 
     public String getName() {
-        return name;
+       return nameProperty().get();
     }
 
     public void setName(String name) {
-        this.name = name;
+        nameProperty().set(name);
+    }
+
+    private StringProperty nameProperty(){
+        if (name == null) {
+            name = new SimpleStringProperty(this, "name");
+        }
+        return name;
     }
 
     public String getPassword() {
-        return password;
+        return passwordProperty().get();
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        passwordProperty().set(password);
     }
 
-    public int getId() {
+    private StringProperty passwordProperty(){
+        if (password == null) {
+            password = new SimpleStringProperty(this, "password");
+        }
+        return password;
+    }
+
+    public String getId() {
+        return idProperty().get();
+    }
+
+    public void setId(String id) {
+        idProperty().set(id);
+    }
+
+    private StringProperty idProperty(){
+        if (id == null) {
+            id = new SimpleStringProperty(this, "id");
+        }
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getWeeklyHours() {
+        return weeklyHoursProperty().get();
     }
 
-    public int getWeeklyHours() {
+    public void setWeeklyHours(String weeklyHours) {
+        weeklyHoursProperty().set(weeklyHours);
+    }
+
+    private StringProperty weeklyHoursProperty(){
+        if (weeklyHours == null) {
+            weeklyHours = new SimpleStringProperty(this, "weeklyHours");
+        }
         return weeklyHours;
     }
 
-    public void setWeeklyHours(int weeklyHours) {
-        this.weeklyHours = weeklyHours;
+    public String getHourlyPay() {
+        return hourlyPayProperty().get();
     }
 
-    public double getHourlyPay() {
+    private void setHourlyPay(String hourlyPay) {
+        hourlyPayProperty().set(hourlyPay);
+    }
+
+    private StringProperty hourlyPayProperty(){
+        if (hourlyPay == null) {
+            hourlyPay = new SimpleStringProperty(this, "hourlyPay");
+        }
         return hourlyPay;
     }
 
-    public void setHourlyPay(double hourlyPay) {
-        this.hourlyPay = hourlyPay;
-    }
-
     public String getOccupation() {
-        return occupation;
+        return occupationProperty().get();
     }
 
     public void setOccupation(String occupation) {
-        this.occupation = occupation;
+        occupationProperty().set(occupation);
     }
 
+    private StringProperty occupationProperty(){
+        if (occupation == null) {
+            occupation = new SimpleStringProperty(this, "occupation");
+        }
+        return occupation;
+    }
 
+    @Override
+    public String toString() {
+        return "Employee: " + getName() + " ID: " + getId();
+    }
 }

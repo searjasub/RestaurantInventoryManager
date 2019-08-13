@@ -14,6 +14,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -52,6 +54,8 @@ public class AdministrativeController {
         this.empsCollection = employeesCollection;
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
 
+        System.out.println("Observable list size = " + data.size());
+        System.out.println(data.get(1));
         if (data.size() > 100) {
             pagination.setPageCount((data.size() / 100) + 1);
         } else {
@@ -150,9 +154,6 @@ public class AdministrativeController {
         radioToggleGroup.getToggles().add(radioClockedIn);
         radioAll.setSelected(true);
 
-//        empsTable.setItems(data);
-
-
         inventory.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
             BorderPane root;
@@ -190,7 +191,6 @@ public class AdministrativeController {
 
         });
 
-
         pos.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
             BorderPane root;
@@ -207,7 +207,6 @@ public class AdministrativeController {
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
         });
-
     }
 
     private TableView<Employee> createTable() {
@@ -216,17 +215,40 @@ public class AdministrativeController {
         empsTable.setEditable(true);
 
         TableColumn<Employee, String> name = new TableColumn<>("Name");
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        name.setCellFactory(TextFieldTableCell.forTableColumn());
+        name.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setName(event.getNewValue()));
+
         TableColumn<Employee, String> employeeId = new TableColumn<>("Employee ID");
+        employeeId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        employeeId.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        TableColumn<Employee, String> weeklyHours = new TableColumn<>("Weekly Hours");
+        weeklyHours.setCellValueFactory(new PropertyValueFactory<>("weeklyHours"));
+        weeklyHours.setCellFactory(TextFieldTableCell.forTableColumn());
+        weeklyHours.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setWeeklyHours(event.getNewValue()));
+
+        TableColumn<Employee, String> password = new TableColumn<>("Password");
+        password.setCellValueFactory(new PropertyValueFactory<>("password"));
+        password.setCellFactory(TextFieldTableCell.forTableColumn());
+        password.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setPassword(event.getNewValue()));
+
+        TableColumn<Employee, String> hourlyPay = new TableColumn<>("Hourly Pay");
+        hourlyPay.setCellValueFactory(new PropertyValueFactory<>("hourlyPay"));
+        hourlyPay.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        TableColumn<Employee, String> occupation = new TableColumn<>("Occupation");
+        occupation.setCellValueFactory(new PropertyValueFactory<>("occupation"));
+        occupation.setCellFactory(TextFieldTableCell.forTableColumn());
+        occupation.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setOccupation(event.getNewValue()));
+
+
         TableColumn<Employee, String> clockIn = new TableColumn<>("Clock In");
         TableColumn<Employee, String> clockOut = new TableColumn<>("Clock Out");
         TableColumn<Employee, String> breakStart = new TableColumn<>("Break Start");
         TableColumn<Employee, String> breakEnd = new TableColumn<>("Break End");
-        TableColumn<Employee, String> weeklyHours = new TableColumn<>("Weekly Hours");
-        TableColumn<Employee, String> password = new TableColumn<>("Password");
-        TableColumn<Employee, String> hourlyPay = new TableColumn<>("Hourly Pay");
-        TableColumn<Employee, String> occupation = new TableColumn<>("Ocuppation");
 
-        empsTable.getColumns().setAll(name, employeeId, clockIn, clockOut, breakStart, breakEnd, weeklyHours, password, hourlyPay, occupation);
+        empsTable.getColumns().setAll(name, employeeId, weeklyHours, password, occupation, hourlyPay, clockIn, clockOut, breakStart, breakEnd);
 
         return empsTable;
 
@@ -235,8 +257,10 @@ public class AdministrativeController {
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
-        int toIndex = Math.min(fromIndex + rowsPerPage, (int)collection.countDocuments());
-        empsTable.setItems(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
+        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
+        System.out.println(fromIndex);
+        System.out.println(toIndex);
+        empsTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return empsTable;
     }
 
@@ -272,7 +296,8 @@ public class AdministrativeController {
 
     public void login(int id, String password) {
         BasicDBObject andQuery = new BasicDBObject();
-        List<BasicDBObject> obj = new ArrayList<BasicDBObject>();;
+        List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
+
         obj.add(new BasicDBObject("employeID", id));
         obj.add(new BasicDBObject("password", password));
         andQuery.put("$and", obj);
@@ -283,12 +308,21 @@ public class AdministrativeController {
         ObservableList<Employee> data = FXCollections.observableArrayList();
 
         int rawId = 100000;
+
+        List<Employee> employees = new ArrayList<>();
+
+
+        Employee employee;
         for (int i = 0; i < collection.countDocuments(); i++) {
 
-//            String meal = collection.find(eq("employeeId", (rawId + i))).toString();
-            Employee employee = new Employee();
+            collection.find(eq("employeeId", (rawId + i)));
+            System.out.println();
+            employee = new Employee();
             employee.setName("Testing");
+            employee.setId(rawId + i + "");
             employee.setPassword("123214");
+            employee.setOccupation("Worker");
+            employee.setWeeklyHours("40");
             data.add(employee);
 
         }

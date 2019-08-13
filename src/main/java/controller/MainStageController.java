@@ -32,12 +32,12 @@ public class MainStageController {
         Employee manager = new Employee();
         manager.setName("Admin");
         manager.setPassword("password2");
-        manager.setId(30001);
+        manager.setId("30001");
         //Simple employee (Worker)
         Employee employee1 = new Employee();
         employee1.setName("Jared");
         employee1.setPassword("password1");
-        employee1.setId(12345);
+        employee1.setId("12345");
 
         employeeCollection.put(30001, manager);
         employeeCollection.put(12345, employee1);
