@@ -1,7 +1,6 @@
 package controller;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
@@ -19,6 +18,8 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import model.Employee;
 import org.bson.Document;
 
@@ -84,8 +85,10 @@ public class AdministrativeController {
         Menu employeesMenu = new Menu("Employees");
         MenuItem addEmployee = new Menu("Add");
         MenuItem deleteEmployee = new Menu("Delete");
+        MenuItem updateEmployee = new Menu("Update");
         employeesMenu.getItems().add(addEmployee);
         employeesMenu.getItems().add(deleteEmployee);
+        employeesMenu.getItems().add(updateEmployee);
 
         addEmployee.setOnAction(event -> {
             Dialog<Employee> dialog = new Dialog<>();
@@ -146,8 +149,153 @@ public class AdministrativeController {
             }
         });
 
+        deleteEmployee.setOnAction(event -> {
+            Dialog<Employee> dialog = new Dialog<>();
+            dialog.setTitle("Contact Dialog");
+            dialog.setHeaderText("Please Input Employee Data To Delete");
+
+            ButtonType deleteButtonType = new ButtonType("Delete", ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(deleteButtonType, ButtonType.CANCEL);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            TextField name = new TextField();
+            name.setPromptText("Name");
+            TextField id = new TextField();
+            id.setPromptText("id");
+
+            grid.add(new Label("Full Name:"), 0, 0);
+            grid.add(name, 1, 0);
+            grid.add(new Label("EmployeeId:"), 0, 1);
+            grid.add(id, 1, 1);
+
+            Node deleteButton = dialog.getDialogPane().lookupButton(deleteButtonType);
+            deleteButton.setDisable(true);
+
+            name.textProperty().addListener((observable, oldValue, newValue) -> {
+                deleteButton.setDisable(newValue.trim().isEmpty());
+            });
+
+            dialog.getDialogPane().setContent(grid);
+
+            Platform.runLater(name::requestFocus);
+
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == deleteButtonType) {
+                    Employee e = new Employee();
+
+                    e.setName(name.getText().trim());
+                    e.setPassword(id.getText().trim());
+
+                    return e;
+                }
+                return null;
+            });
+
+            Optional<Employee> result = dialog.showAndWait();
+
+
+            if (result.isPresent()) {
+                deleteEmployee(result.get());
+            }
+
+        });
+
+        updateEmployee.setOnAction(event -> {
+            Dialog<Employee> dialog = new Dialog<>();
+            dialog.setTitle("Contact Dialog");
+            dialog.setHeaderText("Please Input Employee Data To Delete");
+
+            ButtonType updateButtonType = new ButtonType("Update", ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            TextField name = new TextField();
+            name.setPromptText("Name");
+            TextField id = new TextField();
+            id.setPromptText("EmployeeId");
+            TextField weeklyHours = new TextField();
+            weeklyHours.setPromptText("WeeklyHours");
+            TextField password = new TextField();
+            password.setPromptText("Password");
+            TextField hourlyPay = new TextField();
+            hourlyPay.setPromptText("HourlyPay");
+            TextField occupation = new TextField();
+            occupation.setPromptText("Occupation");
+
+            ObservableList<String> options =
+                    FXCollections.observableArrayList(
+                            "Full Name",
+                            "WeeklyHours",
+                            "Password",
+                            "HourlyPay",
+                            "Occupation"
+                    );
+            final ComboBox comboBox = new ComboBox(options);
+
+//            grid.add(new Label("Full Name:"), 0, 0);
+//            grid.add(name, 1, 0);
+            grid.add(new Label("EmployeeId:"), 0, 0);
+            grid.add(id, 1, 0);
+//            grid.add(new Label("WeeklyHours"), 0, 2);
+//            grid.add(weeklyHours, 1, 2);
+//            grid.add(new Label("Password"), 0, 3);
+//            grid.add(password, 1, 3);
+//            grid.add(new Label("HourlyPay"), 0, 4);
+//            grid.add(hourlyPay, 1, 4);
+//            grid.add(new Label("Occupation"), 0, 5);
+//            grid.add(occupation, 1, 5);
+            grid.add(comboBox,1,1);
+
+
+
+            Node updateButton = dialog.getDialogPane().lookupButton(updateButtonType);
+            updateButton.setDisable(true);
+
+            name.textProperty().addListener((observable, oldValue, newValue) -> {
+                updateButton.setDisable(newValue.trim().isEmpty());
+            });
+
+            dialog.getDialogPane().setContent(grid);
+
+            Platform.runLater(name::requestFocus);
+
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == updateButtonType) {
+                    Employee e = new Employee();
+
+                    e.setName(name.getText().trim());
+                    e.setPassword(id.getText().trim());
+
+                    return e;
+                }
+                return null;
+            });
+
+            Optional<Employee> result = dialog.showAndWait();
+
+
+            if (result.isPresent()) {
+                deleteEmployee(result.get());
+            }
+        });
+
+        MongoClient mongoC = new MongoClient(new ServerAddress("Localhost",27017));
+        DB db = mongoC.getDB("Restaurants");
+        DBCollection collec1 = db.getCollection("Employees");
+        DBObject dock= collec1.findOne();
+        System.out.println(Objects.requireNonNull(dock).get("name"));
+
         menuBar.getMenus().add(viewMenu);
         menuBar.getMenus().add(employeesMenu);
+
 
         ToggleGroup radioToggleGroup = new ToggleGroup();
         radioToggleGroup.getToggles().add(radioAll);
@@ -191,6 +339,7 @@ public class AdministrativeController {
 
         });
 
+
         pos.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
             BorderPane root;
@@ -207,6 +356,7 @@ public class AdministrativeController {
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
         });
+
     }
 
     private TableView<Employee> createTable() {
@@ -270,8 +420,8 @@ public class AdministrativeController {
                 .append("hourlyPay", e.getHourlyPay()).append("occupation", e.getOccupation()));
     }
 
-    public void deleteEmployee(int id) {
-        collection.deleteOne(eq("employeeID", id));
+    public void deleteEmployee(Employee e) {
+        collection.deleteOne(eq("employeeID", e.getId()));
     }
 
     public void updateEmployee(int id, String updateField, String updateValue) {
@@ -292,6 +442,11 @@ public class AdministrativeController {
 
     public void clockOut(int id, Date time) {
         collection.updateOne(eq("employeeID", id), new Document("$set", new Document("clockOut", time)));
+    }
+
+    public void getEmployee(int id) {
+        Employee e = new Employee();
+        collection.find(eq("emplyeeId", id)).toString();
     }
 
     public void login(int id, String password) {
