@@ -7,7 +7,9 @@ import com.mongodb.client.MongoDatabase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -27,6 +29,8 @@ import static com.mongodb.client.model.Filters.eq;
 public class InventoryTrackerController {
 
     public MenuBar menu;
+    public Pagination inventoryPagination;
+
     private MongoClient mc = new MongoClient("localHost");
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Inventory");
@@ -36,15 +40,24 @@ public class InventoryTrackerController {
     private Scene inventoryScene;
     private MainStageController mainController;
 
-    private TableView<String> itemTable = new TableView<>();
+    private ObservableList<Ingredient> data = fillIngredientCollection();
+    private TableView<Ingredient> ingredientTable = createTable();
 
     void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, HashMap<Integer, Employee> employeesCollection) {
         this.primaryStage = primaryStage;
         this.inventoryScene = inventoryScene;
         this.mainController = mainController;
-
-
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
+
+
+        if (data.size() > 100) {
+            inventoryPagination.setPageCount((data.size() / 100) + 1);
+        } else {
+            inventoryPagination.setPageCount(1);
+        }
+        inventoryPagination.setPageFactory(this::createPage);
+
+
 
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
@@ -65,7 +78,7 @@ public class InventoryTrackerController {
 
         inventory.setSelected(true);
 
-        itemTable.setItems(fillInventoryCollection());
+//        ingredientTable.setItems(fillInventoryCollection());
 
 
         menu.getMenus().add(viewMenu);
@@ -130,18 +143,18 @@ public class InventoryTrackerController {
         return null;
     }
 
-    private ObservableList<String> fillInventoryCollection() {
-        ObservableList<String> inventory = FXCollections.observableArrayList();
-        int id = 500001;
-
-        for (int i = 0; i < 4; i++) {
-            String idString = "" + id + "";
-            String item = collection.find(eq("id", idString)).toString();
-            inventory.add(item);
-            id++;
-        }
-        return inventory;
-    }
+//    private ObservableList<String> fillInventoryCollection() {
+//        ObservableList<String> inventory = FXCollections.observableArrayList();
+//        int id = 500001;
+//
+//        for(int i = 0; i < 4; i++){
+//            String idString = ""+id+"";
+//            String item = collection.find(eq("id", idString)).toString();
+//            inventory.add(item);
+//            id++;
+//        }
+//        return inventory;
+//    }
 
     public void retrieveDailySales() {
 
@@ -158,6 +171,50 @@ public class InventoryTrackerController {
     public void onMenuItemExit(ActionEvent actionEvent) {
 
     }
+    private TableView<Ingredient> createTable() {
+
+        ingredientTable = new TableView<>();
+        ingredientTable.setEditable(true);
+
+        TableColumn<Ingredient, String> name = new TableColumn<>("Name");
+        TableColumn<Ingredient, String> ingredientId = new TableColumn<>("Ingredient ID");
+        TableColumn<Ingredient, String> amount = new TableColumn<>("Amount");
+        TableColumn<Ingredient, String> prepDate = new TableColumn<>("Prep Date");
+        TableColumn<Ingredient, String> expiredDate = new TableColumn<>("Expired Date");
+        TableColumn<Ingredient, String> veganFriendly = new TableColumn<>("Vegan Friendly");
+        TableColumn<Ingredient, String> caloriePerServing = new TableColumn<>("Calories Per Serving");
+        TableColumn<Ingredient, String> costPerIngredient = new TableColumn<>("Cost Per Ingredient");
+        TableColumn<Ingredient, String> bulkCost = new TableColumn<>("Bulk Cost");
+
+
+        ingredientTable.getColumns().setAll(name, ingredientId, amount, prepDate, expiredDate, veganFriendly, caloriePerServing, costPerIngredient, bulkCost);
+
+        return ingredientTable;
+
+    }
+
+    private Node createPage(Integer pageIndex) {
+        int rowsPerPage = 10;
+        int fromIndex = pageIndex * rowsPerPage;
+        int toIndex = Math.min(fromIndex + rowsPerPage, (int)collection.countDocuments());
+        ingredientTable.setItems(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
+        return ingredientTable;
+    }
+    private ObservableList<Ingredient> fillIngredientCollection() {
+        ObservableList<Ingredient> data = FXCollections.observableArrayList();
+        int id = 500001;
+
+        for(int i = 0; i < 4; i++){
+            //NEED TO BE AN INGREDIENT BEING PULLED IN
+//            String idString = ""+id+"";
+//            String item = collection.find(eq("id", idString)).toString();
+
+//            data.add(item);
+            id++;
+        }
+        return data;
+    }
+
 
 
 }
