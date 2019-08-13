@@ -21,11 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.in;
-
 
 public class InventoryTrackerController {
 
@@ -137,8 +134,8 @@ public class InventoryTrackerController {
         ObservableList<String> inventory = FXCollections.observableArrayList();
         int id = 500001;
 
-        for(int i = 0; i < 4; i++){
-            String idString = ""+id+"";
+        for (int i = 0; i < 4; i++) {
+            String idString = "" + id + "";
             String item = collection.find(eq("id", idString)).toString();
             inventory.add(item);
             id++;

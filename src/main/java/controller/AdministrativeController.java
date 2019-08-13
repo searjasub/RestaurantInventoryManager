@@ -18,8 +18,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import model.Employee;
 import org.bson.Document;
 
@@ -34,19 +32,18 @@ public class AdministrativeController {
     public RadioButton radioAll;
     public RadioButton radioClockedIn;
     public Pagination pagination;
-
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Employees");
-
     private HashMap<Integer, Employee> empsCollection;
     private Stage primaryStage;
     private Scene adminScene;
     private MainStageController mainController;
-
-    private ObservableList<Employee> data = fillEmpCollection();
     private TableView<Employee> empsTable = createTable();
-
+    private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
+    private DB db = mongoC.getDB("Restaurants");
+    private DBCollection dbCollection = db.getCollection("Employees");
+    private ObservableList<Employee> data = fillEmpCollection();
 
     void setPrimaryStage(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, boolean isAdmin) {
         this.primaryStage = primaryStage;
@@ -252,8 +249,7 @@ public class AdministrativeController {
 //            grid.add(hourlyPay, 1, 4);
 //            grid.add(new Label("Occupation"), 0, 5);
 //            grid.add(occupation, 1, 5);
-            grid.add(comboBox,1,1);
-
+            grid.add(comboBox, 1, 1);
 
 
             Node updateButton = dialog.getDialogPane().lookupButton(updateButtonType);
@@ -287,11 +283,6 @@ public class AdministrativeController {
             }
         });
 
-        MongoClient mongoC = new MongoClient(new ServerAddress("Localhost",27017));
-        DB db = mongoC.getDB("Restaurants");
-        DBCollection collec1 = db.getCollection("Employees");
-        DBObject dock= collec1.findOne();
-        System.out.println(Objects.requireNonNull(dock).get("name"));
 
         menuBar.getMenus().add(viewMenu);
         menuBar.getMenus().add(employeesMenu);
@@ -393,12 +384,12 @@ public class AdministrativeController {
         occupation.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setOccupation(event.getNewValue()));
 
 
-        TableColumn<Employee, String> clockIn = new TableColumn<>("Clock In");
-        TableColumn<Employee, String> clockOut = new TableColumn<>("Clock Out");
-        TableColumn<Employee, String> breakStart = new TableColumn<>("Break Start");
-        TableColumn<Employee, String> breakEnd = new TableColumn<>("Break End");
+//        TableColumn<Employee, String> clockIn = new TableColumn<>("Clock In");
+//        TableColumn<Employee, String> clockOut = new TableColumn<>("Clock Out");
+//        TableColumn<Employee, String> breakStart = new TableColumn<>("Break Start");
+//        TableColumn<Employee, String> breakEnd = new TableColumn<>("Break End");
 
-        empsTable.getColumns().setAll(name, employeeId, weeklyHours, password, occupation, hourlyPay, clockIn, clockOut, breakStart, breakEnd);
+        empsTable.getColumns().setAll(name, employeeId, weeklyHours, password, occupation, hourlyPay);
 
         return empsTable;
 
@@ -462,22 +453,31 @@ public class AdministrativeController {
     private ObservableList<Employee> fillEmpCollection() {
         ObservableList<Employee> data = FXCollections.observableArrayList();
 
-        int rawId = 100000;
 
-        List<Employee> employees = new ArrayList<>();
+        List<DBObject> dbObjects = new ArrayList<>();
+
+        int id = 100001;
+        for (int i = 0; i < collection.countDocuments(); i++) {
+            DBObject query = BasicDBObjectBuilder.start().add("employeeID", id + i).get();
+            DBCursor cursor = dbCollection.find(query);
+            while (cursor.hasNext()) {
+                System.out.println(i);
+                dbObjects.add(cursor.next());
+            }
+        }
+
 
 
         Employee employee;
         for (int i = 0; i < collection.countDocuments(); i++) {
 
-            collection.find(eq("employeeId", (rawId + i)));
-            System.out.println();
             employee = new Employee();
-            employee.setName("Testing");
-            employee.setId(rawId + i + "");
-            employee.setPassword("123214");
-            employee.setOccupation("Worker");
-            employee.setWeeklyHours("40");
+            employee.setName(dbObjects.get(i).get("name").toString());
+            employee.setPassword(dbObjects.get(i).get("password").toString());
+            employee.setOccupation(dbObjects.get(i).get("occupation").toString());
+            employee.setWeeklyHours(dbObjects.get(i).get("weeklyHours").toString());
+            employee.setId(dbObjects.get(i).get("employeeID").toString());
+            employee.setHourlyPay(dbObjects.get(i).get("hourlyPay").toString());
             data.add(employee);
 
         }

@@ -124,7 +124,7 @@ public class Employee {
         return hourlyPayProperty().get();
     }
 
-    private void setHourlyPay(String hourlyPay) {
+    public void setHourlyPay(String hourlyPay) {
         hourlyPayProperty().set(hourlyPay);
     }
 
