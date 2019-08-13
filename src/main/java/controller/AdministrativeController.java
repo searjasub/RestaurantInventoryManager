@@ -142,6 +142,61 @@ public class AdministrativeController {
             }
         });
 
+        deleteEmployee.setOnAction(event -> {
+            Dialog<Employee> dialog = new Dialog<>();
+            dialog.setTitle("Contact Dialog");
+            dialog.setHeaderText("Please Input Employee Data To Delete");
+
+            ButtonType deleteButtonType = new ButtonType("Delete", ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(deleteButtonType, ButtonType.CANCEL);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            TextField name = new TextField();
+            name.setPromptText("Name");
+            TextField id = new TextField();
+            id.setPromptText("id");
+
+            grid.add(new Label("Full Name:"), 0, 0);
+            grid.add(name, 1, 0);
+            grid.add(new Label("EmployeeId:"), 0, 1);
+            grid.add(id, 1, 1);
+
+            Node deleteButton = dialog.getDialogPane().lookupButton(deleteButtonType);
+            deleteButton.setDisable(true);
+
+            name.textProperty().addListener((observable, oldValue, newValue) -> {
+                deleteButton.setDisable(newValue.trim().isEmpty());
+            });
+
+            dialog.getDialogPane().setContent(grid);
+
+            Platform.runLater(name::requestFocus);
+
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == deleteButtonType) {
+                    Employee e = new Employee();
+
+                    e.setName(name.getText().trim());
+                    e.setPassword(id.getText().trim());
+
+                    return e;
+                }
+                return null;
+            });
+
+            Optional<Employee> result = dialog.showAndWait();
+
+
+            if (result.isPresent()) {
+                deleteEmployee(result.get());
+            }
+
+        });
+
         menuBar.getMenus().add(viewMenu);
         menuBar.getMenus().add(employeesMenu);
 
@@ -246,8 +301,8 @@ public class AdministrativeController {
                 .append("hourlyPay", e.getHourlyPay()).append("occupation", e.getOccupation()));
     }
 
-    public void deleteEmployee(int id) {
-        collection.deleteOne(eq("employeeID", id));
+    public void deleteEmployee(Employee e) {
+        collection.deleteOne(eq("employeeID", e.getId()));
     }
 
     public void updateEmployee(int id, String updateField, String updateValue) {
