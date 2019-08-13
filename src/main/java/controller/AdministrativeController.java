@@ -242,37 +242,37 @@ public class AdministrativeController {
 
 
     public void AddEmployee(Employee e) {
-        collection.insertOne(new Document("name", e.getName()).append("employeID", e.getId()).append("password", e.getPassword())
+        collection.insertOne(new Document("name", e.getName()).append("employeeID", e.getId()).append("password", e.getPassword())
                 .append("hourlyPay", e.getHourlyPay()).append("occupation", e.getOccupation()));
     }
 
     public void deleteEmployee(int id) {
-        collection.deleteOne(eq("employeID", id));
+        collection.deleteOne(eq("employeeID", id));
     }
 
     public void updateEmployee(int id, String updateField, String updateValue) {
-        collection.updateOne(eq("employeID", id), new Document("$set", new Document(updateField, updateValue)));
+        collection.updateOne(eq("employeeID", id), new Document("$set", new Document(updateField, updateValue)));
     }
 
     public void startBreak(Date time, int id) {
-        collection.updateOne(eq("employeID", id), new Document("$set", new Document("breakStart", time)));
+        collection.updateOne(eq("employeeID", id), new Document("$set", new Document("breakStart", time)));
     }
 
     public void endBreak(Date time, int id) {
-        collection.updateOne(eq("employeID", id), new Document("$set", new Document("breakEnd", time)));
+        collection.updateOne(eq("employeeID", id), new Document("$set", new Document("breakEnd", time)));
     }
 
     public void clockIn(int id, Date time) {
-        collection.updateOne(eq("employeID", id), new Document("$set", new Document("clockIn", time)));
+        collection.updateOne(eq("employeeID", id), new Document("$set", new Document("clockIn", time)));
     }
 
     public void clockOut(int id, Date time) {
-        collection.updateOne(eq("employeID", id), new Document("$set", new Document("clockOut", time)));
+        collection.updateOne(eq("employeeID", id), new Document("$set", new Document("clockOut", time)));
     }
 
     public void login(int id, String password) {
         BasicDBObject andQuery = new BasicDBObject();
-        List<BasicDBObject> obj = new ArrayList<>();
+        List<BasicDBObject> obj = new ArrayList<BasicDBObject>();;
         obj.add(new BasicDBObject("employeID", id));
         obj.add(new BasicDBObject("password", password));
         andQuery.put("$and", obj);
