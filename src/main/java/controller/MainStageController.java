@@ -28,15 +28,15 @@ public class MainStageController {
         this.primaryStage = primaryStage;
         this.scene = scene;
 
-        //Root employee (Manager)
+               //Root employee (Manager)
         Employee manager = new Employee();
         manager.setName("Admin");
-        manager.setPassword("password");
+        manager.setPassword("password2");
         manager.setId(30001);
         //Simple employee (Worker)
         Employee employee1 = new Employee();
         employee1.setName("Jared");
-        employee1.setPassword("password");
+        employee1.setPassword("password1");
         employee1.setId(12345);
 
         employeeCollection.put(30001, manager);

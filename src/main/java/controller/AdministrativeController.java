@@ -8,7 +8,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -31,6 +30,7 @@ public class AdministrativeController {
     public MenuBar menuBar = new MenuBar();
     public RadioButton radioAll;
     public RadioButton radioClockedIn;
+    public Pagination pagination;
 
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
@@ -41,7 +41,9 @@ public class AdministrativeController {
     private Scene adminScene;
     private MainStageController mainController;
 
-    private TableView<String> empsTable = new TableView<>();
+    private ObservableList<Employee> data = fillEmpCollection();
+    private TableView<Employee> empsTable = createTable();
+
 
     void setPrimaryStage(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, boolean isAdmin) {
         this.primaryStage = primaryStage;
@@ -50,6 +52,12 @@ public class AdministrativeController {
         this.empsCollection = employeesCollection;
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
 
+        if (data.size() > 100) {
+            pagination.setPageCount((data.size() / 100) + 1);
+        } else {
+            pagination.setPageCount(1);
+        }
+        pagination.setPageFactory(this::createPage);
 
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
@@ -74,6 +82,7 @@ public class AdministrativeController {
         MenuItem deleteEmployee = new Menu("Delete");
         employeesMenu.getItems().add(addEmployee);
         employeesMenu.getItems().add(deleteEmployee);
+
         addEmployee.setOnAction(event -> {
             Dialog<Employee> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
@@ -141,7 +150,8 @@ public class AdministrativeController {
         radioToggleGroup.getToggles().add(radioClockedIn);
         radioAll.setSelected(true);
 
-        empsTable.getItems().addAll(fillEmpCollection());
+//        empsTable.setItems(data);
+
 
         inventory.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
@@ -197,6 +207,37 @@ public class AdministrativeController {
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
         });
+
+    }
+
+    private TableView<Employee> createTable() {
+
+        empsTable = new TableView<>();
+        empsTable.setEditable(true);
+
+        TableColumn<Employee, String> name = new TableColumn<>("Name");
+        TableColumn<Employee, String> employeeId = new TableColumn<>("Employee ID");
+        TableColumn<Employee, String> clockIn = new TableColumn<>("Clock In");
+        TableColumn<Employee, String> clockOut = new TableColumn<>("Clock Out");
+        TableColumn<Employee, String> breakStart = new TableColumn<>("Break Start");
+        TableColumn<Employee, String> breakEnd = new TableColumn<>("Break End");
+        TableColumn<Employee, String> weeklyHours = new TableColumn<>("Weekly Hours");
+        TableColumn<Employee, String> password = new TableColumn<>("Password");
+        TableColumn<Employee, String> hourlyPay = new TableColumn<>("Hourly Pay");
+        TableColumn<Employee, String> occupation = new TableColumn<>("Ocuppation");
+
+        empsTable.getColumns().setAll(name, employeeId, clockIn, clockOut, breakStart, breakEnd, weeklyHours, password, hourlyPay, occupation);
+
+        return empsTable;
+
+    }
+
+    private Node createPage(Integer pageIndex) {
+        int rowsPerPage = 10;
+        int fromIndex = pageIndex * rowsPerPage;
+        int toIndex = Math.min(fromIndex + rowsPerPage, (int)collection.countDocuments());
+        empsTable.setItems(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
+        return empsTable;
     }
 
 
@@ -231,24 +272,27 @@ public class AdministrativeController {
 
     public void login(int id, String password) {
         BasicDBObject andQuery = new BasicDBObject();
-        List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
+        List<BasicDBObject> obj = new ArrayList<>();
         obj.add(new BasicDBObject("employeID", id));
         obj.add(new BasicDBObject("password", password));
         andQuery.put("$and", obj);
         collection.find(andQuery);
     }
 
-    private ObservableList<String> fillEmpCollection() {
-        ObservableList<String> emps = FXCollections.observableArrayList();
-        int pid = 100001;
+    private ObservableList<Employee> fillEmpCollection() {
+        ObservableList<Employee> data = FXCollections.observableArrayList();
 
-        for (int i = 0; i < 4; i++) {
-            String idString = "" + pid + "";
-            String meal = collection.find(eq("id", idString)).toString();
-            emps.add(meal);
-            pid++;
+        int rawId = 100000;
+        for (int i = 0; i < collection.countDocuments(); i++) {
+
+//            String meal = collection.find(eq("employeeId", (rawId + i))).toString();
+            Employee employee = new Employee();
+            employee.setName("Testing");
+            employee.setPassword("123214");
+            data.add(employee);
+
         }
-        return emps;
+        return data;
     }
 
 
