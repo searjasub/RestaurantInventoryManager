@@ -55,8 +55,7 @@ public class AdministrativeController {
         this.empsCollection = employeesCollection;
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
 
-        System.out.println("Observable list size = " + data.size());
-        System.out.println(data.get(1));
+
         if (data.size() > 100) {
             pagination.setPageCount((data.size() / 100) + 1);
         } else {
@@ -155,7 +154,6 @@ public class AdministrativeController {
 
             Optional<Employee> result = dialog.showAndWait();
 
-
             if (result.isPresent()) {
                 AddEmployee(result.get());
             }
@@ -198,6 +196,8 @@ public class AdministrativeController {
                     e.setId(id.getText().trim());
             int ids = Integer.parseInt(e.getId());
                 deleteEmployee(ids);
+                    e.setName(name.getText().trim());
+                    e.setId(id.getText().trim());
 
                     return e;
                 }
@@ -205,6 +205,18 @@ public class AdministrativeController {
             });
 
             Optional<Employee> result = dialog.showAndWait();
+
+
+            if (result.isPresent()) {
+                deleteEmployee(result.get());
+            }
+
+            empsTable.getItems().removeAll();
+            empsTable.refresh();
+            data= null;
+            data = fillEmpCollection();
+            empsTable.getItems().addAll(data);
+
         });
 
         updateEmployee.setOnAction(event -> {
@@ -380,12 +392,17 @@ public class AdministrativeController {
                 e.printStackTrace();
             }
             POSController posController = loader.getController();
-            posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection, false);
+            posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection, checkForAdmin());
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
         });
 
+    }
+
+    private boolean checkForAdmin() {
+
+        return false;
     }
 
     private TableView<Employee> createTable() {
@@ -488,27 +505,24 @@ public class AdministrativeController {
         collection.find(andQuery);
     }
 
+
+
     private ObservableList<Employee> fillEmpCollection() {
         ObservableList<Employee> data = FXCollections.observableArrayList();
-
-
         List<DBObject> dbObjects = new ArrayList<>();
 
         int id = 100001;
         for (int i = 0; i < collection.countDocuments(); i++) {
+            System.out.println(collection.countDocuments());
             DBObject query = BasicDBObjectBuilder.start().add("employeeID", id + i).get();
             DBCursor cursor = dbCollection.find(query);
             while (cursor.hasNext()) {
-                System.out.println(i);
                 dbObjects.add(cursor.next());
             }
         }
 
-
-
         Employee employee;
         for (int i = 0; i < collection.countDocuments(); i++) {
-
             employee = new Employee();
             employee.setName(dbObjects.get(i).get("name").toString());
             employee.setPassword(dbObjects.get(i).get("password").toString());
@@ -517,7 +531,6 @@ public class AdministrativeController {
             employee.setId(dbObjects.get(i).get("employeeID").toString());
             employee.setHourlyPay(dbObjects.get(i).get("hourlyPay").toString());
             data.add(employee);
-
         }
         return data;
     }

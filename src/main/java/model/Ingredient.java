@@ -1,5 +1,8 @@
 package model;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import java.util.Date;
 
 public class Ingredient {
@@ -10,11 +13,13 @@ public class Ingredient {
     private double caloriePerServing;
     private double costPerIngredient;
     private double bulkCost;
-    private String name;
+    private StringProperty name;
     private int ingredientId;
     private int amount;
 
-    private Ingredient(int ingredientID, String name, boolean veganFriendly, Date prepDate, Date expiredDate, double caloriePerServing, double costPerIngredient, int amount) {
+    public Ingredient(){};
+
+    public Ingredient(int ingredientID, String name, boolean veganFriendly, Date prepDate, Date expiredDate, double caloriePerServing, double costPerIngredient, int amount) {
         setVeganFriendly(veganFriendly);
         setPrepDate(prepDate);
         setExpiredDate(expiredDate);
@@ -74,11 +79,17 @@ public class Ingredient {
     }
 
     public String getName() {
+        return nameProperty().get();
+    }
+    private StringProperty nameProperty(){
+        if (name == null) {
+            name = new SimpleStringProperty(this, "name");
+        }
         return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+        nameProperty().set(name);
     }
 
     public int getIngredientId() {
