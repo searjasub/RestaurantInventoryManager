@@ -52,8 +52,7 @@ public class AdministrativeController {
         this.empsCollection = employeesCollection;
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
 
-        System.out.println("Observable list size = " + data.size());
-        System.out.println(data.get(1));
+
         if (data.size() > 100) {
             pagination.setPageCount((data.size() / 100) + 1);
         } else {
@@ -450,6 +449,8 @@ public class AdministrativeController {
         collection.find(andQuery);
     }
 
+
+
     private ObservableList<Employee> fillEmpCollection() {
         ObservableList<Employee> data = FXCollections.observableArrayList();
 
@@ -458,10 +459,10 @@ public class AdministrativeController {
 
         int id = 100001;
         for (int i = 0; i < collection.countDocuments(); i++) {
+            System.out.println(collection.countDocuments());
             DBObject query = BasicDBObjectBuilder.start().add("employeeID", id + i).get();
             DBCursor cursor = dbCollection.find(query);
             while (cursor.hasNext()) {
-                System.out.println(i);
                 dbObjects.add(cursor.next());
             }
         }

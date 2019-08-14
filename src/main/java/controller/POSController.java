@@ -9,6 +9,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Employee;
@@ -42,7 +44,7 @@ public class POSController {
     private RadioMenuItem inventory;
     private RadioMenuItem pos;
 
-    private TableView<String> mealTable = new TableView<>();
+    private TableView<Meal> mealTable = createTable();
 
     public static double getSalesTax() {
         return salesTax;
@@ -88,7 +90,7 @@ public class POSController {
 
             pos.setSelected(true);
 
-            mealTable.setItems(fillMealCollection());
+//            mealTable.setItems(fillMealCollection());
             this.menuBar.getMenus().add(viewMenu);
 
             admin.setOnAction(event -> {
@@ -126,6 +128,51 @@ public class POSController {
                 primaryStage.setScene(scene);
             });
         }
+
+    }
+
+    private TableView<Meal> createTable() {
+
+        mealTable = new TableView<>();
+        mealTable.setEditable(true);
+
+        TableColumn<Employee, String> name = new TableColumn<>("Name");
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        name.setCellFactory(TextFieldTableCell.forTableColumn());
+        name.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setName(event.getNewValue()));
+
+        TableColumn<Employee, String> mealID = new TableColumn<>("Meal ID");
+        mealID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        mealID.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        TableColumn<Employee, String> cost = new TableColumn<>("Cost");
+        cost.setCellValueFactory(new PropertyValueFactory<>("cost"));
+        cost.setCellFactory(TextFieldTableCell.forTableColumn());
+        cost.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setWeeklyHours(event.getNewValue()));
+
+        TableColumn<Employee, String> veganFriendly = new TableColumn<>("Vegan Friendly");
+        veganFriendly.setCellValueFactory(new PropertyValueFactory<>("veganFriendly"));
+        veganFriendly.setCellFactory(TextFieldTableCell.forTableColumn());
+        veganFriendly.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setPassword(event.getNewValue()));
+
+        TableColumn<Employee, String> calorieCount = new TableColumn<>("Total Calorie Count");
+        calorieCount.setCellValueFactory(new PropertyValueFactory<>("totalCalorie"));
+        calorieCount.setCellFactory(TextFieldTableCell.forTableColumn());
+
+//        TableColumn<Employee, String> occupation = new TableColumn<>("Ingredient List");
+//        occupation.setCellValueFactory(new PropertyValueFactory<>("ingredients"));
+//        occupation.setCellFactory(TextFieldTableCell.forTableColumn());
+//        occupation.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setOccupation(event.getNewValue()));
+
+
+//        TableColumn<Employee, String> clockIn = new TableColumn<>("Clock In");
+//        TableColumn<Employee, String> clockOut = new TableColumn<>("Clock Out");
+//        TableColumn<Employee, String> breakStart = new TableColumn<>("Break Start");
+//        TableColumn<Employee, String> breakEnd = new TableColumn<>("Break End");
+
+        mealTable.getColumns().setAll(name, mealID, cost, veganFriendly, calorieCount);
+
+        return mealTable;
 
     }
 
