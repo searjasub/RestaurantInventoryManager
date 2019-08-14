@@ -188,23 +188,41 @@ public class InventoryTrackerController {
                 .get(event.getTablePosition().getRow()).setName(event.getNewValue()));
 
         TableColumn<Ingredient, String> ingredientId = new TableColumn<>("Ingredient ID");
+        ingredientId.setCellValueFactory(new PropertyValueFactory<>("ingredientId"));
+        ingredientId.setCellFactory(TextFieldTableCell.forTableColumn());
 
         TableColumn<Ingredient, String> amount = new TableColumn<>("Amount");
+        amount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        amount.setCellFactory(TextFieldTableCell.forTableColumn());
+        amount.setOnEditCommit(event -> event.getTableView().getItems()
+                .get(event.getTablePosition().getRow()).setAmount(event.getNewValue()));
 
-        TableColumn<Ingredient, String> prepDate = new TableColumn<>("Prep Date");
-
-        TableColumn<Ingredient, String> expiredDate = new TableColumn<>("Expired Date");
-
-        TableColumn<Ingredient, String> veganFriendly = new TableColumn<>("Vegan Friendly");
+//        TableColumn<Ingredient, String> prepDate = new TableColumn<>("Prep Date");
+//
+//        TableColumn<Ingredient, String> expiredDate = new TableColumn<>("Expired Date");
+//
+//        TableColumn<Ingredient, String> veganFriendly = new TableColumn<>("Vegan Friendly");
 
         TableColumn<Ingredient, String> caloriePerServing = new TableColumn<>("Calories Per Serving");
+        caloriePerServing.setCellValueFactory(new PropertyValueFactory<>("caloriePerServing"));
+        caloriePerServing.setCellFactory(TextFieldTableCell.forTableColumn());
+        caloriePerServing.setOnEditCommit(event -> event.getTableView().getItems()
+                .get(event.getTablePosition().getRow()).setCaloriePerServing(event.getNewValue()));
 
         TableColumn<Ingredient, String> costPerIngredient = new TableColumn<>("Cost Per Ingredient");
+        costPerIngredient.setCellValueFactory(new PropertyValueFactory<>("costPerIngredient"));
+        costPerIngredient.setCellFactory(TextFieldTableCell.forTableColumn());
+        costPerIngredient.setOnEditCommit(event -> event.getTableView().getItems()
+                .get(event.getTablePosition().getRow()).setCostPerIngredient(event.getNewValue()));
 
         TableColumn<Ingredient, String> bulkCost = new TableColumn<>("Bulk Cost");
+        bulkCost.setCellValueFactory(new PropertyValueFactory<>("bulkCost"));
+        bulkCost.setCellFactory(TextFieldTableCell.forTableColumn());
+        bulkCost.setOnEditCommit(event -> event.getTableView().getItems()
+                .get(event.getTablePosition().getRow()).setBulkCost(event.getNewValue()));
 
 
-        ingredientTable.getColumns().setAll(name, ingredientId, amount, prepDate, expiredDate, veganFriendly, caloriePerServing, costPerIngredient, bulkCost);
+        ingredientTable.getColumns().setAll(name, ingredientId, amount,/* prepDate, expiredDate, veganFriendly,*/ caloriePerServing, costPerIngredient, bulkCost);
 
         return ingredientTable;
 
@@ -238,11 +256,12 @@ public class InventoryTrackerController {
 
             ingredient = new Ingredient();
             ingredient.setName(dbObjects.get(i).get("name").toString());
-//            employee.setPassword(dbObjects.get(i).get("password").toString());
-//            employee.setOccupation(dbObjects.get(i).get("occupation").toString());
-//            employee.setWeeklyHours(dbObjects.get(i).get("weeklyHours").toString());
-//            employee.setId(dbObjects.get(i).get("employeeID").toString());
-//            employee.setHourlyPay(dbObjects.get(i).get("hourlyPay").toString());
+            ingredient.setIngredientId(dbObjects.get(i).get("ingredientID").toString());
+            ingredient.setBulkCost(dbObjects.get(i).get("bulkCost").toString());
+            ingredient.setCostPerIngredient(dbObjects.get(i).get("individualCost").toString());
+            ingredient.setCaloriePerServing(dbObjects.get(i).get("caloriePerServing").toString());
+            ingredient.setAmount(dbObjects.get(i).get("amount").toString());
+
             data.add(ingredient);
 
         }

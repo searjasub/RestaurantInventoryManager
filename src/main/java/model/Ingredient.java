@@ -10,16 +10,16 @@ public class Ingredient {
     private boolean veganFriendly;
     private Date expiredDate;
     private Date prepDate;
-    private double caloriePerServing;
-    private double costPerIngredient;
-    private double bulkCost;
+    private StringProperty caloriePerServing;
+    private StringProperty costPerIngredient;
+    private StringProperty bulkCost;
     private StringProperty name;
-    private int ingredientId;
-    private int amount;
+    private StringProperty ingredientId;
+    private StringProperty amount;
 
     public Ingredient(){};
 
-    public Ingredient(int ingredientID, String name, boolean veganFriendly, Date prepDate, Date expiredDate, double caloriePerServing, double costPerIngredient, int amount) {
+    public Ingredient(String ingredientID, String name, boolean veganFriendly, Date prepDate, Date expiredDate, String caloriePerServing, String costPerIngredient, String amount) {
         setVeganFriendly(veganFriendly);
         setPrepDate(prepDate);
         setExpiredDate(expiredDate);
@@ -54,28 +54,47 @@ public class Ingredient {
         this.prepDate = prepDate;
     }
 
-    public double getCaloriePerServing() {
+    private StringProperty calorieProperty(){
+        if (caloriePerServing == null) {
+            caloriePerServing = new SimpleStringProperty(this, "caloriePerServing");
+        }
         return caloriePerServing;
     }
 
-    public void setCaloriePerServing(double caloriePerServing) {
-        this.caloriePerServing = caloriePerServing;
+    public String getCaloriePerServing() {
+        return calorieProperty().get();
     }
 
-    public double getCostPerIngredient() {
+    public void setCaloriePerServing(String caloriePerServing){
+        calorieProperty().set(caloriePerServing);
+    }
+    private StringProperty costProperty(){
+        if (costPerIngredient == null) {
+            costPerIngredient = new SimpleStringProperty(this, "costPerIngredient");
+        }
         return costPerIngredient;
     }
 
-    public void setCostPerIngredient(double costPerIngredient) {
-        this.costPerIngredient = costPerIngredient;
+    public String getCostPerIngredient() {
+        return costProperty().get();
     }
 
-    public double getBulkCost() {
+    public void setCostPerIngredient(String costPerIngredient) {
+        costProperty().set(costPerIngredient);
+    }
+    private StringProperty bulkCostProperty(){
+        if (bulkCost == null) {
+            bulkCost = new SimpleStringProperty(this, "bulkCost");
+        }
         return bulkCost;
     }
 
-    public void setBulkCost(double bulkCost) {
-        this.bulkCost = bulkCost;
+    public String getBulkCost() {
+        return bulkCostProperty().get();
+    }
+
+    public void setBulkCost(String bulkCost) {
+        bulkCostProperty().set(bulkCost);
     }
 
     public String getName() {
@@ -91,21 +110,34 @@ public class Ingredient {
     public void setName(String name) {
         nameProperty().set(name);
     }
-
-    public int getIngredientId() {
+    private StringProperty ingredientIdProperty(){
+        if (ingredientId == null) {
+            ingredientId = new SimpleStringProperty(this, "ingredientId");
+        }
         return ingredientId;
     }
 
-    public void setIngredientId(int ingredientId) {
-        this.ingredientId = ingredientId;
+    public String getIngredientId() {
+        return ingredientIdProperty().get();
     }
 
-    public int getAmount() {
+    public void setIngredientId(String ingredientId) {
+        ingredientIdProperty().set(ingredientId);
+    }
+
+    private StringProperty amountProperty(){
+        if (amount == null) {
+            amount = new SimpleStringProperty(this, "amount");
+        }
         return amount;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public String getAmount() {
+        return amountProperty().get();
+    }
+
+    public void setAmount(String amount) {
+        amountProperty().set(amount);
     }
 
 
