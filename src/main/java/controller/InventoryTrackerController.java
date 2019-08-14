@@ -227,7 +227,6 @@ public class InventoryTrackerController {
             DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();
             DBCursor cursor = dbCollection.find(query);
             while (cursor.hasNext()) {
-                System.out.println(i);
                 dbObjects.add(cursor.next());
             }
         }

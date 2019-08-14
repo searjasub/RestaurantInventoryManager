@@ -408,7 +408,6 @@ public class AdministrativeController {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
-        System.out.println(fromIndex);
         System.out.println(toIndex);
         empsTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return empsTable;
@@ -459,8 +458,6 @@ public class AdministrativeController {
         collection.find(andQuery);
     }
 
-
-
     private ObservableList<Employee> fillEmpCollection() {
         ObservableList<Employee> data = FXCollections.observableArrayList();
         List<DBObject> dbObjects = new ArrayList<>();
@@ -488,7 +485,6 @@ public class AdministrativeController {
         }
         return data;
     }
-
 
     public void onMenuItemExit(ActionEvent actionEvent) {
         primaryStage.close();

@@ -3,6 +3,7 @@ package controller;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.sun.xml.internal.ws.api.model.MEP;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -136,33 +137,29 @@ public class POSController {
         mealTable = new TableView<>();
         mealTable.setEditable(true);
 
-        TableColumn<Employee, String> name = new TableColumn<>("Name");
+        TableColumn<Meal, String> name = new TableColumn<>("Name");
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         name.setCellFactory(TextFieldTableCell.forTableColumn());
-        name.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setName(event.getNewValue()));
 
-        TableColumn<Employee, String> mealID = new TableColumn<>("Meal ID");
+        TableColumn<Meal, String> mealID = new TableColumn<>("Meal ID");
         mealID.setCellValueFactory(new PropertyValueFactory<>("id"));
         mealID.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        TableColumn<Employee, String> cost = new TableColumn<>("Cost");
+        TableColumn<Meal, String> cost = new TableColumn<>("Cost");
         cost.setCellValueFactory(new PropertyValueFactory<>("cost"));
         cost.setCellFactory(TextFieldTableCell.forTableColumn());
-        cost.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setWeeklyHours(event.getNewValue()));
 
-        TableColumn<Employee, String> veganFriendly = new TableColumn<>("Vegan Friendly");
+        TableColumn<Meal, String> veganFriendly = new TableColumn<>("Vegan Friendly");
         veganFriendly.setCellValueFactory(new PropertyValueFactory<>("veganFriendly"));
         veganFriendly.setCellFactory(TextFieldTableCell.forTableColumn());
-        veganFriendly.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setPassword(event.getNewValue()));
 
-        TableColumn<Employee, String> calorieCount = new TableColumn<>("Total Calorie Count");
+        TableColumn<Meal, String> calorieCount = new TableColumn<>("Total Calorie Count");
         calorieCount.setCellValueFactory(new PropertyValueFactory<>("totalCalorie"));
         calorieCount.setCellFactory(TextFieldTableCell.forTableColumn());
 
 //        TableColumn<Employee, String> occupation = new TableColumn<>("Ingredient List");
 //        occupation.setCellValueFactory(new PropertyValueFactory<>("ingredients"));
 //        occupation.setCellFactory(TextFieldTableCell.forTableColumn());
-//        occupation.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setOccupation(event.getNewValue()));
 
 
 //        TableColumn<Employee, String> clockIn = new TableColumn<>("Clock In");
