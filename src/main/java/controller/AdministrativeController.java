@@ -4,6 +4,8 @@ import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,6 +23,7 @@ import javafx.stage.Stage;
 import model.Employee;
 import org.bson.Document;
 
+import javax.xml.soap.Text;
 import java.io.IOException;
 import java.util.*;
 
@@ -102,17 +105,29 @@ public class AdministrativeController {
 
             TextField name = new TextField();
             name.setPromptText("Name");
+            TextField id = new TextField();
+            id.setPromptText("EmployeeID");
+            TextField weeklyHours = new TextField();
+            weeklyHours.setPromptText("WeeklyHours");
             TextField password = new TextField();
             password.setPromptText("Password");
+            TextField hourlyPay = new TextField();
+            hourlyPay.setPromptText("HourlyPay");
             TextField occupation = new TextField();
             occupation.setPromptText("Occupation");
 
-            grid.add(new Label("First Name:"), 0, 0);
+            grid.add(new Label("Name:"), 0, 0);
             grid.add(name, 1, 0);
-            grid.add(new Label("Last Name:"), 0, 1);
-            grid.add(password, 1, 1);
-            grid.add(new Label("Primary Email:"), 0, 2);
-            grid.add(occupation, 1, 2);
+            grid.add(new Label("EmployeeID:"), 0, 1);
+            grid.add(id, 1, 1);
+            grid.add(new Label("WeeklyHours"), 0, 2);
+            grid.add(weeklyHours, 1, 2);
+            grid.add(new Label("Password"), 0, 3);
+            grid.add(password, 1, 3);
+            grid.add(new Label("HourlyPay"), 0, 4);
+            grid.add(hourlyPay, 1, 4);
+            grid.add(new Label("Primary Email:"), 0, 5);
+            grid.add(occupation, 1, 5);
 
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
             loginButton.setDisable(true);
@@ -130,7 +145,7 @@ public class AdministrativeController {
                     Employee e = new Employee();
 
                     e.setName(name.getText().trim());
-                    e.setPassword(password.getText().trim());
+                    e.setPassword(id.getText().trim());
                     e.setOccupation(occupation.getText().trim());
 
                     return e;
@@ -159,33 +174,30 @@ public class AdministrativeController {
             grid.setVgap(10);
             grid.setPadding(new Insets(20, 150, 10, 10));
 
-            TextField name = new TextField();
-            name.setPromptText("Name");
             TextField id = new TextField();
-            id.setPromptText("id");
+            id.setPromptText("EmployeeID");
 
-            grid.add(new Label("Full Name:"), 0, 0);
-            grid.add(name, 1, 0);
-            grid.add(new Label("EmployeeId:"), 0, 1);
+            grid.add(new Label("EmployeeID:"), 0, 1);
             grid.add(id, 1, 1);
 
             Node deleteButton = dialog.getDialogPane().lookupButton(deleteButtonType);
             deleteButton.setDisable(true);
 
-            name.textProperty().addListener((observable, oldValue, newValue) -> {
+            id.textProperty().addListener((observable, oldValue, newValue) -> {
                 deleteButton.setDisable(newValue.trim().isEmpty());
             });
 
             dialog.getDialogPane().setContent(grid);
 
-            Platform.runLater(name::requestFocus);
+            Platform.runLater(id::requestFocus);
 
+            Employee e = new Employee();
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == deleteButtonType) {
-                    Employee e = new Employee();
 
-                    e.setName(name.getText().trim());
-                    e.setPassword(id.getText().trim());
+                    e.setId(id.getText().trim());
+            int ids = Integer.parseInt(e.getId());
+                deleteEmployee(ids);
 
                     return e;
                 }
@@ -193,12 +205,6 @@ public class AdministrativeController {
             });
 
             Optional<Employee> result = dialog.showAndWait();
-
-
-            if (result.isPresent()) {
-                deleteEmployee(result.get());
-            }
-
         });
 
         updateEmployee.setOnAction(event -> {
@@ -251,6 +257,33 @@ public class AdministrativeController {
 //            grid.add(occupation, 1, 5);
             grid.add(comboBox, 1, 1);
 
+            comboBox.valueProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                    System.out.println("Selected value : " + newValue);
+                    if(newValue == "Full Name"){
+                        grid.add(new Label("Full Name"), 0, 1);
+                        grid.add(name, 1, 1);
+                    }
+                    if(newValue == "WeeklyHours"){
+                        grid.add(new Label("WeeklyHours"), 0, 1);
+                        grid.add(weeklyHours, 1, 1);
+                    }
+                    if(newValue == "Password"){
+                        grid.add(new Label("Password"), 0, 1);
+                        grid.add(password, 1, 1);
+                    }
+                    if(newValue == "HourlyPay"){
+                        grid.add(new Label("HourlyPay"), 0, 1);
+                        grid.add(hourlyPay, 1, 1);
+                    }
+                    if(newValue == "Occupation"){
+                        grid.add(new Label("Occupation"), 0, 1);
+                        grid.add(occupation, 1, 1);
+                    }
+                }
+            });
+
 
             Node updateButton = dialog.getDialogPane().lookupButton(updateButtonType);
             updateButton.setDisable(true);
@@ -268,7 +301,12 @@ public class AdministrativeController {
                     Employee e = new Employee();
 
                     e.setName(name.getText().trim());
-                    e.setPassword(id.getText().trim());
+                    e.setId(id.getText().trim());
+                    e.setPassword(password.getText().trim());
+                    e.setWeeklyHours(weeklyHours.getText().trim());
+                    e.setHourlyPay(hourlyPay.getText().trim());
+                    e.setOccupation(occupation.getText().trim());
+
 
                     return e;
                 }
@@ -279,7 +317,7 @@ public class AdministrativeController {
 
 
             if (result.isPresent()) {
-                deleteEmployee(result.get());
+                //deleteEmployee(result.get());
             }
         });
 
@@ -411,8 +449,8 @@ public class AdministrativeController {
                 .append("hourlyPay", e.getHourlyPay()).append("occupation", e.getOccupation()));
     }
 
-    public void deleteEmployee(Employee e) {
-        collection.deleteOne(eq("employeeID", e.getId()));
+    public void deleteEmployee(int e) {
+        collection.deleteOne(eq("employeeID", e));
     }
 
     public void updateEmployee(int id, String updateField, String updateValue) {
@@ -437,14 +475,14 @@ public class AdministrativeController {
 
     public void getEmployee(int id) {
         Employee e = new Employee();
-        collection.find(eq("emplyeeId", id)).toString();
+        collection.find(eq("employeeId", id)).toString();
     }
 
     public void login(int id, String password) {
         BasicDBObject andQuery = new BasicDBObject();
         List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
 
-        obj.add(new BasicDBObject("employeID", id));
+        obj.add(new BasicDBObject("employeeID", id));
         obj.add(new BasicDBObject("password", password));
         andQuery.put("$and", obj);
         collection.find(andQuery);
