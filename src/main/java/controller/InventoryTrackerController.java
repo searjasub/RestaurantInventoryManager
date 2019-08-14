@@ -43,7 +43,7 @@ public class InventoryTrackerController {
     private MainStageController mainController;
     private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
     private DB db = mongoC.getDB("Restaurants");
-    private DBCollection dbCollection = db.getCollection("Ingredients");
+    private DBCollection dbCollection = db.getCollection("Inventory");
 
     private ObservableList<Ingredient> data = fillIngredientCollection();
     private TableView<Ingredient> ingredientTable = createTable();
@@ -220,10 +220,9 @@ public class InventoryTrackerController {
     private ObservableList<Ingredient> fillIngredientCollection() {
         ObservableList<Ingredient> data = FXCollections.observableArrayList();
 
-
         List<DBObject> dbObjects = new ArrayList<>();
 
-        int id = 100001;
+        int id = 500001;
         for (int i = 0; i < collection.countDocuments(); i++) {
             DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();
             DBCursor cursor = dbCollection.find(query);
