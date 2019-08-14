@@ -1,7 +1,6 @@
 package controller;
 
-import com.mongodb.Block;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.collections.FXCollections;
@@ -12,6 +11,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Employee;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -39,6 +41,9 @@ public class InventoryTrackerController {
     private Stage primaryStage;
     private Scene inventoryScene;
     private MainStageController mainController;
+    private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
+    private DB db = mongoC.getDB("Restaurants");
+    private DBCollection dbCollection = db.getCollection("Inventory");
 
     private ObservableList<Ingredient> data = fillIngredientCollection();
     private TableView<Ingredient> ingredientTable = createTable();
@@ -177,13 +182,25 @@ public class InventoryTrackerController {
         ingredientTable.setEditable(true);
 
         TableColumn<Ingredient, String> name = new TableColumn<>("Name");
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        name.setCellFactory(TextFieldTableCell.forTableColumn());
+        name.setOnEditCommit(event -> event.getTableView().getItems()
+                .get(event.getTablePosition().getRow()).setName(event.getNewValue()));
+
         TableColumn<Ingredient, String> ingredientId = new TableColumn<>("Ingredient ID");
+
         TableColumn<Ingredient, String> amount = new TableColumn<>("Amount");
+
         TableColumn<Ingredient, String> prepDate = new TableColumn<>("Prep Date");
+
         TableColumn<Ingredient, String> expiredDate = new TableColumn<>("Expired Date");
+
         TableColumn<Ingredient, String> veganFriendly = new TableColumn<>("Vegan Friendly");
+
         TableColumn<Ingredient, String> caloriePerServing = new TableColumn<>("Calories Per Serving");
+
         TableColumn<Ingredient, String> costPerIngredient = new TableColumn<>("Cost Per Ingredient");
+
         TableColumn<Ingredient, String> bulkCost = new TableColumn<>("Bulk Cost");
 
 
@@ -197,24 +214,39 @@ public class InventoryTrackerController {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
         int toIndex = Math.min(fromIndex + rowsPerPage, (int)collection.countDocuments());
-        ingredientTable.setItems(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
+        ingredientTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return ingredientTable;
     }
     private ObservableList<Ingredient> fillIngredientCollection() {
         ObservableList<Ingredient> data = FXCollections.observableArrayList();
+
+        List<DBObject> dbObjects = new ArrayList<>();
+
         int id = 500001;
+        for (int i = 0; i < collection.countDocuments(); i++) {
+            DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();
+            DBCursor cursor = dbCollection.find(query);
+            while (cursor.hasNext()) {
+                System.out.println(i);
+                dbObjects.add(cursor.next());
+            }
+        }
 
-        for(int i = 0; i < 4; i++){
-            //NEED TO BE AN INGREDIENT BEING PULLED IN
-//            String idString = ""+id+"";
-//            String item = collection.find(eq("id", idString)).toString();
 
-//            data.add(item);
-            id++;
+
+        Ingredient ingredient;
+        for (int i = 0; i < collection.countDocuments(); i++) {
+
+            ingredient = new Ingredient();
+            ingredient.setName(dbObjects.get(i).get("name").toString());
+//            employee.setPassword(dbObjects.get(i).get("password").toString());
+//            employee.setOccupation(dbObjects.get(i).get("occupation").toString());
+//            employee.setWeeklyHours(dbObjects.get(i).get("weeklyHours").toString());
+//            employee.setId(dbObjects.get(i).get("employeeID").toString());
+//            employee.setHourlyPay(dbObjects.get(i).get("hourlyPay").toString());
+            data.add(ingredient);
+
         }
         return data;
     }
-
-
-
-}
+    }
