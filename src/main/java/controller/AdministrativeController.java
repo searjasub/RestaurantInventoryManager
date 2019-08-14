@@ -144,7 +144,10 @@ public class AdministrativeController {
                     Employee e = new Employee();
 
                     e.setName(name.getText().trim());
-                    e.setPassword(id.getText().trim());
+                    e.setId(id.getText().trim());
+                    e.setWeeklyHours(weeklyHours.getText().trim());
+                    e.setPassword(password.getText().trim());
+                    e.setHourlyPay(hourlyPay.getText().trim());
                     e.setOccupation(occupation.getText().trim());
 
                     return e;
@@ -194,22 +197,13 @@ public class AdministrativeController {
                 if (dialogButton == deleteButtonType) {
 
                     e.setId(id.getText().trim());
-            int ids = Integer.parseInt(e.getId());
-                deleteEmployee(ids);
-                    e.setName(name.getText().trim());
-                    e.setId(id.getText().trim());
-
-                    return e;
+                    int ids = Integer.parseInt(e.getId());
+                    deleteEmployee(ids);
                 }
                 return null;
             });
 
             Optional<Employee> result = dialog.showAndWait();
-
-
-            if (result.isPresent()) {
-                deleteEmployee(result.get());
-            }
 
             empsTable.getItems().removeAll();
             empsTable.refresh();
