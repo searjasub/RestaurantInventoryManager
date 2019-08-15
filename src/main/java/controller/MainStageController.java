@@ -24,14 +24,14 @@ public class MainStageController {
     public Button loginBtn;
     private Stage primaryStage;
     private Scene scene;
-    private HashMap<Integer, Employee> employeeCollection = fillEmpCollection();
+    private HashMap<Integer, Employee> employeeCollection = new HashMap<>();
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Employees");
     private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
     private DB db = mongoC.getDB("Restaurants");
     private DBCollection dbCollection = db.getCollection("Employees");
-    private HashMap<Integer, Employee> adminMap = fillAdminCollection();
+    private HashMap<Integer, Employee> adminMap = new HashMap<>();
     private MongoCollection<Document> adminCollection = database.getCollection("Administrators");
     private DBCollection adminDbCollection = db.getCollection("Administrators");
 
@@ -42,6 +42,9 @@ public class MainStageController {
     public void setPrimaryStage(Stage primaryStage, Scene scene) {
         this.primaryStage = primaryStage;
         this.scene = scene;
+
+        employeeCollection = fillEmpCollection();
+        adminMap = fillAdminCollection();
     }
 
     public void onMenuItemExit() {
@@ -111,13 +114,11 @@ public class MainStageController {
     }
 
     private HashMap<Integer, Employee> fillEmpCollection() {
-        employeeCollection = new HashMap<>();
+
         HashMap<Integer, Employee> data = new HashMap<>();
         List<DBObject> dbObjects = new ArrayList<>();
-
-        System.out.println(collection.countDocuments());
         int id = 100001;
-        for (int i = 0; i < collection.countDocuments(); i++) {
+        for (int i = 0; i < 5; i++) {
             DBObject query = BasicDBObjectBuilder.start().add("employeeID", id + i).get();
             DBCursor cursor = dbCollection.find(query);
             while (cursor.hasNext()) {
@@ -144,22 +145,19 @@ public class MainStageController {
     }
 
     private HashMap<Integer, Employee> fillAdminCollection() {
-        adminMap = new HashMap<>();
         HashMap<Integer, Employee> data = new HashMap<>();
 
 
         List<DBObject> dbObjects = new ArrayList<>();
-        System.out.println(adminCollection.countDocuments());
+        System.out.println("count document: " + adminCollection.countDocuments());
 
         int id = 30000;
         for (int i = 0; i < adminCollection.countDocuments(); i++) {
-            DBObject query1 = BasicDBObjectBuilder.start().add("employeeID", (id + i)).get();
+            DBObject query1 = BasicDBObjectBuilder.start().add("employeeID", "" + (id + i)).get();
             DBCursor cursor = adminDbCollection.find(query1);
-            System.out.println(cursor.hasNext());
+            System.out.println(cursor);
             while (cursor.hasNext()) {
-                System.out.println(cursor.next());
                 dbObjects.add(cursor.next());
-
             }
         }
 

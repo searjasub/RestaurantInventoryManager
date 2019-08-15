@@ -331,7 +331,6 @@ public class AdministrativeController {
         menuBar.getMenus().add(viewMenu);
         menuBar.getMenus().add(employeesMenu);
 
-
         ToggleGroup radioToggleGroup = new ToggleGroup();
         radioToggleGroup.getToggles().add(radioAll);
         radioToggleGroup.getToggles().add(radioClockedIn);
@@ -373,7 +372,6 @@ public class AdministrativeController {
             primaryStage.setScene(financeScene);
 
         });
-
 
         pos.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
@@ -453,7 +451,6 @@ public class AdministrativeController {
         return empsTable;
     }
 
-
     public void AddEmployee(Employee e) {
         collection.insertOne(new Document("name", e.getName()).append("employeeID", e.getId()).append("password", e.getPassword())
                 .append("hourlyPay", e.getHourlyPay()).append("occupation", e.getOccupation()));
@@ -490,7 +487,8 @@ public class AdministrativeController {
 
     public void login(int id, String password) {
         BasicDBObject andQuery = new BasicDBObject();
-        List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
+        List<BasicDBObject> obj;
+        obj = new ArrayList<BasicDBObject>();
 
         obj.add(new BasicDBObject("employeeID", id));
         obj.add(new BasicDBObject("password", password));
