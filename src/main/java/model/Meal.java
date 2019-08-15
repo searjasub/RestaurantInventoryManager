@@ -36,8 +36,9 @@ public class Meal {
         double finalCost = 0.0d;
         String stringVal;
         for (Ingredient i : ingredients) {
-            double temp = i.getCostPerIngredient();
-            finalCost += temp;
+            String temp = i.getCostPerIngredient();
+            Double temp1 = Double.valueOf(temp);
+            finalCost += temp1;
         }
         stringVal = Double.toHexString(finalCost);
         return stringVal;
