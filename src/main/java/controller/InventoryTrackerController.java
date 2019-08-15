@@ -3,17 +3,19 @@ package controller;
 import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import model.Employee;
 import model.Ingredient;
@@ -21,10 +23,7 @@ import model.OrderedItem;
 import org.bson.Document;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -63,7 +62,6 @@ public class InventoryTrackerController {
         inventoryPagination.setPageFactory(this::createPage);
 
 
-
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
         RadioMenuItem inventory = new RadioMenuItem("Inventory");
@@ -75,6 +73,8 @@ public class InventoryTrackerController {
         viewMenu.getItems().add(pos);
         viewMenu.getItems().add(finance);
 
+        menu.getMenus().add(viewMenu);
+
         ToggleGroup toggleGroup = new ToggleGroup();
         toggleGroup.getToggles().add(admin);
         toggleGroup.getToggles().add(inventory);
@@ -83,10 +83,140 @@ public class InventoryTrackerController {
 
         inventory.setSelected(true);
 
-//        ingredientTable.setItems(fillInventoryCollection());
+        Menu ingredientsMenu = new Menu("Ingredients");
+        MenuItem addIngredient = new Menu("Add");
+        MenuItem deleteIngredient = new Menu("Delete");
+        MenuItem updateIngredient = new Menu("Update");
+        ingredientsMenu.getItems().add(addIngredient);
+        ingredientsMenu.getItems().add(deleteIngredient);
+        ingredientsMenu.getItems().add(updateIngredient);
 
+        menu.getMenus().add(ingredientsMenu);
 
-        menu.getMenus().add(viewMenu);
+        addIngredient.setOnAction(event -> {
+            Dialog<Ingredient> dialog = new Dialog<>();
+            dialog.setTitle("Contact Dialog");
+            dialog.setHeaderText("Please Input Ingredient Data");
+
+            ButtonType loginButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            TextField name = new TextField();
+            name.setPromptText("Name");
+            TextField ingredientId = new TextField();
+            ingredientId.setPromptText("IngredientID");
+            TextField amount = new TextField();
+            amount.setPromptText("Amount");
+            TextField caloriePerServing = new TextField();
+            caloriePerServing.setPromptText("CaloriePerServing");
+            TextField costPerIngredient = new TextField();
+            costPerIngredient.setPromptText("CostPerIngredient");
+            TextField bulkCost = new TextField();
+            bulkCost.setPromptText("BulkCost");
+
+            grid.add(new Label("Name:"), 0, 0);
+            grid.add(name, 1, 0);
+            grid.add(new Label("IngredientId:"), 0, 1);
+            grid.add(ingredientId, 1, 1);
+            grid.add(new Label("Amount:"), 0, 2);
+            grid.add(amount, 1, 2);
+            grid.add(new Label("CaloriePerServing"), 0, 3);
+            grid.add(caloriePerServing, 1, 3);
+            grid.add(new Label("CostPerIngredient"), 0, 4);
+            grid.add(costPerIngredient, 1, 4);
+            grid.add(new Label("BulkCost:"), 0, 5);
+            grid.add(bulkCost, 1, 5);
+
+            Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+            loginButton.setDisable(true);
+
+            name.textProperty().addListener((observable, oldValue, newValue) -> {
+                loginButton.setDisable(newValue.trim().isEmpty());
+            });
+
+            dialog.getDialogPane().setContent(grid);
+
+            Platform.runLater(name::requestFocus);
+
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == loginButtonType) {
+                    Ingredient e = new Ingredient();
+
+                    e.setName(name.getText().trim());
+                    e.setIngredientId(ingredientId.getText().trim());
+                    e.setAmount(amount.getText().trim());
+                    e.setCaloriePerServing(caloriePerServing.getText().trim());
+                    e.setCostPerIngredient(costPerIngredient.getText().trim());
+                    e.setBulkCost(bulkCost.getText().trim());
+
+                    return e;
+                }
+                return null;
+            });
+
+            Optional<Ingredient> result = dialog.showAndWait();
+
+            if (result.isPresent()) {
+                addIngredient(result.get().getName(), Integer.parseInt(result.get().getIngredientId()), Integer.parseInt(result.get().getCaloriePerServing()),
+                        Integer.parseInt(result.get().getAmount()), Integer.parseInt(result.get().getCostPerIngredient()), Integer.parseInt(result.get().getBulkCost()));
+            }
+        });
+
+        deleteIngredient.setOnAction(event -> {
+            Dialog<Ingredient> dialog = new Dialog<>();
+            dialog.setTitle("Contact Dialog");
+            dialog.setHeaderText("Please Input Ingredient Data To Delete");
+
+            ButtonType deleteButtonType = new ButtonType("Delete", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(deleteButtonType, ButtonType.CANCEL);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            TextField id = new TextField();
+            id.setPromptText("IngredientID");
+
+            grid.add(new Label("IngredientID:"), 0, 1);
+            grid.add(id, 1, 1);
+
+            Node deleteButton = dialog.getDialogPane().lookupButton(deleteButtonType);
+            deleteButton.setDisable(true);
+
+            id.textProperty().addListener((observable, oldValue, newValue) -> {
+                deleteButton.setDisable(newValue.trim().isEmpty());
+            });
+
+            dialog.getDialogPane().setContent(grid);
+
+            Platform.runLater(id::requestFocus);
+
+            Ingredient e = new Ingredient();
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == deleteButtonType) {
+
+                    e.setIngredientId(id.getText().trim());
+//                    int ids = Integer.parseInt(e.getIngredientId());
+                    deleteIngredient(e.getIngredientId());
+                }
+                return null;
+            });
+
+            Optional<Ingredient> result = dialog.showAndWait();
+
+            ingredientTable.getItems().removeAll();
+            ingredientTable.refresh();
+            data = null;
+            data = fillIngredientCollection();
+            ingredientTable.getItems().addAll(data);
+
+        });
 
         admin.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
@@ -125,6 +255,13 @@ public class InventoryTrackerController {
         });
     }
 
+    //Added this method to deal with the change over to StringProperty values instead of ints and dates. Will try to implement those soon
+    public void addIngredient(String ingredientName, int ingredientId, int caloriePerServing, int amount, int costPerIngredient, int bulkCost) {
+        collection.insertOne(new Document("ingredientName", ingredientName).append("ingredientID", ingredientId)
+                .append("caloriePerServing", caloriePerServing).append("amount", amount).append("costPerIngredient", costPerIngredient)
+                .append("bulkCost", bulkCost));
+    }
+
     public void addItem(String ingredientName, int itemId, Date prepDate, Date expDate, int caloriePerServing,
                         int amount, int individualCost, int bulkCost, int bulkAmount) {
         collection.insertOne(new Document("ingredientName", ingredientName).append("ingredientID", itemId).append("prepDate", prepDate)
@@ -132,8 +269,8 @@ public class InventoryTrackerController {
                 .append("bulkCost", bulkCost).append("bulkAmount", bulkAmount));
     }
 
-    public void deleteItem(String itemName) {
-        collection.deleteOne(eq("name", itemName));
+    public void deleteIngredient(String ingredientId) {
+        collection.deleteOne(eq("ingredientId", ingredientId));
     }
 
     public void updateItem(int itemId, String updateField, String updateValue) {
@@ -176,6 +313,7 @@ public class InventoryTrackerController {
     public void onMenuItemExit(ActionEvent actionEvent) {
 
     }
+
     private TableView<Ingredient> createTable() {
 
         ingredientTable = new TableView<>();
@@ -231,17 +369,18 @@ public class InventoryTrackerController {
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
-        int toIndex = Math.min(fromIndex + rowsPerPage, (int)collection.countDocuments());
+        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments()-1);
         ingredientTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return ingredientTable;
     }
+
     private ObservableList<Ingredient> fillIngredientCollection() {
         ObservableList<Ingredient> data = FXCollections.observableArrayList();
 
         List<DBObject> dbObjects = new ArrayList<>();
 
         int id = 500001;
-        for (int i = 0; i < collection.countDocuments(); i++) {
+        for (int i = 0; i < collection.countDocuments()-1; i++) {
             DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();
             DBCursor cursor = dbCollection.find(query);
             while (cursor.hasNext()) {
@@ -250,9 +389,8 @@ public class InventoryTrackerController {
         }
 
 
-
         Ingredient ingredient;
-        for (int i = 0; i < collection.countDocuments(); i++) {
+        for (int i = 0; i < collection.countDocuments()-1; i++) {
 
             ingredient = new Ingredient();
             ingredient.setName(dbObjects.get(i).get("name").toString());
@@ -267,4 +405,4 @@ public class InventoryTrackerController {
         }
         return data;
     }
-    }
+}
