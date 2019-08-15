@@ -375,6 +375,7 @@ public class AdministrativeController {
         });
 
 
+
         pos.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
             BorderPane root;

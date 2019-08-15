@@ -4,6 +4,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Pagination?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="controller.POSController"
@@ -21,6 +22,9 @@
             </menus>
         </MenuBar>
     </top>
+    <center>
+        <Pagination prefHeight="200.0" prefWidth="600.0" BorderPane.alignment="CENTER" fx:id="paginationPOS"/>
+    </center>
 
 
 </BorderPane>

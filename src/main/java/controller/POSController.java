@@ -1,13 +1,13 @@
 package controller;
 
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.sun.xml.internal.ws.api.model.MEP;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.exists;
 
 public class POSController {
 
@@ -44,8 +45,12 @@ public class POSController {
     private RadioMenuItem admin;
     private RadioMenuItem inventory;
     private RadioMenuItem pos;
-
+    public Pagination paginationPOS;
+    private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
+    private DB db = mongoC.getDB("Restaurants");
+    private DBCollection dbCollection = db.getCollection("Meals");
     private TableView<Meal> mealTable = createTable();
+    private ObservableList<Meal> data = fillMealCollection();
 
     public static double getSalesTax() {
         return salesTax;
@@ -71,6 +76,13 @@ public class POSController {
         this.empsCollection = employeesCollection;
         this.primaryStage.setTitle("Inventory Tracker Manager - POS");
 
+        if (data.size() > 100) {
+            paginationPOS.setPageCount((data.size() / 100) + 1);
+        } else {
+            paginationPOS.setPageCount(1);
+        }
+        paginationPOS.setPageFactory(this::createPage);
+
         if (isAdmin) {
             Menu viewMenu = new Menu("View");
             RadioMenuItem admin = new RadioMenuItem("Admin");
@@ -90,7 +102,6 @@ public class POSController {
             toggleGroup.getToggles().add(finance);
 
             pos.setSelected(true);
-
 //            mealTable.setItems(fillMealCollection());
             this.menuBar.getMenus().add(viewMenu);
 
@@ -128,6 +139,8 @@ public class POSController {
                 primaryStage.setMaxHeight(600);
                 primaryStage.setScene(scene);
             });
+
+
         }
 
     }
@@ -161,29 +174,51 @@ public class POSController {
 //        occupation.setCellValueFactory(new PropertyValueFactory<>("ingredients"));
 //        occupation.setCellFactory(TextFieldTableCell.forTableColumn());
 
-
-//        TableColumn<Employee, String> clockIn = new TableColumn<>("Clock In");
-//        TableColumn<Employee, String> clockOut = new TableColumn<>("Clock Out");
-//        TableColumn<Employee, String> breakStart = new TableColumn<>("Break Start");
-//        TableColumn<Employee, String> breakEnd = new TableColumn<>("Break End");
-
         mealTable.getColumns().setAll(name, mealID, cost, veganFriendly, calorieCount);
 
         return mealTable;
 
     }
 
-    private ObservableList<String> fillMealCollection() {
-        ObservableList<String> emps = FXCollections.observableArrayList();
-        int id = 100001;
-
-        for(int i = 0; i < 4; i++){
-            String idString = ""+id+"";
-            String meal = collection.find(eq("id", idString)).toString();
-            emps.add(meal);
-            id++;
+    private Node createPage(Integer pageIndex) {
+        int rowsPerPage = 10;
+        int fromIndex = pageIndex * rowsPerPage;
+        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
+        System.out.println(toIndex);
+        System.out.println(mealTable.getItems().size());
+        for(int i = 0; i < mealTable.getItems().size();i++){
+            System.out.println(mealTable.getItems().get(i));
         }
-        return emps;
+        mealTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex-1)));
+        return mealTable;
+    }
+
+    private ObservableList<Meal> fillMealCollection() {
+        ObservableList<Meal> data = FXCollections.observableArrayList();
+        List<DBObject> dbObjects = new ArrayList<>();
+
+        for (int i = 0; i < collection.countDocuments(); i++) {
+            System.out.println(collection.countDocuments());
+            DBObject query = BasicDBObjectBuilder.start().add("mealID",  i+1).get();
+            DBCursor cursor = dbCollection.find(query);
+            System.out.println(cursor);
+            System.out.println(cursor.hasNext());
+            while (cursor.hasNext()) {
+                dbObjects.add(cursor.next());
+            }
+        }
+
+        Meal meal;
+        for (int i = 1; i < collection.countDocuments(); i++) {
+            meal = new  Meal();
+            meal.setName(dbObjects.get(i).get("name").toString());
+            meal.setCost(dbObjects.get(i).get("cost").toString());
+            meal.setMealId(dbObjects.get(i).get("mealID").toString());
+            meal.setTotalCalorieCount(dbObjects.get(i).get("totalCalorie").toString());
+            meal.setVeganFriendly(dbObjects.get(i).get("veganFriendly").toString());
+            data.add(meal);
+        }
+        return data;
     }
 
     public void splitTab() {

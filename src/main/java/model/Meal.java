@@ -14,12 +14,17 @@ public class Meal {
     private StringProperty totalCalorieCount;
     private StringProperty mealId;
 
+    public Meal(){
+
+    }
+
     public Meal(String name, String mealId) {
         setName(name);
         setMealId(mealId);
         setVeganFriendly(determineIfVF());
         setCost(calculateTotalCost());
     }
+
 
     public String determineIfVF() {
         String returnVal = "true";
