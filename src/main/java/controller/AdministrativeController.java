@@ -452,8 +452,8 @@ public class AdministrativeController {
     }
 
     public void AddEmployee(Employee e) {
-        collection.insertOne(new Document("name", e.getName()).append("employeeID", e.getId()).append("password", e.getPassword())
-                .append("hourlyPay", e.getHourlyPay()).append("occupation", e.getOccupation()));
+        collection.insertOne(new Document("name", e.getName()).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
+                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
     }
 
     public void deleteEmployee(int e) {

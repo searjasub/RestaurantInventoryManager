@@ -3,8 +3,6 @@ package controller;
 import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,7 +13,9 @@ import model.Employee;
 import org.bson.Document;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MainStageController {
 
@@ -56,7 +56,7 @@ public class MainStageController {
         int employeeIdentifier = Integer.parseInt(usernameTextField.getText(0, 1));
         boolean isManager;
 
-        if (employeeIdentifier == 3){
+        if (employeeIdentifier == 3) {
             isManager = true;
         } else {
             isManager = false;
@@ -64,11 +64,10 @@ public class MainStageController {
 
         if (isManager) {
             Employee e = adminMap.get(Integer.parseInt(usernameTextField.getText()));
-            if(e.equals(null)){
+            if (e.equals(null)) {
                 //Dialog telling user username is not valid
-            }
-            else if(!e.equals(null)){
-                if(passwordTextField.getText().equals(e.getPassword())){
+            } else if (!e.equals(null)) {
+                if (passwordTextField.getText().equals(e.getPassword())) {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
                     BorderPane root = loader.load();
                     AdministrativeController adminController = loader.getController();
@@ -78,20 +77,17 @@ public class MainStageController {
                     primaryStage.setMaxWidth(600);
                     primaryStage.setMaxHeight(600);
                     primaryStage.setScene(administrativeScene);
-                }
-                else{
+                } else {
                     //Dialog telling user password is incorrect
                 }
             }
-
-
         } else {
             Employee e = employeeCollection.get(Integer.parseInt(usernameTextField.getText()));
-            if(e.equals(null)){
+            if (e.equals(null)) {
                 //Dialog telling user username is incorrect
             }
-            if(!e.equals(null)){
-                if(passwordTextField.getText().equals(e.getPassword())) {
+            if (!e.equals(null)) {
+                if (passwordTextField.getText().equals(e.getPassword())) {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
                     BorderPane root = loader.load();
                     POSController posController = loader.getController();
@@ -101,16 +97,11 @@ public class MainStageController {
                     primaryStage.setMaxWidth(600);
                     primaryStage.setMaxHeight(600);
                     primaryStage.setScene(posScene);
-                }
-                else{
+                } else {
                     //Dialog telling user password is incorrect
                 }
-
             }
-
-
         }
-
     }
 
     private HashMap<Integer, Employee> fillEmpCollection() {
@@ -126,11 +117,8 @@ public class MainStageController {
             }
         }
 
-
-
         Employee employee;
         for (int i = 0; i < collection.countDocuments(); i++) {
-
             employee = new Employee();
             employee.setName(dbObjects.get(i).get("name").toString());
             employee.setPassword(dbObjects.get(i).get("password").toString());
@@ -139,7 +127,6 @@ public class MainStageController {
             employee.setId(dbObjects.get(i).get("employeeID").toString());
             employee.setHourlyPay(dbObjects.get(i).get("hourlyPay").toString());
             data.put(Integer.parseInt(employee.getId()), employee);
-
         }
         return data;
     }
@@ -155,18 +142,13 @@ public class MainStageController {
         for (int i = 0; i < adminCollection.countDocuments(); i++) {
             DBObject query1 = BasicDBObjectBuilder.start().add("employeeID", "" + (id + i)).get();
             DBCursor cursor = adminDbCollection.find(query1);
-            System.out.println(cursor);
             while (cursor.hasNext()) {
                 dbObjects.add(cursor.next());
             }
         }
 
-        System.out.println(dbObjects);
-
-
         Employee employee;
         for (int i = 0; i < adminCollection.countDocuments(); i++) {
-
             employee = new Employee();
             employee.setName(dbObjects.get(i).get("name").toString());
             employee.setPassword(dbObjects.get(i).get("password").toString());
@@ -175,7 +157,6 @@ public class MainStageController {
             employee.setId(dbObjects.get(i).get("employeeID").toString());
             employee.setHourlyPay(dbObjects.get(i).get("hourlyPay").toString());
             data.put(Integer.parseInt(employee.getId()), employee);
-
         }
         return data;
     }
