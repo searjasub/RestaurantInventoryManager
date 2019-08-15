@@ -331,7 +331,6 @@ public class AdministrativeController {
         menuBar.getMenus().add(viewMenu);
         menuBar.getMenus().add(employeesMenu);
 
-
         ToggleGroup radioToggleGroup = new ToggleGroup();
         radioToggleGroup.getToggles().add(radioAll);
         radioToggleGroup.getToggles().add(radioClockedIn);
@@ -373,8 +372,6 @@ public class AdministrativeController {
             primaryStage.setScene(financeScene);
 
         });
-
-
 
         pos.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
@@ -449,15 +446,14 @@ public class AdministrativeController {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
-        System.out.println(toIndex);
+
         empsTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return empsTable;
     }
 
-
     public void AddEmployee(Employee e) {
-        collection.insertOne(new Document("name", e.getName()).append("employeeID", e.getId()).append("password", e.getPassword())
-                .append("hourlyPay", e.getHourlyPay()).append("occupation", e.getOccupation()));
+        collection.insertOne(new Document("name", e.getName()).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
+                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
     }
 
     public void deleteEmployee(int e) {
@@ -491,7 +487,8 @@ public class AdministrativeController {
 
     public void login(int id, String password) {
         BasicDBObject andQuery = new BasicDBObject();
-        List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
+        List<BasicDBObject> obj;
+        obj = new ArrayList<BasicDBObject>();
 
         obj.add(new BasicDBObject("employeeID", id));
         obj.add(new BasicDBObject("password", password));
@@ -505,7 +502,6 @@ public class AdministrativeController {
 
         int id = 100001;
         for (int i = 0; i < collection.countDocuments(); i++) {
-            System.out.println(collection.countDocuments());
             DBObject query = BasicDBObjectBuilder.start().add("employeeID", id + i).get();
             DBCursor cursor = dbCollection.find(query);
             while (cursor.hasNext()) {
