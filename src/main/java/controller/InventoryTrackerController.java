@@ -6,7 +6,6 @@ import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -27,11 +26,11 @@ import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 
+@SuppressWarnings("DuplicatedCode")
 public class InventoryTrackerController {
 
     public MenuBar menu;
     public Pagination inventoryPagination;
-
     private MongoClient mc = new MongoClient("localHost");
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Inventory");
@@ -43,7 +42,6 @@ public class InventoryTrackerController {
     private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
     private DB db = mongoC.getDB("Restaurants");
     private DBCollection dbCollection = db.getCollection("Inventory");
-
     private ObservableList<Ingredient> data = fillIngredientCollection();
     private TableView<Ingredient> ingredientTable = createTable();
     private CurrentSession currentSession;
@@ -55,14 +53,12 @@ public class InventoryTrackerController {
         this.currentSession = currentSession;
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
-
         if (data.size() > 100) {
             inventoryPagination.setPageCount((data.size() / 100) + 1);
         } else {
             inventoryPagination.setPageCount(1);
         }
         inventoryPagination.setPageFactory(this::createPage);
-
 
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
@@ -137,9 +133,7 @@ public class InventoryTrackerController {
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
             loginButton.setDisable(true);
 
-            name.textProperty().addListener((observable, oldValue, newValue) -> {
-                loginButton.setDisable(newValue.trim().isEmpty());
-            });
+            name.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
 
             dialog.getDialogPane().setContent(grid);
 
@@ -163,10 +157,8 @@ public class InventoryTrackerController {
 
             Optional<Ingredient> result = dialog.showAndWait();
 
-            if (result.isPresent()) {
-                addIngredient(result.get().getName(), Integer.parseInt(result.get().getIngredientId()), Integer.parseInt(result.get().getCaloriePerServing()),
-                        Integer.parseInt(result.get().getAmount()), Integer.parseInt(result.get().getCostPerIngredient()), Integer.parseInt(result.get().getBulkCost()));
-            }
+            result.ifPresent(ingredient -> addIngredient(ingredient.getName(), Integer.parseInt(ingredient.getIngredientId()), Integer.parseInt(ingredient.getCaloriePerServing()),
+                    Integer.parseInt(ingredient.getAmount()), Integer.parseInt(ingredient.getCostPerIngredient()), Integer.parseInt(ingredient.getBulkCost())));
         });
 
         deleteIngredient.setOnAction(event -> {
@@ -191,9 +183,7 @@ public class InventoryTrackerController {
             Node deleteButton = dialog.getDialogPane().lookupButton(deleteButtonType);
             deleteButton.setDisable(true);
 
-            id.textProperty().addListener((observable, oldValue, newValue) -> {
-                deleteButton.setDisable(newValue.trim().isEmpty());
-            });
+            id.textProperty().addListener((observable, oldValue, newValue) -> deleteButton.setDisable(newValue.trim().isEmpty()));
 
             dialog.getDialogPane().setContent(grid);
 
@@ -210,6 +200,7 @@ public class InventoryTrackerController {
                 return null;
             });
 
+            //TODO What are we doing with this?
             Optional<Ingredient> result = dialog.showAndWait();
 
             ingredientTable.getItems().removeAll();
@@ -234,7 +225,7 @@ public class InventoryTrackerController {
             adminController.setPrimaryStage(primaryStage, inventoryScene, mainController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
-            primaryStage.setScene(new Scene(root, 600, 600));
+            primaryStage.setScene(new Scene(Objects.requireNonNull(root), 600, 600));
         });
 
         pos.setOnAction(event -> {
@@ -258,7 +249,7 @@ public class InventoryTrackerController {
     }
 
     //Added this method to deal with the change over to StringProperty values instead of ints and dates. Will try to implement those soon
-    public void addIngredient(String ingredientName, int ingredientId, int caloriePerServing, int amount, int costPerIngredient, int bulkCost) {
+    private void addIngredient(String ingredientName, int ingredientId, int caloriePerServing, int amount, int costPerIngredient, int bulkCost) {
         collection.insertOne(new Document("ingredientName", ingredientName).append("ingredientID", ingredientId)
                 .append("caloriePerServing", caloriePerServing).append("amount", amount).append("costPerIngredient", costPerIngredient)
                 .append("bulkCost", bulkCost));
@@ -271,7 +262,7 @@ public class InventoryTrackerController {
                 .append("bulkCost", bulkCost).append("bulkAmount", bulkAmount));
     }
 
-    public void deleteIngredient(String ingredientId) {
+    private void deleteIngredient(String ingredientId) {
         collection.deleteOne(eq("ingredientId", ingredientId));
     }
 
@@ -312,7 +303,7 @@ public class InventoryTrackerController {
         return null;
     }
 
-    public void onMenuItemExit(ActionEvent actionEvent) {
+    public void onMenuItemExit() {
 
     }
 
@@ -408,7 +399,7 @@ public class InventoryTrackerController {
         return data;
     }
 
-    public void onMenuEndSession(ActionEvent actionEvent) {
+    public void onMenuEndSession() {
         currentSession.restartSession();
         try {
             FXMLLoader loader = new FXMLLoader();

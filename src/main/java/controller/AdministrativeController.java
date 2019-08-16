@@ -5,10 +5,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -28,6 +26,7 @@ import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 
+@SuppressWarnings("unused")
 public class AdministrativeController {
 
     public MenuBar menuBar = new MenuBar();
@@ -37,7 +36,7 @@ public class AdministrativeController {
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Employees");
-    private HashMap<Integer, Employee> empsCollection;
+    private HashMap<Integer, Employee> employeeHashMap;
     private Stage primaryStage;
     private Scene adminScene;
     private MainStageController mainController;
@@ -52,7 +51,7 @@ public class AdministrativeController {
         this.primaryStage = primaryStage;
         this.adminScene = adminScene;
         this.mainController = mainStageController;
-        this.empsCollection = employeesCollection;
+        this.employeeHashMap = employeesCollection;
         this.currentSession = currentSession;
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
 
@@ -153,9 +152,7 @@ public class AdministrativeController {
 
             Optional<Employee> result = dialog.showAndWait();
 
-            if (result.isPresent()) {
-                AddEmployee(result.get());
-            }
+            result.ifPresent(this::AddEmployee);
         });
 
         //TODO DELETE EMPLOYEE
@@ -181,9 +178,7 @@ public class AdministrativeController {
             Node deleteButton = dialog.getDialogPane().lookupButton(deleteButtonType);
             deleteButton.setDisable(true);
 
-            id.textProperty().addListener((observable, oldValue, newValue) -> {
-                deleteButton.setDisable(newValue.trim().isEmpty());
-            });
+            id.textProperty().addListener((observable, oldValue, newValue) -> deleteButton.setDisable(newValue.trim().isEmpty()));
 
             dialog.getDialogPane().setContent(grid);
 
@@ -253,23 +248,23 @@ public class AdministrativeController {
 
             comboBox.valueProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
                 System.out.println("Selected value : " + newValue);
-                if (newValue == "Full Name") {
+                if (newValue.equals("Full Name")) {
                     grid.add(new Label("Full Name"), 0, 1);
                     grid.add(name, 1, 1);
                 }
-                if (newValue == "WeeklyHours") {
+                if (newValue.equals("WeeklyHours")) {
                     grid.add(new Label("WeeklyHours"), 0, 1);
                     grid.add(weeklyHours, 1, 1);
                 }
-                if (newValue == "Password") {
+                if (newValue.equals("Password")) {
                     grid.add(new Label("Password"), 0, 1);
                     grid.add(password, 1, 1);
                 }
-                if (newValue == "HourlyPay") {
+                if (newValue.equals("HourlyPay")) {
                     grid.add(new Label("HourlyPay"), 0, 1);
                     grid.add(hourlyPay, 1, 1);
                 }
-                if (newValue == "Occupation") {
+                if (newValue.equals("Occupation")) {
                     grid.add(new Label("Occupation"), 0, 1);
                     grid.add(occupation, 1, 1);
                 }
@@ -279,9 +274,7 @@ public class AdministrativeController {
             Node updateButton = dialog.getDialogPane().lookupButton(updateButtonType);
             updateButton.setDisable(true);
 
-            name.textProperty().addListener((observable, oldValue, newValue) -> {
-                updateButton.setDisable(newValue.trim().isEmpty());
-            });
+            name.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
 
             dialog.getDialogPane().setContent(grid);
 
@@ -463,7 +456,7 @@ public class AdministrativeController {
     public void login(int id, String password) {
         BasicDBObject andQuery = new BasicDBObject();
         List<BasicDBObject> obj;
-        obj = new ArrayList<BasicDBObject>();
+        obj = new ArrayList<>();
 
         obj.add(new BasicDBObject("employeeID", id));
         obj.add(new BasicDBObject("password", password));
@@ -498,7 +491,7 @@ public class AdministrativeController {
         return data;
     }
 
-    public void onMenuEndSession(ActionEvent actionEvent) {
+    public void onMenuEndSession() {
         currentSession.restartSession();
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -521,11 +514,11 @@ public class AdministrativeController {
         }
     }
 
-    public void onMenuItemExit(ActionEvent actionEvent) {
+    public void onMenuItemExit() {
         primaryStage.close();
     }
 
-    public void allShow(ActionEvent actionEvent) {
+    public void allShow() {
 
     }
 }

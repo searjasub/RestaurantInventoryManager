@@ -18,17 +18,17 @@ import org.bson.Document;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Objects;
 
 import static javafx.collections.FXCollections.observableArrayList;
 
 public class FinanceController {
 
-    public MenuBar menuBar;
-    TableView table = initTable();
-    ObservableList<FinanceItem> master = observableArrayList();
-    ObservableList<OrderedItem> ordered = observableArrayList();
-    int pageSize = 50;
-    InventoryTrackerController tracker = new InventoryTrackerController();
+    private MenuBar menuBar;
+    private TableView table = initTable();
+    private ObservableList<FinanceItem> master = observableArrayList();
+    private ObservableList<OrderedItem> ordered = observableArrayList();
+    private InventoryTrackerController tracker = new InventoryTrackerController();
     private MongoClient mc = new MongoClient("localHost");
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Inventory");
@@ -37,14 +37,11 @@ public class FinanceController {
     private AdministrativeController adminCon;
     private Scene financeScene;
     private MainStageController mainStageController;
-    private RadioMenuItem pos;
-    private RadioMenuItem inventory;
-    private RadioMenuItem admin;
     private Pagination myPagination;
     private CurrentSession currentSession;
 
-    public void setPrimaryScene(Stage primaryStage, Scene administrativeScene, MainStageController mainStageController,
-                                HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
+    void setPrimaryScene(Stage primaryStage, Scene administrativeScene, MainStageController mainStageController,
+                         HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
         this.financeScene = administrativeScene;
         this.mainStageController = mainStageController;
@@ -83,7 +80,7 @@ public class FinanceController {
             adminController.setPrimaryStage(primaryStage, administrativeScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
-            primaryStage.setScene(new Scene(root, 600, 600));
+            primaryStage.setScene(new Scene(Objects.requireNonNull(root), 600, 600));
         });
 
         pos.setOnAction(event -> {
@@ -112,10 +109,10 @@ public class FinanceController {
         table = new TableView<FinanceItem>();
         table.setEditable(true);
 
-        TableColumn<FinanceItem, Integer> id = new TableColumn<FinanceItem, Integer>();
+        TableColumn<FinanceItem, Integer> id = new TableColumn<>();
         id.setText("ID");
 
-        TableColumn<FinanceItem, String> name = new TableColumn<FinanceItem, String>();
+        //TableColumn<FinanceItem, String> name = new TableColumn<>();
 
 
         return table;
@@ -124,11 +121,11 @@ public class FinanceController {
     public void init() {
         // Method to get all inventory items and set them to the ObservableList needed
         ordered = tracker.reviewOrderedItems();
-
         myPagination.setPageFactory(this::createPage);
     }
 
-    public Node createPage(int pageIndex) {
+    private Node createPage(int pageIndex) {
+        int pageSize = 50;
         int first = pageIndex * pageSize;
         int last = Math.min(first + pageSize, master.size());
         table.getItems().add(observableArrayList(master.subList(first, last)));
@@ -151,6 +148,7 @@ public class FinanceController {
     // all items of that type along with their asset/liability values and the dates
     // they were put in and their expiration date
 
+    //TODO MAKE CLASSES FOR THIS
     public static class FinanceItem {
         private int id;
         private String name;

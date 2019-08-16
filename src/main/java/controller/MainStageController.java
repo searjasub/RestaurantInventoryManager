@@ -77,6 +77,7 @@ public class MainStageController {
         if (isManager) {
             Employee e = adminMap.get(Integer.parseInt(usernameTextField.getText()));
             currentSession.setLoggedIn(e);
+            //TODO finish
             if (e.equals(null)) {
                 //Dialog telling user username is not valid
             } else if (!e.equals(null)) {

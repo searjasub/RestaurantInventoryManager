@@ -7,11 +7,7 @@ public class CurrentSession {
     private Employee loggedIn;
     private boolean isAdmin;
 
-    public CurrentSession() {
-    }
-
-    public CurrentSession(Employee loggedIn) {
-        this.setLoggedIn(loggedIn);
+    CurrentSession() {
     }
 
     public Employee getLoggedIn() {
@@ -21,18 +17,18 @@ public class CurrentSession {
         return loggedIn;
     }
 
-    public void setLoggedIn(Employee loggedIn) {
+    void setLoggedIn(Employee loggedIn) {
         if (loggedIn == null) {
             throw new IllegalArgumentException("There is no employee");
         }
         this.loggedIn = loggedIn;
     }
 
-    public void restartSession() {
+    void restartSession() {
         loggedIn = null;
     }
 
-    public boolean isAdmin() {
+    boolean isAdmin() {
         return isAdmin;
     }
 
