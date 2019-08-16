@@ -90,6 +90,7 @@ public class AdministrativeController {
         employeesMenu.getItems().add(deleteEmployee);
         employeesMenu.getItems().add(updateEmployee);
 
+        //TODO ADD EMPLOYEE
         addEmployee.setOnAction(event -> {
             Dialog<Employee> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
@@ -105,8 +106,6 @@ public class AdministrativeController {
 
             TextField name = new TextField();
             name.setPromptText("Name");
-            TextField id = new TextField();
-            id.setPromptText("EmployeeID");
             TextField weeklyHours = new TextField();
             weeklyHours.setPromptText("WeeklyHours");
             TextField password = new TextField();
@@ -118,16 +117,14 @@ public class AdministrativeController {
 
             grid.add(new Label("Name:"), 0, 0);
             grid.add(name, 1, 0);
-            grid.add(new Label("EmployeeID:"), 0, 1);
-            grid.add(id, 1, 1);
-            grid.add(new Label("WeeklyHours"), 0, 2);
-            grid.add(weeklyHours, 1, 2);
-            grid.add(new Label("Password"), 0, 3);
-            grid.add(password, 1, 3);
-            grid.add(new Label("HourlyPay"), 0, 4);
-            grid.add(hourlyPay, 1, 4);
-            grid.add(new Label("Primary Email:"), 0, 5);
-            grid.add(occupation, 1, 5);
+            grid.add(new Label("WeeklyHours"), 0, 1);
+            grid.add(weeklyHours, 1, 1);
+            grid.add(new Label("Password"), 0, 2);
+            grid.add(password, 1, 2);
+            grid.add(new Label("HourlyPay"), 0, 3);
+            grid.add(hourlyPay, 1, 3);
+            grid.add(new Label("Primary Email:"), 0, 4);
+            grid.add(occupation, 1, 4);
 
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
             loginButton.setDisable(true);
@@ -143,7 +140,7 @@ public class AdministrativeController {
                     Employee e = new Employee();
 
                     e.setName(name.getText().trim());
-                    e.setId(id.getText().trim());
+                    e.setId("" + (collection.countDocuments() + 1));
                     e.setWeeklyHours(weeklyHours.getText().trim());
                     e.setPassword(password.getText().trim());
                     e.setHourlyPay(hourlyPay.getText().trim());
@@ -161,6 +158,7 @@ public class AdministrativeController {
             }
         });
 
+        //TODO DELETE EMPLOYEE
         deleteEmployee.setOnAction(event -> {
             Dialog<Employee> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
@@ -212,6 +210,7 @@ public class AdministrativeController {
 
         });
 
+        //TODO UPDATE EMPLOYEE
         updateEmployee.setOnAction(event -> {
             Dialog<Employee> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
@@ -248,44 +247,31 @@ public class AdministrativeController {
                     );
             final ComboBox comboBox = new ComboBox(options);
 
-//            grid.add(new Label("Full Name:"), 0, 0);
-//            grid.add(name, 1, 0);
             grid.add(new Label("EmployeeId:"), 0, 0);
             grid.add(id, 1, 0);
-//            grid.add(new Label("WeeklyHours"), 0, 2);
-//            grid.add(weeklyHours, 1, 2);
-//            grid.add(new Label("Password"), 0, 3);
-//            grid.add(password, 1, 3);
-//            grid.add(new Label("HourlyPay"), 0, 4);
-//            grid.add(hourlyPay, 1, 4);
-//            grid.add(new Label("Occupation"), 0, 5);
-//            grid.add(occupation, 1, 5);
             grid.add(comboBox, 1, 1);
 
-            comboBox.valueProperty().addListener(new ChangeListener<String>() {
-                @Override
-                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                    System.out.println("Selected value : " + newValue);
-                    if (newValue == "Full Name") {
-                        grid.add(new Label("Full Name"), 0, 1);
-                        grid.add(name, 1, 1);
-                    }
-                    if (newValue == "WeeklyHours") {
-                        grid.add(new Label("WeeklyHours"), 0, 1);
-                        grid.add(weeklyHours, 1, 1);
-                    }
-                    if (newValue == "Password") {
-                        grid.add(new Label("Password"), 0, 1);
-                        grid.add(password, 1, 1);
-                    }
-                    if (newValue == "HourlyPay") {
-                        grid.add(new Label("HourlyPay"), 0, 1);
-                        grid.add(hourlyPay, 1, 1);
-                    }
-                    if (newValue == "Occupation") {
-                        grid.add(new Label("Occupation"), 0, 1);
-                        grid.add(occupation, 1, 1);
-                    }
+            comboBox.valueProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                System.out.println("Selected value : " + newValue);
+                if (newValue == "Full Name") {
+                    grid.add(new Label("Full Name"), 0, 1);
+                    grid.add(name, 1, 1);
+                }
+                if (newValue == "WeeklyHours") {
+                    grid.add(new Label("WeeklyHours"), 0, 1);
+                    grid.add(weeklyHours, 1, 1);
+                }
+                if (newValue == "Password") {
+                    grid.add(new Label("Password"), 0, 1);
+                    grid.add(password, 1, 1);
+                }
+                if (newValue == "HourlyPay") {
+                    grid.add(new Label("HourlyPay"), 0, 1);
+                    grid.add(hourlyPay, 1, 1);
+                }
+                if (newValue == "Occupation") {
+                    grid.add(new Label("Occupation"), 0, 1);
+                    grid.add(occupation, 1, 1);
                 }
             });
 
@@ -444,12 +430,12 @@ public class AdministrativeController {
         return empsTable;
     }
 
-    public void AddEmployee(Employee e) {
+    private void AddEmployee(Employee e) {
         collection.insertOne(new Document("name", e.getName()).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
                 .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
     }
 
-    public void deleteEmployee(int e) {
+    private void deleteEmployee(int e) {
         collection.deleteOne(eq("employeeID", e));
     }
 
@@ -473,10 +459,6 @@ public class AdministrativeController {
         collection.updateOne(eq("employeeID", id), new Document("$set", new Document("clockOut", time)));
     }
 
-    public void getEmployee(int id) {
-        Employee e = new Employee();
-        collection.find(eq("employeeId", id)).toString();
-    }
 
     public void login(int id, String password) {
         BasicDBObject andQuery = new BasicDBObject();
