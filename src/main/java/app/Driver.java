@@ -9,7 +9,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class Driver extends Application {
 
@@ -19,7 +18,6 @@ public class Driver extends Application {
 
     public void start(Stage primaryStage) {
         try {
-
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/MainStage.fxml"));
             BorderPane root = loader.load();

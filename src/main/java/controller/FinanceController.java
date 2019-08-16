@@ -4,7 +4,6 @@ import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -45,29 +44,29 @@ public class FinanceController {
     private CurrentSession currentSession;
 
     public void setPrimaryScene(Stage primaryStage, Scene administrativeScene, MainStageController mainStageController,
-								HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
+                                HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
         this.financeScene = administrativeScene;
         this.mainStageController = mainStageController;
         this.currentSession = currentSession;
         this.primaryStage.setTitle("Restaurant Inventory Manager - Finance");
 
-		Menu viewMenu = new Menu("View");
-		RadioMenuItem admin = new RadioMenuItem("Admin");
-		RadioMenuItem inventory = new RadioMenuItem("Inventory");
-		RadioMenuItem pos = new RadioMenuItem("POS");
-		RadioMenuItem finance = new RadioMenuItem("Finance");
+        Menu viewMenu = new Menu("View");
+        RadioMenuItem admin = new RadioMenuItem("Admin");
+        RadioMenuItem inventory = new RadioMenuItem("Inventory");
+        RadioMenuItem pos = new RadioMenuItem("POS");
+        RadioMenuItem finance = new RadioMenuItem("Finance");
 
         viewMenu.getItems().add(admin);
         viewMenu.getItems().add(inventory);
         viewMenu.getItems().add(pos);
         viewMenu.getItems().add(finance);
 
-		ToggleGroup toggleGroup = new ToggleGroup();
-		toggleGroup.getToggles().add(admin);
-		toggleGroup.getToggles().add(inventory);
-		toggleGroup.getToggles().add(pos);
-		toggleGroup.getToggles().add(finance);
+        ToggleGroup toggleGroup = new ToggleGroup();
+        toggleGroup.getToggles().add(admin);
+        toggleGroup.getToggles().add(inventory);
+        toggleGroup.getToggles().add(pos);
+        toggleGroup.getToggles().add(finance);
 
         this.menuBar.getMenus().add(viewMenu);
 
@@ -124,7 +123,7 @@ public class FinanceController {
 
     public void init() {
         // Method to get all inventory items and set them to the ObservableList needed
-       ordered = tracker.reviewOrderedItems();
+        ordered = tracker.reviewOrderedItems();
 
         myPagination.setPageFactory(this::createPage);
     }
@@ -151,53 +150,48 @@ public class FinanceController {
     // Method that allows the user to click on the name of an item, and then view
     // all items of that type along with their asset/liability values and the dates
     // they were put in and their expiration date
-    
-    
-    
+
     public static class FinanceItem {
-    	public enum financeType{
-    		ASSET, LIABILITY, CAPITAL
-    	}
-    	
-    	private int id;
-    	
-    	public int getId() {
-			return id;
-		}
+        private int id;
+        private String name;
+        private int amount;
+        private financeType type;
 
-		public void setId(int id) {
-			this.id = id;
-		}
+        public int getId() {
+            return id;
+        }
 
-		public String getName() {
-			return name;
-		}
+        public void setId(int id) {
+            this.id = id;
+        }
 
-		public void setName(String name) {
-			this.name = name;
-		}
+        public String getName() {
+            return name;
+        }
 
-		public int getAmount() {
-			return amount;
-		}
+        public void setName(String name) {
+            this.name = name;
+        }
 
-		public void setAmount(int amount) {
-			this.amount = amount;
-		}
+        public int getAmount() {
+            return amount;
+        }
 
-		public financeType getType() {
-			return type;
-		}
+        public void setAmount(int amount) {
+            this.amount = amount;
+        }
 
-		public void setType(financeType type) {
-			this.type = type;
-		}
+        public financeType getType() {
+            return type;
+        }
 
-		private String name;
-    	
-    	private int amount;
-    	
-    	private financeType type;
+        public void setType(financeType type) {
+            this.type = type;
+        }
+
+        public enum financeType {
+            ASSET, LIABILITY, CAPITAL
+        }
 
 
     }

@@ -24,13 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.exists;
 
 public class POSController {
 
     private static double salesTax;
     public BorderPane borderPane;
     public MenuBar menuBar;
+    public Pagination paginationPOS;
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Meals");
@@ -45,7 +45,6 @@ public class POSController {
     private RadioMenuItem admin;
     private RadioMenuItem inventory;
     private RadioMenuItem pos;
-    public Pagination paginationPOS;
     private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
     private DB db = mongoC.getDB("Restaurants");
     private DBCollection dbCollection = db.getCollection("Meals");
@@ -136,7 +135,7 @@ public class POSController {
                 InventoryTrackerController inventoryController = loader.getController();
 
                 inventory.setSelected(true);
-                inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, employeesCollection,currentSession);
+                inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, employeesCollection, currentSession);
                 primaryStage.setMaxWidth(600);
                 primaryStage.setMaxHeight(600);
                 primaryStage.setScene(scene);
@@ -186,12 +185,11 @@ public class POSController {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
-        System.out.println(toIndex);
-        System.out.println(mealTable.getItems().size());
-        for(int i = 0; i < mealTable.getItems().size();i++){
+
+        for (int i = 0; i < mealTable.getItems().size(); i++) {
             System.out.println(mealTable.getItems().get(i));
         }
-        mealTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex-1)));
+        mealTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex - 1)));
         return mealTable;
     }
 
@@ -200,11 +198,9 @@ public class POSController {
         List<DBObject> dbObjects = new ArrayList<>();
 
         for (int i = 0; i < collection.countDocuments(); i++) {
-            System.out.println(collection.countDocuments());
-            DBObject query = BasicDBObjectBuilder.start().add("mealID",  i+1).get();
+
+            DBObject query = BasicDBObjectBuilder.start().add("mealID", i + 1).get();
             DBCursor cursor = dbCollection.find(query);
-            System.out.println(cursor);
-            System.out.println(cursor.hasNext());
             while (cursor.hasNext()) {
                 dbObjects.add(cursor.next());
             }
@@ -212,7 +208,7 @@ public class POSController {
 
         Meal meal;
         for (int i = 1; i < collection.countDocuments(); i++) {
-            meal = new  Meal();
+            meal = new Meal();
             meal.setName(dbObjects.get(i).get("name").toString());
             meal.setCost(dbObjects.get(i).get("cost").toString());
             meal.setMealId(dbObjects.get(i).get("mealID").toString());
@@ -271,7 +267,7 @@ public class POSController {
         this.orderNumber = orderNumber;
     }
 
-    public void onMenuEndSession(ActionEvent actionEvent){
+    public void onMenuEndSession(ActionEvent actionEvent) {
         currentSession.restartSession();
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -293,6 +289,7 @@ public class POSController {
             e.printStackTrace();
         }
     }
+
     public void onMenuItemExit(ActionEvent actionEvent) {
         primaryStage.close();
     }

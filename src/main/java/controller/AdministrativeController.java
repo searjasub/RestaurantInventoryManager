@@ -206,7 +206,7 @@ public class AdministrativeController {
 
             empsTable.getItems().removeAll();
             empsTable.refresh();
-            data= null;
+            data = null;
             data = fillEmpCollection();
             empsTable.getItems().addAll(data);
 
@@ -266,23 +266,23 @@ public class AdministrativeController {
                 @Override
                 public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                     System.out.println("Selected value : " + newValue);
-                    if(newValue == "Full Name"){
+                    if (newValue == "Full Name") {
                         grid.add(new Label("Full Name"), 0, 1);
                         grid.add(name, 1, 1);
                     }
-                    if(newValue == "WeeklyHours"){
+                    if (newValue == "WeeklyHours") {
                         grid.add(new Label("WeeklyHours"), 0, 1);
                         grid.add(weeklyHours, 1, 1);
                     }
-                    if(newValue == "Password"){
+                    if (newValue == "Password") {
                         grid.add(new Label("Password"), 0, 1);
                         grid.add(password, 1, 1);
                     }
-                    if(newValue == "HourlyPay"){
+                    if (newValue == "HourlyPay") {
                         grid.add(new Label("HourlyPay"), 0, 1);
                         grid.add(hourlyPay, 1, 1);
                     }
-                    if(newValue == "Occupation"){
+                    if (newValue == "Occupation") {
                         grid.add(new Label("Occupation"), 0, 1);
                         grid.add(occupation, 1, 1);
                     }
@@ -516,7 +516,7 @@ public class AdministrativeController {
         return data;
     }
 
-    public void onMenuEndSession(ActionEvent actionEvent){
+    public void onMenuEndSession(ActionEvent actionEvent) {
         currentSession.restartSession();
         try {
             FXMLLoader loader = new FXMLLoader();

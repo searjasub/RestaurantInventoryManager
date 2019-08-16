@@ -371,7 +371,7 @@ public class InventoryTrackerController {
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
-        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments()-1);
+        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments() - 1);
         ingredientTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return ingredientTable;
     }
@@ -382,7 +382,7 @@ public class InventoryTrackerController {
         List<DBObject> dbObjects = new ArrayList<>();
 
         int id = 500001;
-        for (int i = 0; i < collection.countDocuments()-1; i++) {
+        for (int i = 0; i < collection.countDocuments() - 1; i++) {
             DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();
             DBCursor cursor = dbCollection.find(query);
             while (cursor.hasNext()) {
@@ -392,7 +392,7 @@ public class InventoryTrackerController {
 
 
         Ingredient ingredient;
-        for (int i = 0; i < collection.countDocuments()-1; i++) {
+        for (int i = 0; i < collection.countDocuments() - 1; i++) {
 
             ingredient = new Ingredient();
             ingredient.setName(dbObjects.get(i).get("name").toString());
@@ -408,7 +408,7 @@ public class InventoryTrackerController {
         return data;
     }
 
-    public void onMenuEndSession(ActionEvent actionEvent){
+    public void onMenuEndSession(ActionEvent actionEvent) {
         currentSession.restartSession();
         try {
             FXMLLoader loader = new FXMLLoader();
