@@ -23,7 +23,6 @@ import javafx.stage.Stage;
 import model.Employee;
 import org.bson.Document;
 
-import javax.xml.soap.Text;
 import java.io.IOException;
 import java.util.*;
 
@@ -47,12 +46,14 @@ public class AdministrativeController {
     private DB db = mongoC.getDB("Restaurants");
     private DBCollection dbCollection = db.getCollection("Employees");
     private ObservableList<Employee> data = fillEmpCollection();
+    private CurrentSession currentSession;
 
-    void setPrimaryStage(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, boolean isAdmin) {
+    void setPrimaryStage(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
         this.adminScene = adminScene;
         this.mainController = mainStageController;
         this.empsCollection = employeesCollection;
+        this.currentSession = currentSession;
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
 
 
@@ -131,9 +132,7 @@ public class AdministrativeController {
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
             loginButton.setDisable(true);
 
-            name.textProperty().addListener((observable, oldValue, newValue) -> {
-                loginButton.setDisable(newValue.trim().isEmpty());
-            });
+            name.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
 
             dialog.getDialogPane().setContent(grid);
 
@@ -327,7 +326,6 @@ public class AdministrativeController {
             }
         });
 
-
         menuBar.getMenus().add(viewMenu);
         menuBar.getMenus().add(employeesMenu);
 
@@ -348,7 +346,7 @@ public class AdministrativeController {
             }
             InventoryTrackerController inventoryController = loader.getController();
 
-            inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, employeesCollection);
+            inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(administrativeScene);
@@ -366,7 +364,7 @@ public class AdministrativeController {
             }
             FinanceController financeController = loader.getController();
 
-            financeController.setPrimaryScene(primaryStage, financeScene, mainStageController, employeesCollection);
+            financeController.setPrimaryScene(primaryStage, financeScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(financeScene);
@@ -384,7 +382,7 @@ public class AdministrativeController {
                 e.printStackTrace();
             }
             POSController posController = loader.getController();
-            posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection, checkForAdmin());
+            posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
@@ -392,10 +390,6 @@ public class AdministrativeController {
 
     }
 
-    private boolean checkForAdmin() {
-
-        return false;
-    }
 
     private TableView<Employee> createTable() {
 
@@ -429,7 +423,6 @@ public class AdministrativeController {
         occupation.setCellValueFactory(new PropertyValueFactory<>("occupation"));
         occupation.setCellFactory(TextFieldTableCell.forTableColumn());
         occupation.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setOccupation(event.getNewValue()));
-
 
 //        TableColumn<Employee, String> clockIn = new TableColumn<>("Clock In");
 //        TableColumn<Employee, String> clockOut = new TableColumn<>("Clock Out");
@@ -521,6 +514,29 @@ public class AdministrativeController {
             data.add(employee);
         }
         return data;
+    }
+
+    public void onMenuEndSession(ActionEvent actionEvent){
+        currentSession.restartSession();
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/MainStage.fxml"));
+            BorderPane root = loader.load();
+            MainStageController c = loader.getController();
+
+            Scene scene = new Scene(root, 400, 400);
+
+            c.setPrimaryStage(primaryStage, scene);
+            primaryStage.setTitle("Restaurant Inventory Manager");
+            primaryStage.setScene(scene);
+            primaryStage.setMinWidth(530);
+            primaryStage.setMinHeight(250);
+            primaryStage.setMaxHeight(250);
+            primaryStage.setMaxWidth(530);
+            primaryStage.show();
+        } catch (NumberFormatException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onMenuItemExit(ActionEvent actionEvent) {

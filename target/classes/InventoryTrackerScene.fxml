@@ -9,6 +9,7 @@
     <top>
         <MenuBar fx:id="menu">
             <Menu text="File">
+                <MenuItem onAction="#onMenuEndSession" text="Switch User"/>
                 <MenuItem onAction="#onMenuItemExit" text="Exit"/>
             </Menu>
         </MenuBar>

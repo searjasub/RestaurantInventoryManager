@@ -46,11 +46,13 @@ public class InventoryTrackerController {
 
     private ObservableList<Ingredient> data = fillIngredientCollection();
     private TableView<Ingredient> ingredientTable = createTable();
+    private CurrentSession currentSession;
 
-    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, HashMap<Integer, Employee> employeesCollection) {
+    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
         this.inventoryScene = inventoryScene;
         this.mainController = mainController;
+        this.currentSession = currentSession;
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
 
@@ -229,7 +231,7 @@ public class InventoryTrackerController {
 
             AdministrativeController adminController = loader.getController();
             inventory.setSelected(true);
-            adminController.setPrimaryStage(primaryStage, inventoryScene, mainController, employeesCollection, true);
+            adminController.setPrimaryStage(primaryStage, inventoryScene, mainController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(new Scene(root, 600, 600));
@@ -247,7 +249,7 @@ public class InventoryTrackerController {
             }
             POSController posController = loader.getController();
             pos.setSelected(true);
-            posController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, true);
+            posController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
@@ -404,5 +406,28 @@ public class InventoryTrackerController {
 
         }
         return data;
+    }
+
+    public void onMenuEndSession(ActionEvent actionEvent){
+        currentSession.restartSession();
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/MainStage.fxml"));
+            BorderPane root = loader.load();
+            MainStageController c = loader.getController();
+
+            Scene scene = new Scene(root, 400, 400);
+
+            c.setPrimaryStage(primaryStage, scene);
+            primaryStage.setTitle("Restaurant Inventory Manager");
+            primaryStage.setScene(scene);
+            primaryStage.setMinWidth(530);
+            primaryStage.setMinHeight(250);
+            primaryStage.setMaxHeight(250);
+            primaryStage.setMaxWidth(530);
+            primaryStage.show();
+        } catch (NumberFormatException | IOException e) {
+            e.printStackTrace();
+        }
     }
 }

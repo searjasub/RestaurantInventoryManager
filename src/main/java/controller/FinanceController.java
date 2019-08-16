@@ -42,12 +42,14 @@ public class FinanceController {
     private RadioMenuItem inventory;
     private RadioMenuItem admin;
     private Pagination myPagination;
+    private CurrentSession currentSession;
 
     public void setPrimaryScene(Stage primaryStage, Scene administrativeScene, MainStageController mainStageController,
-								HashMap<Integer, Employee> employeesCollection) {
+								HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
         this.financeScene = administrativeScene;
         this.mainStageController = mainStageController;
+        this.currentSession = currentSession;
         this.primaryStage.setTitle("Restaurant Inventory Manager - Finance");
 
 		Menu viewMenu = new Menu("View");
@@ -79,7 +81,7 @@ public class FinanceController {
             }
             AdministrativeController adminController = loader.getController();
             inventory.setSelected(true);
-            adminController.setPrimaryStage(primaryStage, administrativeScene, mainStageController, employeesCollection, true);
+            adminController.setPrimaryStage(primaryStage, administrativeScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(new Scene(root, 600, 600));
@@ -98,7 +100,7 @@ public class FinanceController {
             POSController posController = loader.getController();
 
             pos.setSelected(true);
-            posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection, false);
+            posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
@@ -196,6 +198,8 @@ public class FinanceController {
     	private int amount;
     	
     	private financeType type;
+
+
     }
 
 }

@@ -51,6 +51,7 @@ public class POSController {
     private DBCollection dbCollection = db.getCollection("Meals");
     private TableView<Meal> mealTable = createTable();
     private ObservableList<Meal> data = fillMealCollection();
+    private CurrentSession currentSession;
 
     public static double getSalesTax() {
         return salesTax;
@@ -69,11 +70,12 @@ public class POSController {
 //    }
 
 
-    void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, boolean isAdmin) {
+    void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
         this.scene = posScene;
         this.mainController = mainStageController;
         this.empsCollection = employeesCollection;
+        this.currentSession = currentSession;
         this.primaryStage.setTitle("Inventory Tracker Manager - POS");
 
         if (data.size() > 100) {
@@ -83,7 +85,7 @@ public class POSController {
         }
         paginationPOS.setPageFactory(this::createPage);
 
-        if (isAdmin) {
+        if (currentSession.isAdmin()) {
             Menu viewMenu = new Menu("View");
             RadioMenuItem admin = new RadioMenuItem("Admin");
             RadioMenuItem inventory = new RadioMenuItem("Inventory");
@@ -115,7 +117,7 @@ public class POSController {
                 }
                 AdministrativeController adminController = loader.getController();
                 admin.setSelected(true);
-                adminController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, true);
+                adminController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, currentSession);
                 primaryStage.setMaxWidth(600);
                 primaryStage.setMaxHeight(600);
                 primaryStage.setScene(new Scene(root, 600, 600));
@@ -134,7 +136,7 @@ public class POSController {
                 InventoryTrackerController inventoryController = loader.getController();
 
                 inventory.setSelected(true);
-                inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, employeesCollection);
+                inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, employeesCollection,currentSession);
                 primaryStage.setMaxWidth(600);
                 primaryStage.setMaxHeight(600);
                 primaryStage.setScene(scene);
@@ -269,6 +271,28 @@ public class POSController {
         this.orderNumber = orderNumber;
     }
 
+    public void onMenuEndSession(ActionEvent actionEvent){
+        currentSession.restartSession();
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/MainStage.fxml"));
+            BorderPane root = loader.load();
+            MainStageController c = loader.getController();
+
+            Scene scene = new Scene(root, 400, 400);
+
+            c.setPrimaryStage(primaryStage, scene);
+            primaryStage.setTitle("Restaurant Inventory Manager");
+            primaryStage.setScene(scene);
+            primaryStage.setMinWidth(530);
+            primaryStage.setMinHeight(250);
+            primaryStage.setMaxHeight(250);
+            primaryStage.setMaxWidth(530);
+            primaryStage.show();
+        } catch (NumberFormatException | IOException e) {
+            e.printStackTrace();
+        }
+    }
     public void onMenuItemExit(ActionEvent actionEvent) {
         primaryStage.close();
     }

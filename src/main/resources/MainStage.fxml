@@ -32,19 +32,29 @@
 
     </center>
    <center>
-      <VBox  prefWidth="200.0" BorderPane.alignment="CENTER">
+      <VBox prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <TextField  prefWidth="541.0" promptText="Username" fx:id="usernameTextField">
+            <TextField fx:id="usernameTextField" prefWidth="541.0" promptText="Username">
                <VBox.margin>
                   <Insets bottom="10.0" left="30.0" right="30.0" />
                </VBox.margin>
             </TextField>
-            <TextField promptText="Password" fx:id="passwordTextField">
+            <TextField fx:id="passwordTextField" promptText="Password">
                <VBox.margin>
                   <Insets bottom="10.0" left="30.0" right="30.0" />
                </VBox.margin>
             </TextField>
-            <Button  prefHeight="25.0" prefWidth="51.0" text="Login" fx:id="loginBtn" onAction="#login">
+            <PasswordField fx:id="passwordField" promptText="Password">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="30.0" right="30.0" />
+               </VBox.margin>
+            </PasswordField>
+            <CheckBox fx:id="checkbox" mnemonicParsing="false" prefHeight="17.0" prefWidth="157.0" text="Hide/Show Password">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="30.0" right="30.0" />
+               </VBox.margin>
+            </CheckBox>
+            <Button fx:id="loginBtn" onAction="#login" prefHeight="25.0" prefWidth="51.0" text="Login">
                <VBox.margin>
                   <Insets left="332.0" />
                </VBox.margin>

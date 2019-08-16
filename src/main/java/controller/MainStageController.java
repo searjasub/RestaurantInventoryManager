@@ -6,6 +6,8 @@ import com.mongodb.client.MongoDatabase;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -22,6 +24,8 @@ public class MainStageController {
     public TextField usernameTextField;
     public TextField passwordTextField;
     public Button loginBtn;
+    public TextField passwordField;
+    public CheckBox checkbox;
     private Stage primaryStage;
     private Scene scene;
     private HashMap<Integer, Employee> employeeCollection = new HashMap<>();
@@ -34,6 +38,7 @@ public class MainStageController {
     private HashMap<Integer, Employee> adminMap = new HashMap<>();
     private MongoCollection<Document> adminCollection = database.getCollection("Administrators");
     private DBCollection adminDbCollection = db.getCollection("Administrators");
+    private CurrentSession currentSession = new CurrentSession();
 
     public MainStageController() {
 
@@ -42,9 +47,21 @@ public class MainStageController {
     public void setPrimaryStage(Stage primaryStage, Scene scene) {
         this.primaryStage = primaryStage;
         this.scene = scene;
-
         employeeCollection = fillEmpCollection();
         adminMap = fillAdminCollection();
+
+        passwordTextField.setManaged(false);
+        passwordTextField.setVisible(false);
+
+        passwordField.managedProperty().bind(checkbox.selectedProperty());
+        passwordField.visibleProperty().bind(checkbox.selectedProperty());
+
+        passwordTextField.managedProperty().bind(checkbox.selectedProperty().not());
+        passwordTextField.visibleProperty().bind(checkbox.selectedProperty().not());
+
+        passwordTextField.textProperty().bindBidirectional(passwordField.textProperty());
+
+
     }
 
     public void onMenuItemExit() {
@@ -54,16 +71,13 @@ public class MainStageController {
     public void login() throws IOException {
         Scene tmp = this.scene;
         int employeeIdentifier = Integer.parseInt(usernameTextField.getText(0, 1));
-        boolean isManager;
 
-        if (employeeIdentifier == 3) {
-            isManager = true;
-        } else {
-            isManager = false;
-        }
+        //Simplified if else statement
+        boolean isManager = employeeIdentifier == 3;
 
         if (isManager) {
             Employee e = adminMap.get(Integer.parseInt(usernameTextField.getText()));
+            currentSession.setLoggedIn(e);
             if (e.equals(null)) {
                 //Dialog telling user username is not valid
             } else if (!e.equals(null)) {
@@ -73,7 +87,7 @@ public class MainStageController {
                     AdministrativeController adminController = loader.getController();
                     Scene administrativeScene = new Scene(root, 600, 600);
 
-                    adminController.setPrimaryStage(primaryStage, tmp, this, employeeCollection, true);
+                    adminController.setPrimaryStage(primaryStage, tmp, this, employeeCollection, currentSession);
                     primaryStage.setMaxWidth(600);
                     primaryStage.setMaxHeight(600);
                     primaryStage.setScene(administrativeScene);
@@ -93,7 +107,7 @@ public class MainStageController {
                     POSController posController = loader.getController();
                     Scene posScene = new Scene(root, 600, 600);
 
-                    posController.setPrimaryStage(primaryStage, tmp, this, employeeCollection, false);
+                    posController.setPrimaryStage(primaryStage, tmp, this, employeeCollection, currentSession);
                     primaryStage.setMaxWidth(600);
                     primaryStage.setMaxHeight(600);
                     primaryStage.setScene(posScene);
@@ -105,7 +119,6 @@ public class MainStageController {
     }
 
     private HashMap<Integer, Employee> fillEmpCollection() {
-
         HashMap<Integer, Employee> data = new HashMap<>();
         List<DBObject> dbObjects = new ArrayList<>();
         int id = 100001;
@@ -134,9 +147,7 @@ public class MainStageController {
     private HashMap<Integer, Employee> fillAdminCollection() {
         HashMap<Integer, Employee> data = new HashMap<>();
 
-
         List<DBObject> dbObjects = new ArrayList<>();
-        System.out.println("count document: " + adminCollection.countDocuments());
 
         int id = 30000;
         for (int i = 0; i < adminCollection.countDocuments(); i++) {
