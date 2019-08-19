@@ -283,17 +283,33 @@ public class AdministrativeController {
 
             Platform.runLater(name::requestFocus);
 
+                    Employee e = new Employee();
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == updateButtonType) {
-                    Employee e = new Employee();
 
                     e.setName(name.getText().trim());
                     e.setId(id.getText().trim());
+                    int ids = Integer.parseInt(e.getId());
                     e.setPassword(password.getText().trim());
                     e.setWeeklyHours(weeklyHours.getText().trim());
                     e.setHourlyPay(hourlyPay.getText().trim());
                     e.setOccupation(occupation.getText().trim());
 
+                    if(!name.equals(null)){
+                        updateEmployee(ids, "name", e.getName());
+                    }
+                    if(!password.equals(null)){
+                        updateEmployee(ids, "password", e.getPassword());
+                    }
+                    if(!weeklyHours.equals(null)){
+                        updateEmployee(ids, "weeklyHours", e.getWeeklyHours());
+                    }
+                    if(!hourlyPay.equals(null)){
+                        updateEmployee(ids, "hourlyPay", e.getHourlyPay());
+                    }
+                    if(!occupation.equals(null)){
+                        updateEmployee(ids, "occupation", e.getOccupation());
+                    }
 
                     return e;
                 }
