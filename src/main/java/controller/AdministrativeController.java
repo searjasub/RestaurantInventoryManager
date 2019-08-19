@@ -54,6 +54,9 @@ public class AdministrativeController {
         this.employeeHashMap = employeesCollection;
         this.currentSession = currentSession;
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
+        System.out.println(currentSession.isAdmin());
+        System.out.println(currentSession.getLoggedIn().getId());
+        System.out.println(currentSession.getLoggedIn().getName());
 
 
         if (data.size() > 100) {
@@ -299,7 +302,7 @@ public class AdministrativeController {
 
             Optional<Employee> result = dialog.showAndWait();
 
-
+            //TODO what's next?
             if (result.isPresent()) {
                 //deleteEmployee(result.get());
             }

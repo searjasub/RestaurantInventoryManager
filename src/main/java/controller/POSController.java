@@ -17,7 +17,6 @@ import javafx.stage.Stage;
 import model.Employee;
 import model.Meal;
 import org.bson.Document;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +33,7 @@ public class POSController {
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Meals");
-    private ArrayList<Meal> meals = new ArrayList<Meal>();
+    private List<Meal> meals = new ArrayList<>();
     private double totalCost;
     private double tip;
     private int orderNumber;
@@ -60,15 +59,6 @@ public class POSController {
         POSController.salesTax = salesTax;
     }
 
-//    void setPrimaryStage(Stage primaryStage, Scene tmp, MainStageController mainStageController) {
-//        this.primaryStage = primaryStage;
-//        this.scene = tmp;
-//        this.mainController = mainStageController;
-//
-//        primaryStage.setTitle("Inventory Tracker Manager - POS");
-//    }
-
-
     void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
         this.scene = posScene;
@@ -85,6 +75,7 @@ public class POSController {
         paginationPOS.setPageFactory(this::createPage);
 
         if (currentSession.isAdmin()) {
+            System.out.println("you're an admin");
             Menu viewMenu = new Menu("View");
             RadioMenuItem admin = new RadioMenuItem("Admin");
             RadioMenuItem inventory = new RadioMenuItem("Inventory");
@@ -142,6 +133,9 @@ public class POSController {
             });
 
 
+        } else {
+
+            System.out.println("not an admin");
         }
 
     }
@@ -178,7 +172,6 @@ public class POSController {
         mealTable.getColumns().setAll(name, mealID, cost, veganFriendly, calorieCount);
 
         return mealTable;
-
     }
 
     private Node createPage(Integer pageIndex) {

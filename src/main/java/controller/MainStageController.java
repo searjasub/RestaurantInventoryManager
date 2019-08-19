@@ -58,6 +58,8 @@ public class MainStageController {
 
     }
 
+
+
     public void onMenuItemExit() {
         primaryStage.close();
     }
@@ -77,6 +79,8 @@ public class MainStageController {
                 //Dialog telling user username is not valid
             } else if (!e.equals(null)) {
                 if (passwordTextField.getText().equals(e.getPassword())) {
+                    currentSession.setAdmin(true);
+                    currentSession.setLoggedIn(e);
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
                     BorderPane root = loader.load();
                     AdministrativeController adminController = loader.getController();
