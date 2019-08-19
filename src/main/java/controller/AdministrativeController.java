@@ -241,7 +241,8 @@ public class AdministrativeController {
                             "WeeklyHours",
                             "Password",
                             "HourlyPay",
-                            "Occupation"
+                            "Occupation",
+                            "EmployeeID"
                     );
             final ComboBox comboBox = new ComboBox(options);
 
@@ -269,6 +270,10 @@ public class AdministrativeController {
                 }
                 if (newValue.equals("Occupation")) {
                     grid.add(new Label("Occupation"), 0, 1);
+                    grid.add(occupation, 1, 1);
+                }
+                if (newValue.equals("employeeID")) {
+                    grid.add(new Label("employeeID"), 0, 1);
                     grid.add(occupation, 1, 1);
                 }
             });
@@ -309,6 +314,9 @@ public class AdministrativeController {
                     }
                     if(!occupation.equals(null)){
                         updateEmployee(ids, "occupation", e.getOccupation());
+                    }
+                    if(!id.equals(null)){
+                        updateEmployee(ids, "employeeID", e.getId());
                     }
 
                     return e;
