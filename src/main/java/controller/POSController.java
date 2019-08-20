@@ -3,24 +3,29 @@ package controller;
 import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import model.Employee;
+import model.Ingredient;
 import model.Meal;
 import org.bson.Document;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -93,6 +98,135 @@ public class POSController {
             toggleGroup.getToggles().add(pos);
             toggleGroup.getToggles().add(finance);
 
+            Menu mealMenu = new Menu("Menu");
+            MenuItem addMeal = new Menu("Add");
+            MenuItem deleteMeal = new Menu("Delete");
+            MenuItem updateMeal = new Menu("Update");
+            mealMenu.getItems().add(addMeal);
+            mealMenu.getItems().add(deleteMeal);
+                mealMenu.getItems().add(updateMeal);
+
+            menuBar.getMenus().add(mealMenu);
+
+            addMeal.setOnAction(event -> {
+                        Dialog<Meal> dialog = new Dialog<>();
+                        dialog.setTitle("Contact Dialog");
+                        dialog.setHeaderText("Please Input Ingredient Data");
+
+                        ButtonType loginButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+                        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+                        GridPane grid = new GridPane();
+                        grid.setHgap(10);
+                        grid.setVgap(10);
+                        grid.setPadding(new Insets(20, 150, 10, 10));
+
+                        TextField name = new TextField();
+                        name.setPromptText("Name");
+                        TextField mealID = new TextField();
+                        mealID.setPromptText("MealID");
+                        TextField veganFriendly = new TextField();
+                        veganFriendly.setPromptText("Vegan Friendly");
+                        TextField totalCalorie = new TextField();
+                        totalCalorie.setPromptText("totalCalorie");
+                        TextField cost = new TextField();
+                        cost.setPromptText("Cost");
+//                        TextField numberOfIngredients = new TextField();
+//                        numberOfIngredients.setPromptText("Number of Ingredients");
+
+                        grid.add(new Label("Name:"), 0, 0);
+                        grid.add(name, 1, 0);
+                        grid.add(new Label("mealID:"), 0, 1);
+                        grid.add(mealID, 1, 1);
+                        grid.add(new Label("veganFriendly:"), 0, 2);
+                        grid.add(veganFriendly, 1, 2);
+                        grid.add(new Label("totalCalorie"), 0, 3);
+                        grid.add(totalCalorie, 1, 3);
+                        grid.add(new Label("cost"), 0, 4);
+                        grid.add(cost, 1, 4);
+//                        grid.add(new Label("BulkCost:"), 0, 5);
+//                        grid.add(bulkCost, 1, 5);
+
+                        Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+                        loginButton.setDisable(true);
+
+                        name.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
+
+                        dialog.getDialogPane().setContent(grid);
+
+                        Platform.runLater(name::requestFocus);
+
+                        dialog.setResultConverter(dialogButton -> {
+                            if (dialogButton == loginButtonType) {
+                                Meal m = new Meal();
+
+                                m.setName(name.getText().trim());
+                                m.setMealId(mealID.getText().trim());
+                                m.setCost(cost.getText().trim());
+                                m.setTotalCalorieCount(totalCalorie.getText().trim());
+                                m.setVeganFriendly(veganFriendly.getText().trim());
+//                                e.setBulkCost(bulkCost.getText().trim());
+
+                                return m;
+                            }
+                            return null;
+                        });
+                Optional<Meal> result = dialog.showAndWait();
+
+                result.ifPresent(meal -> addMeal(meal.getName(), Integer.parseInt(meal.getMealId()), Double.parseDouble(meal.getTotalCalorieCount()),
+                        Integer.parseInt(meal.isVeganFriendly()), Double.parseDouble(meal.getCost())));
+                    });
+
+            deleteMeal.setOnAction(event -> {
+                Dialog<Ingredient> dialog = new Dialog<>();
+                dialog.setTitle("Contact Dialog");
+                dialog.setHeaderText("Please Input Ingredient Data To Delete");
+
+                ButtonType deleteButtonType = new ButtonType("Delete", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(deleteButtonType, ButtonType.CANCEL);
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                TextField id = new TextField();
+                id.setPromptText("MealId");
+
+                grid.add(new Label("mealID:"), 0, 1);
+                grid.add(id, 1, 1);
+
+                Node deleteButton = dialog.getDialogPane().lookupButton(deleteButtonType);
+                deleteButton.setDisable(true);
+
+                id.textProperty().addListener((observable, oldValue, newValue) -> deleteButton.setDisable(newValue.trim().isEmpty()));
+
+                dialog.getDialogPane().setContent(grid);
+
+                Platform.runLater(id::requestFocus);
+
+                Meal e = new Meal();
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == deleteButtonType) {
+
+                        e.setMealId(id.getText().trim());
+//                    int ids = Integer.parseInt(e.getIngredientId());
+                        delete(e.getMealId());
+                    }
+                    return null;
+                });
+
+                //TODO What are we doing with this?
+                Optional<Ingredient> result = dialog.showAndWait();
+
+                mealTable.getItems().removeAll();
+                mealTable.refresh();
+                data = null;
+                data = fillMealCollection();
+                mealTable.getItems().addAll(data);
+
+            });
+
             pos.setSelected(true);
 //            mealTable.setItems(fillMealCollection());
             this.menuBar.getMenus().add(viewMenu);
@@ -139,6 +273,20 @@ public class POSController {
         }
 
     }
+
+    private void addMeal(String mealName, int mealID, double totalCalorieCount, int veganFriendly, double cost) {
+        collection.insertOne(new Document("name", mealName).append("mealID", mealID)
+                .append("totalCalorieCount", totalCalorieCount).append("veganFriendly", veganFriendly).append("cost", cost));
+    }
+
+    private void delete(String mealID) {
+        collection.deleteOne(eq("mealID", mealID));
+    }
+
+    public void updateItem(int mealId, String updateField, String updateValue) {
+        collection.updateOne(eq("mealID", mealId), new Document("$set", new Document(updateField, updateValue)));
+    }
+
 
     private TableView<Meal> createTable() {
 
@@ -205,7 +353,7 @@ public class POSController {
             meal.setName(dbObjects.get(i).get("name").toString());
             meal.setCost(dbObjects.get(i).get("cost").toString());
             meal.setMealId(dbObjects.get(i).get("mealID").toString());
-            meal.setTotalCalorieCount(dbObjects.get(i).get("totalCalorie").toString());
+//            meal.setTotalCalorieCount(dbObjects.get(i).get("totalCalorie").toString());
             meal.setVeganFriendly(dbObjects.get(i).get("veganFriendly").toString());
             data.add(meal);
         }
