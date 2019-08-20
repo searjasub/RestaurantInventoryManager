@@ -355,19 +355,19 @@ public class AdministrativeController {
         inventory.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
             BorderPane root;
-            Scene administrativeScene = null;
+            Scene inventoryScene = null;
             try {
                 root = loader.load();
-                administrativeScene = new Scene(root, 600, 600);
+                inventoryScene = new Scene(root, 600, 600);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             InventoryTrackerController inventoryController = loader.getController();
 
-            inventoryController.setPrimaryScene(primaryStage, administrativeScene, mainStageController, employeesCollection, currentSession);
+            inventoryController.setPrimaryScene(primaryStage, inventoryScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
-            primaryStage.setScene(administrativeScene);
+            primaryStage.setScene(inventoryScene);
         });
 
         finance.setOnAction(event -> {
@@ -515,6 +515,8 @@ public class AdministrativeController {
                 dbObjects.add(cursor.next());
             }
         }
+
+        System.out.println(dbObjects);
 
         Employee employee;
         for (int i = 0; i < collection.countDocuments(); i++) {

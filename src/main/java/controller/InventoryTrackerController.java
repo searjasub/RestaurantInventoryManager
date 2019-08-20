@@ -58,7 +58,8 @@ public class InventoryTrackerController {
         } else {
             inventoryPagination.setPageCount(1);
         }
-        inventoryPagination.setPageFactory(this::createPage);
+        System.out.println();
+        inventoryPagination.setPageFactory(pageIndex -> createPage(1));
 
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
@@ -223,8 +224,8 @@ public class InventoryTrackerController {
             AdministrativeController adminController = loader.getController();
             inventory.setSelected(true);
             adminController.setPrimaryStage(primaryStage, inventoryScene, mainController, employeesCollection, currentSession);
-            primaryStage.setMaxWidth(600);
-            primaryStage.setMaxHeight(600);
+            primaryStage.setMaxWidth(800);
+            primaryStage.setMaxHeight(800);
             primaryStage.setScene(new Scene(Objects.requireNonNull(root), 600, 600));
         });
 
@@ -234,7 +235,7 @@ public class InventoryTrackerController {
             BorderPane root;
             try {
                 root = loader.load();
-                posScene = new Scene(root, 600, 600);
+                posScene = new Scene(root, 800 , 800);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -362,7 +363,10 @@ public class InventoryTrackerController {
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
+        System.out.println("PAge index:" + pageIndex);
+        System.out.println("rows per page:" + pageIndex);
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
+        System.out.println("To index: " + toIndex);
         ingredientTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return ingredientTable;
     }
