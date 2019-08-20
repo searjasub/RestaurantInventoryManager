@@ -174,7 +174,7 @@ public class POSController {
                 Optional<Meal> result = dialog.showAndWait();
 
                 result.ifPresent(meal -> addMeal(meal.getName(), Integer.parseInt(meal.getMealId()), Double.parseDouble(meal.getTotalCalorieCount()),
-                        Integer.parseInt(meal.isVeganFriendly()), Double.parseDouble(meal.getCost())));
+                        (meal.isVeganFriendly()), Double.parseDouble(meal.getCost())));
                     });
 
             deleteMeal.setOnAction(event -> {
@@ -274,7 +274,7 @@ public class POSController {
 
     }
 
-    private void addMeal(String mealName, int mealID, double totalCalorieCount, int veganFriendly, double cost) {
+    private void addMeal(String mealName, int mealID, double totalCalorieCount, String veganFriendly, double cost) {
         collection.insertOne(new Document("name", mealName).append("mealID", mealID)
                 .append("totalCalorieCount", totalCalorieCount).append("veganFriendly", veganFriendly).append("cost", cost));
     }
