@@ -14,6 +14,7 @@ import model.Employee;
 import org.bson.Document;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,26 +29,20 @@ public class MainStageController {
     private Stage primaryStage;
     private Scene scene;
     private HashMap<Integer, Employee> employeeCollection = new HashMap<>();
-    private MongoClient mc = new MongoClient();
-    private MongoDatabase database = mc.getDatabase("Restaurants");
-    private MongoCollection<Document> collection = database.getCollection("Employees");
-    private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
-    private DB db = mongoC.getDB("Restaurants");
-    private DBCollection dbCollection = db.getCollection("Employees");
     private HashMap<Integer, Employee> adminMap = new HashMap<>();
-    private MongoCollection<Document> adminCollection = database.getCollection("Administrators");
-    private DBCollection adminDbCollection = db.getCollection("Administrators");
     private CurrentSession currentSession = new CurrentSession();
+    private MongoController mCon = new MongoController();
 
-    public MainStageController() {
+
+    public MainStageController() throws UnknownHostException {
 
     }
 
     public void setPrimaryStage(Stage primaryStage, Scene scene) {
         this.primaryStage = primaryStage;
         this.scene = scene;
-        employeeCollection = fillEmpCollection();
-        adminMap = fillAdminCollection();
+        employeeCollection = mCon.fillEmpCollection();
+        adminMap = mCon.fillAdminCollection();
 
         passwordTextField.setManaged(false);
         passwordTextField.setVisible(false);
@@ -122,57 +117,7 @@ public class MainStageController {
         }
     }
 
-    private HashMap<Integer, Employee> fillEmpCollection() {
-        HashMap<Integer, Employee> data = new HashMap<>();
-        List<DBObject> dbObjects = new ArrayList<>();
-        int id = 100001;
-        for (int i = 0; i < 5; i++) {
-            DBObject query = BasicDBObjectBuilder.start().add("employeeID", id + i).get();
-            DBCursor cursor = dbCollection.find(query);
-            while (cursor.hasNext()) {
-                dbObjects.add(cursor.next());
-            }
-        }
 
-        Employee employee;
-        for (int i = 0; i < collection.countDocuments(); i++) {
-            employee = new Employee();
-            employee.setName(dbObjects.get(i).get("name").toString());
-            employee.setPassword(dbObjects.get(i).get("password").toString());
-            employee.setOccupation(dbObjects.get(i).get("occupation").toString());
-            employee.setWeeklyHours(dbObjects.get(i).get("weeklyHours").toString());
-            employee.setId(dbObjects.get(i).get("employeeID").toString());
-            employee.setHourlyPay(dbObjects.get(i).get("hourlyPay").toString());
-            data.put(Integer.parseInt(employee.getId()), employee);
-        }
-        return data;
-    }
 
-    private HashMap<Integer, Employee> fillAdminCollection() {
-        HashMap<Integer, Employee> data = new HashMap<>();
 
-        List<DBObject> dbObjects = new ArrayList<>();
-
-        int id = 30000;
-        for (int i = 0; i < adminCollection.countDocuments(); i++) {
-            DBObject query1 = BasicDBObjectBuilder.start().add("employeeID", "" + (id + i)).get();
-            DBCursor cursor = adminDbCollection.find(query1);
-            while (cursor.hasNext()) {
-                dbObjects.add(cursor.next());
-            }
-        }
-
-        Employee employee;
-        for (int i = 0; i < adminCollection.countDocuments(); i++) {
-            employee = new Employee();
-            employee.setName(dbObjects.get(i).get("name").toString());
-            employee.setPassword(dbObjects.get(i).get("password").toString());
-            employee.setOccupation(dbObjects.get(i).get("occupation").toString());
-            employee.setWeeklyHours(dbObjects.get(i).get("weeklyHours").toString());
-            employee.setId(dbObjects.get(i).get("employeeID").toString());
-            employee.setHourlyPay(dbObjects.get(i).get("hourlyPay").toString());
-            data.put(Integer.parseInt(employee.getId()), employee);
-        }
-        return data;
-    }
 }
