@@ -4,3 +4,5 @@
 *.iml
 *.xml
 *.iml
+target/classes/icon/icon2.png
+*.kotlin_module
