@@ -42,7 +42,7 @@ public class MongoController {
         }
 
         Employee employee;
-        for (int i = 0; i < collection.countDocuments(); i++) {
+        for (int i = 0; i < collection.countDocuments() - 1; i++) {
             employee = new Employee();
             employee.setName(dbObjects.get(i).get("name").toString());
             employee.setPassword(dbObjects.get(i).get("password").toString());

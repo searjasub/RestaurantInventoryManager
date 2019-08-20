@@ -362,7 +362,7 @@ public class InventoryTrackerController {
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
-        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments() - 1);
+        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
         ingredientTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return ingredientTable;
     }

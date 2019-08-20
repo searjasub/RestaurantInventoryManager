@@ -131,7 +131,19 @@ public class AdministrativeController {
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
             loginButton.setDisable(true);
 
+
             name.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
+
+            weeklyHours.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
+
+            password.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
+
+            hourlyPay.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
+
+            occupation.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
+
+
+
 
             dialog.getDialogPane().setContent(grid);
 
@@ -444,14 +456,14 @@ public class AdministrativeController {
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
-        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
+        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments()-1);
 
         empsTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return empsTable;
     }
 
     private void AddEmployee(Employee e) {
-        collection.insertOne(new Document("name", e.getName()).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
+        collection.insertOne(new Document("name", e.getName()).append("weeklyHours", Integer.parseInt(e.getWeeklyHours())).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
                 .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
     }
 
