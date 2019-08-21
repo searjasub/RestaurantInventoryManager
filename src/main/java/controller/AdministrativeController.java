@@ -217,7 +217,7 @@ public class AdministrativeController {
             data = null;
             data = fillEmpCollection();
             empsTable.getItems().addAll(data);
-
+            empsTable.refresh();
         });
 
         //TODO UPDATE EMPLOYEE
@@ -456,7 +456,7 @@ public class AdministrativeController {
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
-        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments()-1);
+        int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
 
         empsTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return empsTable;
@@ -507,28 +507,25 @@ public class AdministrativeController {
         ObservableList<Employee> data = FXCollections.observableArrayList();
         List<DBObject> dbObjects = new ArrayList<>();
 
-        int id = 100001;
-        for (int i = 0; i < collection.countDocuments(); i++) {
-            DBObject query = BasicDBObjectBuilder.start().add("employeeID", id + i).get();
-            DBCursor cursor = dbCollection.find(query);
-            while (cursor.hasNext()) {
-                dbObjects.add(cursor.next());
-            }
-        }
+        DBCursor cursor = dbCollection.find();
+
+        dbObjects = cursor.toArray();
 
         System.out.println(dbObjects);
 
         Employee employee;
-        for (int i = 0; i < collection.countDocuments(); i++) {
+        for (DBObject obj: dbObjects) {
             employee = new Employee();
-            employee.setName(dbObjects.get(i).get("name").toString());
-            employee.setPassword(dbObjects.get(i).get("password").toString());
-            employee.setOccupation(dbObjects.get(i).get("occupation").toString());
-            employee.setWeeklyHours(dbObjects.get(i).get("weeklyHours").toString());
-            employee.setId(dbObjects.get(i).get("employeeID").toString());
-            employee.setHourlyPay(dbObjects.get(i).get("hourlyPay").toString());
+            employee.setName(obj.get("name").toString());
+            employee.setPassword(obj.get("password").toString());
+            employee.setOccupation(obj.get("occupation").toString());
+            employee.setWeeklyHours(obj.get("weeklyHours").toString());
+            employee.setId(obj.get("employeeID").toString());
+            employee.setHourlyPay(obj.get("hourlyPay").toString());
+            System.out.println(obj);
             data.add(employee);
         }
+        System.out.println(data);
         return data;
     }
 

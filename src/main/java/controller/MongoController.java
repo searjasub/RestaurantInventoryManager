@@ -32,14 +32,8 @@ public class MongoController {
     public HashMap<Integer, Employee> fillEmpCollection() {
         HashMap<Integer, Employee> data = new HashMap<>();
         List<DBObject> dbObjects = new ArrayList<>();
-        int id = 100001;
-        for (int i = 0; i < 5; i++) {
-            DBObject query = BasicDBObjectBuilder.start().add("employeeID", id + i).get();
-            DBCursor cursor = dbCollection.find(query);
-            while (cursor.hasNext()) {
-                dbObjects.add(cursor.next());
-            }
-        }
+        DBCursor cursor = dbCollection.find();
+        dbObjects = cursor.toArray();
 
         Employee employee;
         for (int i = 0; i < collection.countDocuments() - 1; i++) {
