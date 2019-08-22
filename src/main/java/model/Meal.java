@@ -113,9 +113,13 @@ public class Meal {
 
     private StringProperty mealIdProperty(){
         if (mealId == null) {
-            mealId = new SimpleStringProperty(this, "id");
+            mealId = new SimpleStringProperty(this, "mealID");
         }
         return mealId;
+    }
+
+    public String getBulkCost(){
+        return "20.0";
     }
 
 
