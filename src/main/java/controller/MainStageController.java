@@ -94,6 +94,8 @@ public class MainStageController {
             employee = employeeCollection.get(Integer.parseInt(usernameTextField.getText()));
             if (employee != null) {
                 if (passwordTextField.getText().equals(employee.getPassword())) {
+                    currentSession.setAdmin(false);
+                    currentSession.setLoggedIn(employee);
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
                     BorderPane root = loader.load();
                     POSController posController = loader.getController();
