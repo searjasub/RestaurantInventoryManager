@@ -60,6 +60,8 @@ public class InventoryTrackerController {
         }
         inventoryPagination.setPageFactory(this::createPage);
 
+        ingredientTable.setMaxHeight(270);
+
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
         RadioMenuItem inventory = new RadioMenuItem("Inventory");

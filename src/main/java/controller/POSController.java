@@ -21,11 +21,11 @@ import model.Employee;
 import model.Ingredient;
 import model.Meal;
 import org.bson.Document;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
+
+import javax.swing.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -80,7 +80,7 @@ public class POSController {
         paginationPOS.setPageFactory(this::createPage);
 
         if (currentSession.isAdmin()) {
-            System.out.println("you're an admin");
+//            System.out.println("you're an admin");
             Menu viewMenu = new Menu("View");
             RadioMenuItem admin = new RadioMenuItem("Admin");
             RadioMenuItem inventory = new RadioMenuItem("Inventory");
@@ -123,10 +123,16 @@ public class POSController {
 
                         TextField name = new TextField();
                         name.setPromptText("Name");
-                        TextField mealID = new TextField();
-                        mealID.setPromptText("MealID");
-                        TextField veganFriendly = new TextField();
-                        veganFriendly.setPromptText("Vegan Friendly");
+//                        TextField mealID = new TextField();
+//                        mealID.setPromptText("MealID");
+//                        TextField veganFriendly = new TextField();
+//                        veganFriendly.setPromptText("Vegan Friendly");
+
+                        ComboBox<String> veganFriendly = new ComboBox<>();
+
+                        veganFriendly.getItems().add("true");
+                        veganFriendly.getItems().add("false");
+
                         TextField totalCalorie = new TextField();
                         totalCalorie.setPromptText("totalCalorie");
                         TextField cost = new TextField();
@@ -136,10 +142,10 @@ public class POSController {
 
                         grid.add(new Label("Name:"), 0, 0);
                         grid.add(name, 1, 0);
-                        grid.add(new Label("mealID:"), 0, 1);
-                        grid.add(mealID, 1, 1);
+//                        grid.add(new Label("mealID:"), 0, 1);
+//                        grid.add(mealID, 1, 1);
                         grid.add(new Label("veganFriendly:"), 0, 2);
-                        grid.add(veganFriendly, 1, 2);
+                        grid.add(( veganFriendly), 1, 2);
                         grid.add(new Label("totalCalorie"), 0, 3);
                         grid.add(totalCalorie, 1, 3);
                         grid.add(new Label("cost"), 0, 4);
@@ -156,15 +162,16 @@ public class POSController {
 
                         Platform.runLater(name::requestFocus);
 
+                        String mealID = Long.toString(collection.countDocuments())+1;
                         dialog.setResultConverter(dialogButton -> {
                             if (dialogButton == loginButtonType) {
                                 Meal m = new Meal();
 
                                 m.setName(name.getText().trim());
-                                m.setMealId(mealID.getText().trim());
+                                m.setMealId(mealID);
                                 m.setCost(cost.getText().trim());
                                 m.setTotalCalorieCount(totalCalorie.getText().trim());
-                                m.setVeganFriendly(veganFriendly.getText().trim());
+                                m.setVeganFriendly(veganFriendly.getSelectionModel().getSelectedItem());
 //                                e.setBulkCost(bulkCost.getText().trim());
 
                                 return m;
@@ -327,33 +334,30 @@ public class POSController {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
-        mealTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex - 1)));
+        mealTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return mealTable;
     }
 
     private ObservableList<Meal> fillMealCollection() {
         ObservableList<Meal> data = FXCollections.observableArrayList();
         List<DBObject> dbObjects = new ArrayList<>();
+        DBCursor cursor = dbCollection.find();
+        dbObjects = cursor.toArray();
 
-        for (int i = 0; i < collection.countDocuments(); i++) {
-
-            DBObject query = BasicDBObjectBuilder.start().add("mealID", i + 1).get();
-            DBCursor cursor = dbCollection.find(query);
-            while (cursor.hasNext()) {
-                dbObjects.add(cursor.next());
-            }
-        }
+        System.out.println(dbObjects);
 
         Meal meal;
-        for (int i = 1; i < collection.countDocuments(); i++) {
+        for (DBObject obj: dbObjects) {
             meal = new Meal();
-            meal.setName(dbObjects.get(i).get("name").toString());
-            meal.setCost(dbObjects.get(i).get("cost").toString());
-            meal.setMealId(dbObjects.get(i).get("mealID").toString());
-//            meal.setTotalCalorieCount(dbObjects.get(i).get("totalCalorie").toString());
-            meal.setVeganFriendly(dbObjects.get(i).get("veganFriendly").toString());
+            meal.setName(obj.get("name").toString());
+            meal.setTotalCalorieCount(obj.get("totalCalorie").toString());
+            meal.setVeganFriendly(obj.get("veganFriendly").toString());
+            meal.setMealId(obj.get("mealID").toString());
+            meal.setCost(obj.get("cost").toString());
+
             data.add(meal);
         }
+
         return data;
     }
 

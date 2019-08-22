@@ -151,7 +151,7 @@ public class AdministrativeController {
                     Employee e = new Employee();
 
                     e.setName(name.getText().trim());
-                    e.setId("10000" + (collection.countDocuments() + 1));
+                    e.setId("" + (collection.countDocuments() + 1));
                     e.setWeeklyHours(weeklyHours.getText().trim());
                     e.setPassword(password.getText().trim());
                     e.setHourlyPay(hourlyPay.getText().trim());
@@ -289,7 +289,7 @@ public class AdministrativeController {
                 }
                 if (newValue.equals("employeeID")) {
                     grid.add(new Label("employeeID"), 0, 1);
-                    grid.add(id, 1, 1);
+                    grid.add(occupation, 1, 1);
                 }
             });
 
@@ -321,22 +321,22 @@ public class AdministrativeController {
                     e.setHourlyPay(hourlyPay.getText().trim());
                     e.setOccupation(occupation.getText().trim());
 
-                    if(!name.equals(null)){
+                    if(!name.getText().isEmpty()){
                         updateEmployee(ids, "name", e.getName());
                     }
-                    if(!password.equals(null)){
+                    if(!password.getText().isEmpty()){
                         updateEmployee(ids, "password", e.getPassword());
                     }
-                    if(!weeklyHours.equals(null)){
+                    if(!weeklyHours.getText().isEmpty()){
                         updateEmployee(ids, "weeklyHours", e.getWeeklyHours());
                     }
-                    if(!hourlyPay.equals(null)){
+                    if(!hourlyPay.getText().isEmpty()){
                         updateEmployee(ids, "hourlyPay", e.getHourlyPay());
                     }
-                    if(!occupation.equals(null)){
+                    if(!occupation.getText().isEmpty()){
                         updateEmployee(ids, "occupation", e.getOccupation());
                     }
-                    if(!id.equals(null)){
+                    if(!id.getText().isEmpty()){
                         updateEmployee(ids, "employeeID", e.getId());
                     }
 
@@ -346,7 +346,6 @@ public class AdministrativeController {
             });
 
             Optional<Employee> result = dialog.showAndWait();
-
 
             empsTable.getItems().clear();
             empsTable.refresh();
@@ -480,8 +479,12 @@ public class AdministrativeController {
     }
 
     private void AddEmployee(Employee e) {
-        collection.insertOne(new Document("name", e.getName()).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
-                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()).append("weeklyHours", e.getWeeklyHours()));
+        collection.insertOne(new Document("name", e.getName()).append("weeklyHours", Integer.parseInt(e.getWeeklyHours())).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
+                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
+        empsTable.getItems().clear();
+        data = null;
+        data = fillEmpCollection();
+        empsTable.getItems().addAll(data);
     }
 
     private void deleteEmployee(int e) {
