@@ -58,7 +58,6 @@ public class InventoryTrackerController {
         } else {
             inventoryPagination.setPageCount(1);
         }
-        System.out.println();
         inventoryPagination.setPageFactory(this::createPage);
 
         Menu viewMenu = new Menu("View");
@@ -369,10 +368,7 @@ public class InventoryTrackerController {
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
-        System.out.println("PAge index:" + pageIndex);
-        System.out.println("rows per page:" + pageIndex);
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
-        System.out.println("To index: " + toIndex);
         ingredientTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return ingredientTable;
     }
@@ -390,12 +386,7 @@ public class InventoryTrackerController {
 //          }
 //        }
         DBCursor cursor = dbCollection.find();
-
         dbObjects = cursor.toArray();
-
-        System.out.println(dbObjects);
-
-
         Ingredient ingredient;
         for (DBObject obj : dbObjects) {
 

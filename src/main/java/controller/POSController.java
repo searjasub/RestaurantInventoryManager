@@ -327,10 +327,6 @@ public class POSController {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
-
-        for (int i = 0; i < mealTable.getItems().size(); i++) {
-            System.out.println(mealTable.getItems().get(i));
-        }
         mealTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex - 1)));
         return mealTable;
     }
