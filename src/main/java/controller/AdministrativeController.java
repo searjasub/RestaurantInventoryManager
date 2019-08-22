@@ -142,7 +142,7 @@ public class AdministrativeController {
                     Employee e = new Employee();
 
                     e.setName(name.getText().trim());
-                    e.setId("" + (collection.countDocuments() + 1));
+                    e.setId("100000" + (collection.countDocuments() + 1));
                     e.setWeeklyHours(weeklyHours.getText().trim());
                     e.setPassword(password.getText().trim());
                     e.setHourlyPay(hourlyPay.getText().trim());
@@ -200,7 +200,7 @@ public class AdministrativeController {
 
             Optional<Employee> result = dialog.showAndWait();
 
-            empsTable.getItems().removeAll();
+            empsTable.getItems().clear();
             empsTable.refresh();
             data = null;
             data = fillEmpCollection();
@@ -274,7 +274,7 @@ public class AdministrativeController {
                 }
                 if (newValue.equals("employeeID")) {
                     grid.add(new Label("employeeID"), 0, 1);
-                    grid.add(occupation, 1, 1);
+                    grid.add(id, 1, 1);
                 }
             });
 
@@ -452,7 +452,7 @@ public class AdministrativeController {
 
     private void AddEmployee(Employee e) {
         collection.insertOne(new Document("name", e.getName()).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
-                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
+                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()).append("weeklyHours", e.getWeeklyHours()));
     }
 
     private void deleteEmployee(int e) {
