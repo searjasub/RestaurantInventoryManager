@@ -164,6 +164,13 @@ public class AdministrativeController {
 
             Optional<Employee> result = dialog.showAndWait();
 
+            empsTable.getItems().clear();
+            empsTable.refresh();
+            data = null;
+            data = fillEmpCollection();
+            empsTable.getItems().addAll(data);
+            empsTable.refresh();
+
             result.ifPresent(this::AddEmployee);
         });
 
@@ -209,7 +216,7 @@ public class AdministrativeController {
 
             Optional<Employee> result = dialog.showAndWait();
 
-            empsTable.getItems().removeAll();
+            empsTable.getItems().clear();
             empsTable.refresh();
             data = null;
             data = fillEmpCollection();
@@ -314,22 +321,22 @@ public class AdministrativeController {
                     e.setHourlyPay(hourlyPay.getText().trim());
                     e.setOccupation(occupation.getText().trim());
 
-                    if(!name.equals(null)){
+                    if(!name.getText().isEmpty()){
                         updateEmployee(ids, "name", e.getName());
                     }
-                    if(!password.equals(null)){
+                    if(!password.getText().isEmpty()){
                         updateEmployee(ids, "password", e.getPassword());
                     }
-                    if(!weeklyHours.equals(null)){
+                    if(!weeklyHours.getText().isEmpty()){
                         updateEmployee(ids, "weeklyHours", e.getWeeklyHours());
                     }
-                    if(!hourlyPay.equals(null)){
+                    if(!hourlyPay.getText().isEmpty()){
                         updateEmployee(ids, "hourlyPay", e.getHourlyPay());
                     }
-                    if(!occupation.equals(null)){
+                    if(!occupation.getText().isEmpty()){
                         updateEmployee(ids, "occupation", e.getOccupation());
                     }
-                    if(!id.equals(null)){
+                    if(!id.getText().isEmpty()){
                         updateEmployee(ids, "employeeID", e.getId());
                     }
 
@@ -339,6 +346,13 @@ public class AdministrativeController {
             });
 
             Optional<Employee> result = dialog.showAndWait();
+
+            empsTable.getItems().clear();
+            empsTable.refresh();
+            data = null;
+            data = fillEmpCollection();
+            empsTable.getItems().addAll(data);
+            empsTable.refresh();
 
             //TODO what's next?
             if (result.isPresent()) {

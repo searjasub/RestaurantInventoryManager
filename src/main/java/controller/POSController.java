@@ -334,7 +334,7 @@ public class POSController {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
-        mealTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex - 1)));
+        mealTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return mealTable;
     }
 
@@ -354,8 +354,8 @@ public class POSController {
             meal.setVeganFriendly(obj.get("veganFriendly").toString());
             meal.setMealId(obj.get("mealID").toString());
             meal.setCost(obj.get("cost").toString());
-            data.add(meal);
 
+            data.add(meal);
         }
 
         return data;
