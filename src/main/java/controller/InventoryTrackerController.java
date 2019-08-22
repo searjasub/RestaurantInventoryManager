@@ -195,13 +195,15 @@ public class InventoryTrackerController {
                 if (dialogButton == deleteButtonType) {
 
                     e.setIngredientId(id.getText().trim());
-//                    int ids = Integer.parseInt(e.getIngredientId());
-                    deleteIngredient(e.getIngredientId());
+                    int ids = Integer.parseInt(e.getIngredientId());
+                    deleteIngredient(ids);
                 }
                 return null;
             });
 
-            ingredientTable.getItems().removeAll();
+            Optional<Ingredient> result = dialog.showAndWait();
+
+            ingredientTable.getItems().clear();
             ingredientTable.refresh();
             data = null;
             data = fillIngredientCollection();
@@ -260,8 +262,8 @@ public class InventoryTrackerController {
                 .append("bulkCost", bulkCost).append("bulkAmount", bulkAmount));
     }
 
-    private void deleteIngredient(String ingredientId) {
-        collection.deleteOne(eq("ingredientId", ingredientId));
+    private void deleteIngredient(int ingredientId) {
+        collection.deleteOne(eq("ingredientID", ingredientId));
     }
 
     public void updateItem(int itemId, String updateField, String updateValue) {
@@ -359,8 +361,8 @@ public class InventoryTrackerController {
 
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
-        int fromIndex = (pageIndex * rowsPerPage);
-        System.out.println("Page index:" + pageIndex);
+        int fromIndex = pageIndex * rowsPerPage;
+        System.out.println("PAge index:" + pageIndex);
         System.out.println("rows per page:" + pageIndex);
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
         System.out.println("To index: " + toIndex);
@@ -374,12 +376,11 @@ public class InventoryTrackerController {
         List<DBObject> dbObjects = new ArrayList<>();
 
 //        int id = 500001;
-//        for (int i = 0; i < collection.countDocuments() - 1; i++) {
-//            DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();
-//            DBCursor cursor = dbCollection.find(query);
+//        for (int i = 0; i < collection.countDocuments(); i++) {
+//            DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();//           DBCursor cursor = dbCollection.find(query);
 //            while (cursor.hasNext()) {
 //                dbObjects.add(cursor.next());
-//            }
+//          }
 //        }
         DBCursor cursor = dbCollection.find();
 
@@ -389,15 +390,15 @@ public class InventoryTrackerController {
 
 
         Ingredient ingredient;
-        for (int i = 0; i < collection.countDocuments(); i++) {
+        for (DBObject obj: dbObjects) {
 
             ingredient = new Ingredient();
-            ingredient.setName(dbObjects.get(i).get("name").toString());
-            ingredient.setIngredientId(dbObjects.get(i).get("ingredientID").toString());
-            ingredient.setBulkCost(dbObjects.get(i).get("bulkCost").toString());
-            ingredient.setCostPerIngredient(dbObjects.get(i).get("individualCost").toString());
-            ingredient.setCaloriePerServing(dbObjects.get(i).get("caloriePerServing").toString());
-            ingredient.setAmount(dbObjects.get(i).get("amount").toString());
+            ingredient.setName(obj.get("name").toString());
+            ingredient.setIngredientId(obj.get("ingredientID").toString());
+            ingredient.setBulkCost(obj.get("bulkCost").toString());
+            ingredient.setCostPerIngredient(obj.get("individualCost").toString());
+            ingredient.setCaloriePerServing(obj.get("caloriePerServing").toString());
+            ingredient.setAmount(obj.get("amount").toString());
 
             data.add(ingredient);
 

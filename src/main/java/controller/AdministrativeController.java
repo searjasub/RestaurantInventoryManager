@@ -154,7 +154,7 @@ public class AdministrativeController {
                     Employee e = new Employee();
 
                     e.setName(name.getText().trim());
-                    e.setId("100000" + (collection.countDocuments() + 1));
+                    e.setId("10000" + (collection.countDocuments() + 1));
                     e.setWeeklyHours(weeklyHours.getText().trim());
                     e.setPassword(password.getText().trim());
                     e.setHourlyPay(hourlyPay.getText().trim());
@@ -166,6 +166,13 @@ public class AdministrativeController {
             });
 
             Optional<Employee> result = dialog.showAndWait();
+
+            empsTable.getItems().clear();
+            empsTable.refresh();
+            data = null;
+            data = fillEmpCollection();
+            empsTable.getItems().addAll(data);
+            empsTable.refresh();
 
             result.ifPresent(this::AddEmployee);
         });
@@ -337,6 +344,14 @@ public class AdministrativeController {
             });
 
             Optional<Employee> result = dialog.showAndWait();
+
+
+            empsTable.getItems().clear();
+            empsTable.refresh();
+            data = null;
+            data = fillEmpCollection();
+            empsTable.getItems().addAll(data);
+            empsTable.refresh();
 
             //TODO what's next?
             if (result.isPresent()) {
