@@ -154,7 +154,7 @@ public class AdministrativeController {
                     Employee e = new Employee();
 
                     e.setName(name.getText().trim());
-                    e.setId("10000" + (collection.countDocuments() + 1));
+                    e.setId("" + (collection.countDocuments() + 1));
                     e.setWeeklyHours(weeklyHours.getText().trim());
                     e.setPassword(password.getText().trim());
                     e.setHourlyPay(hourlyPay.getText().trim());
@@ -166,13 +166,6 @@ public class AdministrativeController {
             });
 
             Optional<Employee> result = dialog.showAndWait();
-
-            empsTable.getItems().clear();
-            empsTable.refresh();
-            data = null;
-            data = fillEmpCollection();
-            empsTable.getItems().addAll(data);
-            empsTable.refresh();
 
             result.ifPresent(this::AddEmployee);
         });
@@ -219,7 +212,7 @@ public class AdministrativeController {
 
             Optional<Employee> result = dialog.showAndWait();
 
-            empsTable.getItems().clear();
+            empsTable.getItems().removeAll();
             empsTable.refresh();
             data = null;
             data = fillEmpCollection();
@@ -293,7 +286,7 @@ public class AdministrativeController {
                 }
                 if (newValue.equals("employeeID")) {
                     grid.add(new Label("employeeID"), 0, 1);
-                    grid.add(id, 1, 1);
+                    grid.add(occupation, 1, 1);
                 }
             });
 
@@ -344,14 +337,6 @@ public class AdministrativeController {
             });
 
             Optional<Employee> result = dialog.showAndWait();
-
-
-            empsTable.getItems().clear();
-            empsTable.refresh();
-            data = null;
-            data = fillEmpCollection();
-            empsTable.getItems().addAll(data);
-            empsTable.refresh();
 
             //TODO what's next?
             if (result.isPresent()) {
@@ -478,8 +463,12 @@ public class AdministrativeController {
     }
 
     private void AddEmployee(Employee e) {
-        collection.insertOne(new Document("name", e.getName()).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
-                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()).append("weeklyHours", e.getWeeklyHours()));
+        collection.insertOne(new Document("name", e.getName()).append("weeklyHours", Integer.parseInt(e.getWeeklyHours())).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
+                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
+        empsTable.getItems().clear();
+        data = null;
+        data = fillEmpCollection();
+        empsTable.getItems().addAll(data);
     }
 
     private void deleteEmployee(int e) {
