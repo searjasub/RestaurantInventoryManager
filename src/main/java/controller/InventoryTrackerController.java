@@ -53,8 +53,8 @@ public class InventoryTrackerController {
         this.currentSession = currentSession;
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
-        if (data.size() > 100) {
-            inventoryPagination.setPageCount((data.size() / 100) + 1);
+        if (data.size() > 10) {
+            inventoryPagination.setPageCount((data.size() / 10) + 1);
         } else {
             inventoryPagination.setPageCount(1);
         }
@@ -152,14 +152,21 @@ public class InventoryTrackerController {
                     e.setBulkCost(bulkCost.getText().trim());
 
                     return e;
-                }
-                return null;
-            });
 
+                }
+                    return null;
+            });
             Optional<Ingredient> result = dialog.showAndWait();
+
 
             result.ifPresent(ingredient -> addIngredient(ingredient.getName(), Integer.parseInt(ingredient.getIngredientId()), Integer.parseInt(ingredient.getCaloriePerServing()),
                     Integer.parseInt(ingredient.getAmount()), Integer.parseInt(ingredient.getCostPerIngredient()), Integer.parseInt(ingredient.getBulkCost())));
+
+                    ingredientTable.getItems().clear();
+                    ingredientTable.refresh();
+                    data = null;
+                    data = fillIngredientCollection();
+                    ingredientTable.getItems().addAll(data);
         });
 
         deleteIngredient.setOnAction(event -> {
@@ -234,7 +241,7 @@ public class InventoryTrackerController {
             BorderPane root;
             try {
                 root = loader.load();
-                posScene = new Scene(root, 800 , 800);
+                posScene = new Scene(root, 800, 800);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -390,7 +397,7 @@ public class InventoryTrackerController {
 
 
         Ingredient ingredient;
-        for (DBObject obj: dbObjects) {
+        for (DBObject obj : dbObjects) {
 
             ingredient = new Ingredient();
             ingredient.setName(obj.get("name").toString());
