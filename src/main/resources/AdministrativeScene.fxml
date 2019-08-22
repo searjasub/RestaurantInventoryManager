@@ -15,7 +15,6 @@
                 <Menu text="File">
                     <items>
                         <MenuItem onAction="#onMenuEndSession" text="Switch User"/>
-                        <MenuItem onAction="#onMenuItemExit" text="Exit" />
                     </items>
                 </Menu>
             </menus>
