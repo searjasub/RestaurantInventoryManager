@@ -54,9 +54,6 @@ public class AdministrativeController {
         this.employeeHashMap = employeesCollection;
         this.currentSession = currentSession;
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
-        System.out.println(currentSession.isAdmin());
-        System.out.println(currentSession.getLoggedIn().getId());
-        System.out.println(currentSession.getLoggedIn().getName());
 
 
         if (data.size() > 100) {
@@ -125,7 +122,7 @@ public class AdministrativeController {
             grid.add(password, 1, 2);
             grid.add(new Label("HourlyPay"), 0, 3);
             grid.add(hourlyPay, 1, 3);
-            grid.add(new Label("Primary Email:"), 0, 4);
+            grid.add(new Label("Occupation:"), 0, 4);
             grid.add(occupation, 1, 4);
 
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
@@ -263,7 +260,6 @@ public class AdministrativeController {
             grid.add(comboBox, 1, 1);
 
             comboBox.valueProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-                System.out.println("Selected value : " + newValue);
                 if (newValue.equals("Full Name")) {
                     grid.add(new Label("Full Name"), 0, 1);
                     grid.add(name, 1, 1);
@@ -295,6 +291,12 @@ public class AdministrativeController {
             updateButton.setDisable(true);
 
             name.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            password.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            weeklyHours.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            hourlyPay.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            occupation.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            id.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+
 
             dialog.getDialogPane().setContent(grid);
 
@@ -512,10 +514,7 @@ public class AdministrativeController {
         List<DBObject> dbObjects = new ArrayList<>();
 
         DBCursor cursor = dbCollection.find();
-
         dbObjects = cursor.toArray();
-
-        System.out.println(dbObjects);
 
         Employee employee;
         for (DBObject obj: dbObjects) {
@@ -526,10 +525,8 @@ public class AdministrativeController {
             employee.setWeeklyHours(obj.get("weeklyHours").toString());
             employee.setId(obj.get("employeeID").toString());
             employee.setHourlyPay(obj.get("hourlyPay").toString());
-            System.out.println(obj);
             data.add(employee);
         }
-        System.out.println(data);
         return data;
     }
 
