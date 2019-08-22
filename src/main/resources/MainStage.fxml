@@ -19,13 +19,7 @@
 
     <top>
         <MenuBar fx:id="topMenu">
-            <menus>
-                <Menu text="File">
-                    <items>
-                        <MenuItem onAction="#onMenuItemExit" text="Exit" />
-                    </items>
-                </Menu>
-            </menus>
+
         </MenuBar>
     </top>
     <center>
