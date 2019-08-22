@@ -153,14 +153,19 @@ public class MainStageController {
 
         List<DBObject> dbObjects = new ArrayList<>();
 
-        int id = 30000;
-        for (int i = 0; i < adminCollection.countDocuments(); i++) {
-            DBObject query1 = BasicDBObjectBuilder.start().add("employeeID", "" + (id + i)).get();
-            DBCursor cursor = adminDbCollection.find(query1);
-            while (cursor.hasNext()) {
-                dbObjects.add(cursor.next());
-            }
-        }
+//        int id = 30000;
+//        for (int i = 0; i < adminCollection.countDocuments(); i++) {
+//            DBObject query1 = BasicDBObjectBuilder.start().add("employeeID", "" + (id + i)).get();
+//            DBCursor cursor = adminDbCollection.find(query1);
+//            while (cursor.hasNext()) {
+//                dbObjects.add(cursor.next());
+//            }
+//        }
+        DBCursor cursor = adminDbCollection.find();
+
+        dbObjects = cursor.toArray();
+
+        System.out.println(dbObjects);
 
         Employee employee;
         for (int i = 0; i < adminCollection.countDocuments(); i++) {
