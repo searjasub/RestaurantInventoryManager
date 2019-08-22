@@ -58,8 +58,9 @@ public class InventoryTrackerController {
         } else {
             inventoryPagination.setPageCount(1);
         }
-        System.out.println();
         inventoryPagination.setPageFactory(this::createPage);
+
+        ingredientTable.setMaxHeight(270);
 
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
@@ -107,8 +108,7 @@ public class InventoryTrackerController {
 
             TextField name = new TextField();
             name.setPromptText("Name");
-            TextField ingredientId = new TextField();
-            ingredientId.setPromptText("IngredientID");
+
             TextField amount = new TextField();
             amount.setPromptText("Amount");
             TextField caloriePerServing = new TextField();
@@ -120,16 +120,14 @@ public class InventoryTrackerController {
 
             grid.add(new Label("Name:"), 0, 0);
             grid.add(name, 1, 0);
-            grid.add(new Label("IngredientId:"), 0, 1);
-            grid.add(ingredientId, 1, 1);
-            grid.add(new Label("Amount:"), 0, 2);
-            grid.add(amount, 1, 2);
-            grid.add(new Label("CaloriePerServing"), 0, 3);
-            grid.add(caloriePerServing, 1, 3);
-            grid.add(new Label("CostPerIngredient"), 0, 4);
-            grid.add(costPerIngredient, 1, 4);
-            grid.add(new Label("BulkCost:"), 0, 5);
-            grid.add(bulkCost, 1, 5);
+            grid.add(new Label("Amount:"), 0, 1);
+            grid.add(amount, 1, 1);
+            grid.add(new Label("CaloriePerServing"), 0, 2);
+            grid.add(caloriePerServing, 1, 2);
+            grid.add(new Label("CostPerIngredient"), 0, 3);
+            grid.add(costPerIngredient, 1, 3);
+            grid.add(new Label("BulkCost:"), 0, 4);
+            grid.add(bulkCost, 1, 4);
 
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
             loginButton.setDisable(true);
@@ -143,9 +141,10 @@ public class InventoryTrackerController {
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == loginButtonType) {
                     Ingredient e = new Ingredient();
+                    long id = 500000 + (collection.countDocuments() + 1);
 
                     e.setName(name.getText().trim());
-                    e.setIngredientId(ingredientId.getText().trim());
+                    e.setIngredientId("" + id);
                     e.setAmount(amount.getText().trim());
                     e.setCaloriePerServing(caloriePerServing.getText().trim());
                     e.setCostPerIngredient(costPerIngredient.getText().trim());
@@ -369,10 +368,7 @@ public class InventoryTrackerController {
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
         int fromIndex = pageIndex * rowsPerPage;
-        System.out.println("PAge index:" + pageIndex);
-        System.out.println("rows per page:" + pageIndex);
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
-        System.out.println("To index: " + toIndex);
         ingredientTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
         return ingredientTable;
     }
@@ -390,12 +386,7 @@ public class InventoryTrackerController {
 //          }
 //        }
         DBCursor cursor = dbCollection.find();
-
         dbObjects = cursor.toArray();
-
-        System.out.println(dbObjects);
-
-
         Ingredient ingredient;
         for (DBObject obj : dbObjects) {
 

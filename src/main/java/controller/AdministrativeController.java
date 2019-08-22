@@ -54,9 +54,6 @@ public class AdministrativeController {
         this.employeeHashMap = employeesCollection;
         this.currentSession = currentSession;
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
-        System.out.println(currentSession.isAdmin());
-        System.out.println(currentSession.getLoggedIn().getId());
-        System.out.println(currentSession.getLoggedIn().getName());
 
 
         if (data.size() > 100) {
@@ -154,7 +151,7 @@ public class AdministrativeController {
                     Employee e = new Employee();
 
                     e.setName(name.getText().trim());
-                    e.setId("10000" + (collection.countDocuments() + 1));
+                    e.setId("" + (collection.countDocuments() + 1));
                     e.setWeeklyHours(weeklyHours.getText().trim());
                     e.setPassword(password.getText().trim());
                     e.setHourlyPay(hourlyPay.getText().trim());
@@ -166,13 +163,6 @@ public class AdministrativeController {
             });
 
             Optional<Employee> result = dialog.showAndWait();
-
-            empsTable.getItems().clear();
-            empsTable.refresh();
-            data = null;
-            data = fillEmpCollection();
-            empsTable.getItems().addAll(data);
-            empsTable.refresh();
 
             result.ifPresent(this::AddEmployee);
         });
@@ -219,7 +209,7 @@ public class AdministrativeController {
 
             Optional<Employee> result = dialog.showAndWait();
 
-            empsTable.getItems().clear();
+            empsTable.getItems().removeAll();
             empsTable.refresh();
             data = null;
             data = fillEmpCollection();
@@ -270,7 +260,6 @@ public class AdministrativeController {
             grid.add(comboBox, 1, 1);
 
             comboBox.valueProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-                System.out.println("Selected value : " + newValue);
                 if (newValue.equals("Full Name")) {
                     grid.add(new Label("Full Name"), 0, 1);
                     grid.add(name, 1, 1);
@@ -293,7 +282,7 @@ public class AdministrativeController {
                 }
                 if (newValue.equals("employeeID")) {
                     grid.add(new Label("employeeID"), 0, 1);
-                    grid.add(id, 1, 1);
+                    grid.add(occupation, 1, 1);
                 }
             });
 
@@ -350,14 +339,6 @@ public class AdministrativeController {
             });
 
             Optional<Employee> result = dialog.showAndWait();
-
-
-            empsTable.getItems().clear();
-            empsTable.refresh();
-            data = null;
-            data = fillEmpCollection();
-            empsTable.getItems().addAll(data);
-            empsTable.refresh();
 
             //TODO what's next?
             if (result.isPresent()) {
@@ -484,8 +465,12 @@ public class AdministrativeController {
     }
 
     private void AddEmployee(Employee e) {
-        collection.insertOne(new Document("name", e.getName()).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
-                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()).append("weeklyHours", e.getWeeklyHours()));
+        collection.insertOne(new Document("name", e.getName()).append("weeklyHours", Integer.parseInt(e.getWeeklyHours())).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
+                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
+        empsTable.getItems().clear();
+        data = null;
+        data = fillEmpCollection();
+        empsTable.getItems().addAll(data);
     }
 
     private void deleteEmployee(int e) {
@@ -529,10 +514,7 @@ public class AdministrativeController {
         List<DBObject> dbObjects = new ArrayList<>();
 
         DBCursor cursor = dbCollection.find();
-
         dbObjects = cursor.toArray();
-
-        System.out.println(dbObjects);
 
         Employee employee;
         for (DBObject obj: dbObjects) {
@@ -543,10 +525,8 @@ public class AdministrativeController {
             employee.setWeeklyHours(obj.get("weeklyHours").toString());
             employee.setId(obj.get("employeeID").toString());
             employee.setHourlyPay(obj.get("hourlyPay").toString());
-            System.out.println(obj);
             data.add(employee);
         }
-        System.out.println(data);
         return data;
     }
 
