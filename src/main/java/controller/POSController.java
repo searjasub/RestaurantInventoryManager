@@ -106,7 +106,7 @@ public class POSController {
             mealMenu.getItems().add(deleteMeal);
                 mealMenu.getItems().add(updateMeal);
 
-            menuBar.getMenus().add(mealMenu);
+
 
             addMeal.setOnAction(event -> {
                         Dialog<Meal> dialog = new Dialog<>();
@@ -229,7 +229,8 @@ public class POSController {
 
             pos.setSelected(true);
 //            mealTable.setItems(fillMealCollection());
-            this.menuBar.getMenus().add(viewMenu);
+            menuBar.getMenus().add(viewMenu);
+            menuBar.getMenus().add(mealMenu);
 
             admin.setOnAction(event -> {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));

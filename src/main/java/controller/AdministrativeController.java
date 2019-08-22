@@ -125,7 +125,7 @@ public class AdministrativeController {
             grid.add(password, 1, 2);
             grid.add(new Label("HourlyPay"), 0, 3);
             grid.add(hourlyPay, 1, 3);
-            grid.add(new Label("Primary Email:"), 0, 4);
+            grid.add(new Label("Occupation:"), 0, 4);
             grid.add(occupation, 1, 4);
 
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
@@ -302,6 +302,12 @@ public class AdministrativeController {
             updateButton.setDisable(true);
 
             name.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            password.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            weeklyHours.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            hourlyPay.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            occupation.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            id.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+
 
             dialog.getDialogPane().setContent(grid);
 
