@@ -248,8 +248,8 @@ public class InventoryTrackerController {
 
     //Added this method to deal with the change over to StringProperty values instead of ints and dates. Will try to implement those soon
     private void addIngredient(String ingredientName, int ingredientId, int caloriePerServing, int amount, int costPerIngredient, int bulkCost) {
-        collection.insertOne(new Document("ingredientName", ingredientName).append("ingredientID", ingredientId)
-                .append("caloriePerServing", caloriePerServing).append("amount", amount).append("costPerIngredient", costPerIngredient)
+        collection.insertOne(new Document("name", ingredientName).append("ingredientID", ingredientId)
+                .append("caloriePerServing", caloriePerServing).append("amount", amount).append("individualCost", costPerIngredient)
                 .append("bulkCost", bulkCost));
     }
 
