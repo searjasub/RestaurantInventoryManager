@@ -59,7 +59,7 @@ public class InventoryTrackerController {
             inventoryPagination.setPageCount(1);
         }
         System.out.println();
-        inventoryPagination.setPageFactory(pageIndex -> createPage(1));
+        inventoryPagination.setPageFactory(this::createPage);
 
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
@@ -200,9 +200,6 @@ public class InventoryTrackerController {
                 }
                 return null;
             });
-
-            //TODO What are we doing with this?
-            Optional<Ingredient> result = dialog.showAndWait();
 
             ingredientTable.getItems().removeAll();
             ingredientTable.refresh();
@@ -362,8 +359,8 @@ public class InventoryTrackerController {
 
     private Node createPage(Integer pageIndex) {
         int rowsPerPage = 10;
-        int fromIndex = pageIndex * rowsPerPage;
-        System.out.println("PAge index:" + pageIndex);
+        int fromIndex = (pageIndex * rowsPerPage);
+        System.out.println("Page index:" + pageIndex);
         System.out.println("rows per page:" + pageIndex);
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
         System.out.println("To index: " + toIndex);
@@ -376,18 +373,23 @@ public class InventoryTrackerController {
 
         List<DBObject> dbObjects = new ArrayList<>();
 
-        int id = 500001;
-        for (int i = 0; i < collection.countDocuments() - 1; i++) {
-            DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();
-            DBCursor cursor = dbCollection.find(query);
-            while (cursor.hasNext()) {
-                dbObjects.add(cursor.next());
-            }
-        }
+//        int id = 500001;
+//        for (int i = 0; i < collection.countDocuments() - 1; i++) {
+//            DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();
+//            DBCursor cursor = dbCollection.find(query);
+//            while (cursor.hasNext()) {
+//                dbObjects.add(cursor.next());
+//            }
+//        }
+        DBCursor cursor = dbCollection.find();
+
+        dbObjects = cursor.toArray();
+
+        System.out.println(dbObjects);
 
 
         Ingredient ingredient;
-        for (int i = 0; i < collection.countDocuments() - 1; i++) {
+        for (int i = 0; i < collection.countDocuments(); i++) {
 
             ingredient = new Ingredient();
             ingredient.setName(dbObjects.get(i).get("name").toString());
