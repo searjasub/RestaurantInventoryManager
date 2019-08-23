@@ -416,9 +416,7 @@ public class AdministrativeController {
         });
     }
 
-
     private TableView<Employee> createTable() {
-
         empsTable = new TableView<>();
         empsTable.setEditable(true);
 
@@ -470,13 +468,23 @@ public class AdministrativeController {
         return empsTable;
     }
 
+    private void showAlertFillInfo() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Complete all fields", ButtonType.OK);
+        alert.setTitle("Employee not completed");
+        alert.show();
+    }
+
     private void AddEmployee(Employee e) {
-        collection.insertOne(new Document("name", e.getName()).append("weeklyHours", Integer.parseInt(e.getWeeklyHours())).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
-                .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
-        empsTable.getItems().clear();
-        data = null;
-        data = fillEmpCollection();
-        empsTable.getItems().addAll(data);
+        try {
+            collection.insertOne(new Document("name", e.getName()).append("weeklyHours", Integer.parseInt(e.getWeeklyHours())).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
+                    .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
+            empsTable.getItems().clear();
+            data = null;
+            data = fillEmpCollection();
+            empsTable.getItems().addAll(data);
+        } catch (NumberFormatException ex){
+            showAlertFillInfo();
+        }
     }
 
     private void deleteEmployee(int e) {
@@ -517,20 +525,12 @@ public class AdministrativeController {
 
     private ObservableList<Employee> fillEmpCollection() {
         ObservableList<Employee> data = FXCollections.observableArrayList();
-        List<DBObject> dbObjects = new ArrayList<>();
-
+        List<DBObject> dbObjects;
         DBCursor cursor = dbCollection.find();
         dbObjects = cursor.toArray();
 
-        Employee employee;
         for (DBObject obj : dbObjects) {
-            employee = new Employee();
-            employee.setName(obj.get("name").toString());
-            employee.setPassword(obj.get("password").toString());
-            employee.setOccupation(obj.get("occupation").toString());
-            employee.setWeeklyHours(obj.get("weeklyHours").toString());
-            employee.setId(obj.get("employeeID").toString());
-            employee.setHourlyPay(obj.get("hourlyPay").toString());
+            Employee employee = MainStageController.getEmployee(obj);
             data.add(employee);
         }
         return data;
@@ -557,10 +557,6 @@ public class AdministrativeController {
         } catch (NumberFormatException | IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void onMenuItemExit() {
-        primaryStage.close();
     }
 
     public void allShow() {

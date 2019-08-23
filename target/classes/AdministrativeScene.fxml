@@ -11,13 +11,9 @@
     </center>
     <top>
         <MenuBar fx:id="menuBar">
-            <menus>
-                <Menu text="File">
-                    <items>
-                        <MenuItem onAction="#onMenuEndSession" text="Switch User"/>
-                    </items>
-                </Menu>
-            </menus>
+            <Menu text="File">
+                <MenuItem onAction="#onMenuEndSession" text="Switch User"/>
+            </Menu>
         </MenuBar>
     </top>
 </BorderPane>

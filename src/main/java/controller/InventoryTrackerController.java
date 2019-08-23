@@ -157,9 +157,7 @@ public class InventoryTrackerController {
             });
             Optional<Ingredient> result = dialog.showAndWait();
 
-
-            result.ifPresent(ingredient -> addIngredient(ingredient.getName(), Integer.parseInt(ingredient.getIngredientId()), Integer.parseInt(ingredient.getCaloriePerServing()),
-                    Integer.parseInt(ingredient.getAmount()), Integer.parseInt(ingredient.getCostPerIngredient()), Integer.parseInt(ingredient.getBulkCost())));
+            result.ifPresent(this::addIngredient);
 
             ingredientTable.getItems().clear();
             ingredientTable.refresh();
@@ -168,6 +166,7 @@ public class InventoryTrackerController {
             ingredientTable.getItems().addAll(data);
         });
 
+        //TODO DELETE
         deleteIngredient.setOnAction(event -> {
             Dialog<Ingredient> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
@@ -217,6 +216,7 @@ public class InventoryTrackerController {
 
         });
 
+        //TODO UPDATE
         updateIngredient.setOnAction(event -> {
             Dialog<Ingredient> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
@@ -384,11 +384,37 @@ public class InventoryTrackerController {
         });
     }
 
+    private void addIngredient(Ingredient ingredient) {
+        try {
+            if (ingredient.getName().equalsIgnoreCase("")){
+                throw new NumberFormatException();
+            }
+            collection.insertOne(new Document("name", ingredient.getName()).append("ingredientID", Integer.parseInt(ingredient.getIngredientId()))
+                    .append("caloriePerServing", Integer.parseInt(ingredient.getCaloriePerServing())).append("amount", Integer.parseInt(ingredient.getAmount())).append("individualCost", Integer.parseInt(ingredient.getCostPerIngredient())).append("bulkCost", Integer.parseInt(ingredient.getBulkCost())));
+            ingredientTable.getItems().clear();
+            data = null;
+            data = fillIngredientCollection();
+            ingredientTable.getItems().addAll(data);
+        } catch (NumberFormatException ex){
+            showAlertFillInfo();
+        }
+    }
+
+    private void showAlertFillInfo() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Complete all fields", ButtonType.OK);
+        alert.setTitle("Employee not completed");
+        alert.show();
+    }
+
     //Added this method to deal with the change over to StringProperty values instead of ints and dates. Will try to implement those soon
     private void addIngredient(String ingredientName, int ingredientId, int caloriePerServing, int amount, int costPerIngredient, int bulkCost) {
-        collection.insertOne(new Document("name", ingredientName).append("ingredientID", ingredientId)
-                .append("caloriePerServing", caloriePerServing).append("amount", amount).append("individualCost", costPerIngredient)
-                .append("bulkCost", bulkCost));
+        try {
+            collection.insertOne(new Document("name", ingredientName).append("ingredientID", ingredientId)
+                    .append("caloriePerServing", caloriePerServing).append("amount", amount).append("individualCost", costPerIngredient)
+                    .append("bulkCost", bulkCost));
+        } catch (NumberFormatException ex){
+            showAlertFillInfo();
+        }
     }
 
     public void addItem(String ingredientName, int itemId, Date prepDate, Date expDate, int caloriePerServing,
