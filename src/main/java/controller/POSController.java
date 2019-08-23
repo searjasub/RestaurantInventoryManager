@@ -217,8 +217,8 @@ public class POSController {
                     if (dialogButton == deleteButtonType) {
 
                         e.setMealId(id.getText().trim());
-//                    int ids = Integer.parseInt(e.getIngredientId());
-                        delete(e.getMealId());
+                        int ids = Integer.parseInt(e.getMealId());
+                        deleteMeal(ids);
                     }
                     return null;
                 });
@@ -285,14 +285,6 @@ public class POSController {
     private void addMeal(String mealName, int mealID, double totalCalorieCount, String veganFriendly, double cost) {
         collection.insertOne(new Document("name", mealName).append("mealID", mealID)
                 .append("totalCalorieCount", totalCalorieCount).append("veganFriendly", veganFriendly).append("cost", cost));
-    }
-
-    private void delete(String mealID) {
-        collection.deleteOne(eq("mealID", mealID));
-    }
-
-    public void updateItem(int mealId, String updateField, String updateValue) {
-        collection.updateOne(eq("mealID", mealId), new Document("$set", new Document(updateField, updateValue)));
     }
 
 
