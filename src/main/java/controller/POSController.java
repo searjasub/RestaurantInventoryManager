@@ -85,18 +85,18 @@ public class POSController {
             RadioMenuItem admin = new RadioMenuItem("Admin");
             RadioMenuItem inventory = new RadioMenuItem("Inventory");
             RadioMenuItem pos = new RadioMenuItem("POS");
-            RadioMenuItem finance = new RadioMenuItem("Finance");
+//            RadioMenuItem finance = new RadioMenuItem("Finance");
 
             viewMenu.getItems().add(admin);
             viewMenu.getItems().add(inventory);
             viewMenu.getItems().add(pos);
-            viewMenu.getItems().add(finance);
+//            viewMenu.getItems().add(finance);
 
             ToggleGroup toggleGroup = new ToggleGroup();
             toggleGroup.getToggles().add(admin);
             toggleGroup.getToggles().add(inventory);
             toggleGroup.getToggles().add(pos);
-            toggleGroup.getToggles().add(finance);
+//            toggleGroup.getToggles().add(finance);
 
             Menu mealMenu = new Menu("Menu");
             MenuItem addMeal = new Menu("Add");

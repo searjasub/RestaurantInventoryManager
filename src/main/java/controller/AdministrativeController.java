@@ -21,6 +21,9 @@ import javafx.stage.Stage;
 import model.Employee;
 import org.bson.Document;
 
+import javax.swing.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.*;
 
@@ -30,8 +33,6 @@ import static com.mongodb.client.model.Filters.eq;
 public class AdministrativeController {
 
     public MenuBar menuBar = new MenuBar();
-    public RadioButton radioAll;
-    public RadioButton radioClockedIn;
     public Pagination pagination;
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
@@ -67,18 +68,18 @@ public class AdministrativeController {
         RadioMenuItem admin = new RadioMenuItem("Admin");
         RadioMenuItem inventory = new RadioMenuItem("Inventory");
         RadioMenuItem pos = new RadioMenuItem("POS");
-        RadioMenuItem finance = new RadioMenuItem("Finance");
+//        RadioMenuItem finance = new RadioMenuItem("Finance");
 
         viewMenu.getItems().add(admin);
         viewMenu.getItems().add(inventory);
         viewMenu.getItems().add(pos);
-        viewMenu.getItems().add(finance);
+//        viewMenu.getItems().add(finance);
 
         ToggleGroup toggleGroup = new ToggleGroup();
         toggleGroup.getToggles().add(admin);
         toggleGroup.getToggles().add(inventory);
         toggleGroup.getToggles().add(pos);
-        toggleGroup.getToggles().add(finance);
+//        toggleGroup.getToggles().add(finance);
         admin.setSelected(true);
 
         Menu employeesMenu = new Menu("Employees");
@@ -88,6 +89,18 @@ public class AdministrativeController {
         employeesMenu.getItems().add(addEmployee);
         employeesMenu.getItems().add(deleteEmployee);
         employeesMenu.getItems().add(updateEmployee);
+
+
+        JTree jTree = new JTree();
+        jTree.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent evt) {
+                if (evt.isControlDown() && evt.getKeyCode() == KeyEvent.VK_N) {
+
+                }
+            }
+
+        });
 
         //TODO ADD EMPLOYEE
         addEmployee.setOnAction(event -> {
@@ -130,22 +143,13 @@ public class AdministrativeController {
 
 
             name.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
-
             weeklyHours.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
-
             password.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
-
             hourlyPay.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
-
             occupation.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
 
-
-
-
             dialog.getDialogPane().setContent(grid);
-
             Platform.runLater(name::requestFocus);
-
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == loginButtonType) {
                     Employee e = new Employee();
@@ -156,7 +160,6 @@ public class AdministrativeController {
                     e.setPassword(password.getText().trim());
                     e.setHourlyPay(hourlyPay.getText().trim());
                     e.setOccupation(occupation.getText().trim());
-
                     return e;
                 }
                 return null;
@@ -304,15 +307,11 @@ public class AdministrativeController {
             occupation.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
             id.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
 
-
             dialog.getDialogPane().setContent(grid);
-
             Platform.runLater(name::requestFocus);
-
-                    Employee e = new Employee();
+            Employee e = new Employee();
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == updateButtonType) {
-
                     e.setName(name.getText().trim());
                     e.setId(id.getText().trim());
                     int ids = Integer.parseInt(e.getId());
@@ -321,25 +320,24 @@ public class AdministrativeController {
                     e.setHourlyPay(hourlyPay.getText().trim());
                     e.setOccupation(occupation.getText().trim());
 
-                    if(!name.getText().isEmpty()){
+                    if (!name.getText().isEmpty()) {
                         updateEmployee(ids, "name", e.getName());
                     }
-                    if(!password.getText().isEmpty()){
+                    if (!password.getText().isEmpty()) {
                         updateEmployee(ids, "password", e.getPassword());
                     }
-                    if(!weeklyHours.getText().isEmpty()){
+                    if (!weeklyHours.getText().isEmpty()) {
                         updateEmployee(ids, "weeklyHours", e.getWeeklyHours());
                     }
-                    if(!hourlyPay.getText().isEmpty()){
+                    if (!hourlyPay.getText().isEmpty()) {
                         updateEmployee(ids, "hourlyPay", e.getHourlyPay());
                     }
-                    if(!occupation.getText().isEmpty()){
+                    if (!occupation.getText().isEmpty()) {
                         updateEmployee(ids, "occupation", e.getOccupation());
                     }
-                    if(!id.getText().isEmpty()){
+                    if (!id.getText().isEmpty()) {
                         updateEmployee(ids, "employeeID", e.getId());
                     }
-
                     return e;
                 }
                 return null;
@@ -363,11 +361,6 @@ public class AdministrativeController {
         menuBar.getMenus().add(viewMenu);
         menuBar.getMenus().add(employeesMenu);
 
-        ToggleGroup radioToggleGroup = new ToggleGroup();
-        radioToggleGroup.getToggles().add(radioAll);
-        radioToggleGroup.getToggles().add(radioClockedIn);
-        radioAll.setSelected(true);
-
         inventory.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
             BorderPane root;
@@ -381,29 +374,29 @@ public class AdministrativeController {
             InventoryTrackerController inventoryController = loader.getController();
 
             inventoryController.setPrimaryScene(primaryStage, inventoryScene, mainStageController, employeesCollection, currentSession);
-            primaryStage.setMaxWidth(600);
+            primaryStage.setMinHeight(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(inventoryScene);
         });
 
-        finance.setOnAction(event -> {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
-            BorderPane root;
-            Scene financeScene = null;
-            try {
-                root = loader.load();
-                financeScene = new Scene(root, 600, 600);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            FinanceController financeController = loader.getController();
-
-            financeController.setPrimaryScene(primaryStage, financeScene, mainStageController, employeesCollection, currentSession);
-            primaryStage.setMaxWidth(600);
-            primaryStage.setMaxHeight(600);
-            primaryStage.setScene(financeScene);
-
-        });
+//        finance.setOnAction(event -> {
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
+//            BorderPane root;
+//            Scene financeScene = null;
+//            try {
+//                root = loader.load();
+//                financeScene = new Scene(root, 600, 600);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            FinanceController financeController = loader.getController();
+//
+//            financeController.setPrimaryScene(primaryStage, financeScene, mainStageController, employeesCollection, currentSession);
+//            primaryStage.setMaxWidth(600);
+//            primaryStage.setMaxHeight(600);
+//            primaryStage.setScene(financeScene);
+//
+//        });
 
         pos.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
@@ -421,7 +414,6 @@ public class AdministrativeController {
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);
         });
-
     }
 
 
@@ -531,7 +523,7 @@ public class AdministrativeController {
         dbObjects = cursor.toArray();
 
         Employee employee;
-        for (DBObject obj: dbObjects) {
+        for (DBObject obj : dbObjects) {
             employee = new Employee();
             employee.setName(obj.get("name").toString());
             employee.setPassword(obj.get("password").toString());

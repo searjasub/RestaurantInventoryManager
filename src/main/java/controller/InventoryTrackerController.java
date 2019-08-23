@@ -55,24 +55,24 @@ public class InventoryTrackerController {
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
         if (data.size() > 10) {
-            inventoryPagination.setPageCount((data.size() / 10) + 1);
+            inventoryPagination.setPageCount((data.size() / 17) + 1);
         } else {
             inventoryPagination.setPageCount(1);
         }
         inventoryPagination.setPageFactory(this::createPage);
 
-        ingredientTable.setMaxHeight(270);
+
 
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
         RadioMenuItem inventory = new RadioMenuItem("Inventory");
         RadioMenuItem pos = new RadioMenuItem("POS");
-        RadioMenuItem finance = new RadioMenuItem("Finance");
+//        RadioMenuItem finance = new RadioMenuItem("Finance");
 
         viewMenu.getItems().add(admin);
         viewMenu.getItems().add(inventory);
         viewMenu.getItems().add(pos);
-        viewMenu.getItems().add(finance);
+//        viewMenu.getItems().add(finance);
 
         menu.getMenus().add(viewMenu);
 
@@ -80,7 +80,7 @@ public class InventoryTrackerController {
         toggleGroup.getToggles().add(admin);
         toggleGroup.getToggles().add(inventory);
         toggleGroup.getToggles().add(pos);
-        toggleGroup.getToggles().add(finance);
+//        toggleGroup.getToggles().add(finance);
 
         inventory.setSelected(true);
 
