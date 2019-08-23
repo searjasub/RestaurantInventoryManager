@@ -32,7 +32,6 @@ public class FinanceController {
     private MongoClient mc = new MongoClient("localHost");
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Inventory");
-    private Block<Document> printBlock = System.out::println;
     private Stage primaryStage;
     private AdministrativeController adminCon;
     private Scene financeScene;

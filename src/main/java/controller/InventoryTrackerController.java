@@ -4,6 +4,7 @@ import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -54,24 +55,23 @@ public class InventoryTrackerController {
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
         if (data.size() > 10) {
-            inventoryPagination.setPageCount((data.size() / 10) + 1);
+            inventoryPagination.setPageCount((data.size() / 17) + 1);
         } else {
             inventoryPagination.setPageCount(1);
         }
         inventoryPagination.setPageFactory(this::createPage);
 
-        ingredientTable.setMaxHeight(270);
 
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
         RadioMenuItem inventory = new RadioMenuItem("Inventory");
         RadioMenuItem pos = new RadioMenuItem("POS");
-        RadioMenuItem finance = new RadioMenuItem("Finance");
+//        RadioMenuItem finance = new RadioMenuItem("Finance");
 
         viewMenu.getItems().add(admin);
         viewMenu.getItems().add(inventory);
         viewMenu.getItems().add(pos);
-        viewMenu.getItems().add(finance);
+//        viewMenu.getItems().add(finance);
 
         menu.getMenus().add(viewMenu);
 
@@ -79,7 +79,7 @@ public class InventoryTrackerController {
         toggleGroup.getToggles().add(admin);
         toggleGroup.getToggles().add(inventory);
         toggleGroup.getToggles().add(pos);
-        toggleGroup.getToggles().add(finance);
+//        toggleGroup.getToggles().add(finance);
 
         inventory.setSelected(true);
 
@@ -153,21 +153,20 @@ public class InventoryTrackerController {
                     return e;
 
                 }
-                    return null;
+                return null;
             });
             Optional<Ingredient> result = dialog.showAndWait();
 
+            result.ifPresent(this::addIngredient);
 
-            result.ifPresent(ingredient -> addIngredient(ingredient.getName(), Integer.parseInt(ingredient.getIngredientId()), Integer.parseInt(ingredient.getCaloriePerServing()),
-                    Integer.parseInt(ingredient.getAmount()), Integer.parseInt(ingredient.getCostPerIngredient()), Integer.parseInt(ingredient.getBulkCost())));
-
-                    ingredientTable.getItems().clear();
-                    ingredientTable.refresh();
-                    data = null;
-                    data = fillIngredientCollection();
-                    ingredientTable.getItems().addAll(data);
+            ingredientTable.getItems().clear();
+            ingredientTable.refresh();
+            data = null;
+            data = fillIngredientCollection();
+            ingredientTable.getItems().addAll(data);
         });
 
+        //TODO DELETE
         deleteIngredient.setOnAction(event -> {
             Dialog<Ingredient> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
@@ -217,6 +216,137 @@ public class InventoryTrackerController {
 
         });
 
+        //TODO UPDATE
+        updateIngredient.setOnAction(event -> {
+            Dialog<Ingredient> dialog = new Dialog<>();
+            dialog.setTitle("Contact Dialog");
+            dialog.setHeaderText("Please Input Employee Data To Update");
+
+            ButtonType updateButtonType = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            TextField name = new TextField();
+            name.setPromptText("name");
+            TextField id = new TextField();
+            id.setPromptText("ingredientID");
+            TextField caloriePerServing = new TextField();
+            caloriePerServing.setPromptText("caloriePerServing");
+            TextField amount = new TextField();
+            amount.setPromptText("amount");
+            TextField individualCost = new TextField();
+            individualCost.setPromptText("individualCost");
+            TextField bulkCost = new TextField();
+            bulkCost.setPromptText("bulkCost");
+
+            ObservableList<String> options =
+                    FXCollections.observableArrayList(
+                            "Name",
+                            "ingredientID",
+                            "caloriePerServings",
+                            "amount",
+                            "individualCost",
+                            "bulkCost"
+                    );
+            final ComboBox comboBox = new ComboBox(options);
+
+            grid.add(new Label("ingredientID:"), 0, 0);
+            grid.add(id, 1, 0);
+            grid.add(comboBox, 1, 1);
+
+            comboBox.valueProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                if (newValue.equals("name")) {
+                    grid.add(new Label("name"), 0, 1);
+                    grid.add(name, 1, 1);
+                }
+                if (newValue.equals("ingredientID")) {
+                    grid.add(new Label("IngredientID"), 0, 1);
+                    grid.add(id, 1, 1);
+                }
+                if (newValue.equals("caloriePerServings")) {
+                    grid.add(new Label("caloriePerServings"), 0, 1);
+                    grid.add(caloriePerServing, 1, 1);
+                }
+                if (newValue.equals("amount")) {
+                    grid.add(new Label("amount"), 0, 1);
+                    grid.add(amount, 1, 1);
+                }
+                if (newValue.equals("individualCost")) {
+                    grid.add(new Label("individualCost"), 0, 1);
+                    grid.add(individualCost, 1, 1);
+                }
+                if (newValue.equals("bulkCost")) {
+                    grid.add(new Label("bulkCost"), 0, 1);
+                    grid.add(bulkCost, 1, 1);
+                }
+            });
+
+            Node updateButton = dialog.getDialogPane().lookupButton(updateButtonType);
+            updateButton.setDisable(true);
+
+            name.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            amount.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            caloriePerServing.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            individualCost.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            bulkCost.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            id.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+
+            dialog.getDialogPane().setContent(grid);
+            Platform.runLater(name::requestFocus);
+            Ingredient i = new Ingredient();
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == updateButtonType) {
+
+                    i.setName(name.getText().trim());
+                    i.setIngredientId(id.getText().trim());
+                    int ids = Integer.parseInt(i.getIngredientId());
+                    i.setCaloriePerServing(caloriePerServing.getText().trim());
+                    i.setAmount(amount.getText().trim());
+                    i.setCostPerIngredient(individualCost.getText().trim());
+                    i.setBulkCost(bulkCost.getText().trim());
+
+                    if (!name.getText().isEmpty()) {
+                        updateItem(ids, "name", i.getName());
+                    }
+                    if (!id.getText().isEmpty()) {
+                        updateItem(ids, "ID", i.getIngredientId());
+                    }
+                    if (!caloriePerServing.getText().isEmpty()) {
+                        updateItem(ids, "caloriePerServing", i.getCaloriePerServing());
+                    }
+                    if (!amount.getText().isEmpty()) {
+                        updateItem(ids, "amount", i.getAmount());
+                    }
+                    if (!individualCost.getText().isEmpty()) {
+                        updateItem(ids, "individualCost", i.getCostPerIngredient());
+                    }
+                    if (!bulkCost.getText().isEmpty()) {
+                        updateItem(ids, "bulkCost", i.getBulkCost());
+                    }
+
+                    return i;
+                }
+                return null;
+            });
+
+            Optional<Ingredient> result = dialog.showAndWait();
+
+            ingredientTable.getItems().clear();
+            ingredientTable.refresh();
+            data = null;
+            data = fillIngredientCollection();
+            ingredientTable.getItems().addAll(data);
+
+            //TODO what's next?
+            if (result.isPresent()) {
+                //deleteEmployee(result.get());
+            }
+        });
+
         admin.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
             BorderPane root = null;
@@ -254,11 +384,37 @@ public class InventoryTrackerController {
         });
     }
 
+    private void addIngredient(Ingredient ingredient) {
+        try {
+            if (ingredient.getName().equalsIgnoreCase("")){
+                throw new NumberFormatException();
+            }
+            collection.insertOne(new Document("name", ingredient.getName()).append("ingredientID", Integer.parseInt(ingredient.getIngredientId()))
+                    .append("caloriePerServing", Integer.parseInt(ingredient.getCaloriePerServing())).append("amount", Integer.parseInt(ingredient.getAmount())).append("individualCost", Integer.parseInt(ingredient.getCostPerIngredient())).append("bulkCost", Integer.parseInt(ingredient.getBulkCost())));
+            ingredientTable.getItems().clear();
+            data = null;
+            data = fillIngredientCollection();
+            ingredientTable.getItems().addAll(data);
+        } catch (NumberFormatException ex){
+            showAlertFillInfo();
+        }
+    }
+
+    private void showAlertFillInfo() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Complete all fields", ButtonType.OK);
+        alert.setTitle("Employee not completed");
+        alert.show();
+    }
+
     //Added this method to deal with the change over to StringProperty values instead of ints and dates. Will try to implement those soon
     private void addIngredient(String ingredientName, int ingredientId, int caloriePerServing, int amount, int costPerIngredient, int bulkCost) {
-        collection.insertOne(new Document("name", ingredientName).append("ingredientID", ingredientId)
-                .append("caloriePerServing", caloriePerServing).append("amount", amount).append("individualCost", costPerIngredient)
-                .append("bulkCost", bulkCost));
+        try {
+            collection.insertOne(new Document("name", ingredientName).append("ingredientID", ingredientId)
+                    .append("caloriePerServing", caloriePerServing).append("amount", amount).append("individualCost", costPerIngredient)
+                    .append("bulkCost", bulkCost));
+        } catch (NumberFormatException ex){
+            showAlertFillInfo();
+        }
     }
 
     public void addItem(String ingredientName, int itemId, Date prepDate, Date expDate, int caloriePerServing,
@@ -309,10 +465,6 @@ public class InventoryTrackerController {
         return null;
     }
 
-    public void onMenuItemExit() {
-
-    }
-
     private TableView<Ingredient> createTable() {
 
         ingredientTable = new TableView<>();
@@ -335,9 +487,7 @@ public class InventoryTrackerController {
                 .get(event.getTablePosition().getRow()).setAmount(event.getNewValue()));
 
 //        TableColumn<Ingredient, String> prepDate = new TableColumn<>("Prep Date");
-//
 //        TableColumn<Ingredient, String> expiredDate = new TableColumn<>("Expired Date");
-//
 //        TableColumn<Ingredient, String> veganFriendly = new TableColumn<>("Vegan Friendly");
 
         TableColumn<Ingredient, String> caloriePerServing = new TableColumn<>("Calories Per Serving");
@@ -357,8 +507,6 @@ public class InventoryTrackerController {
         bulkCost.setCellFactory(TextFieldTableCell.forTableColumn());
         bulkCost.setOnEditCommit(event -> event.getTableView().getItems()
                 .get(event.getTablePosition().getRow()).setBulkCost(event.getNewValue()));
-
-
         ingredientTable.getColumns().setAll(name, ingredientId, amount,/* prepDate, expiredDate, veganFriendly,*/ caloriePerServing, costPerIngredient, bulkCost);
 
         return ingredientTable;
@@ -376,20 +524,12 @@ public class InventoryTrackerController {
     private ObservableList<Ingredient> fillIngredientCollection() {
         ObservableList<Ingredient> data = FXCollections.observableArrayList();
 
-        List<DBObject> dbObjects = new ArrayList<>();
+        List<DBObject> dbObjects;
 
-//        int id = 500001;
-//        for (int i = 0; i < collection.countDocuments(); i++) {
-//            DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();//           DBCursor cursor = dbCollection.find(query);
-//            while (cursor.hasNext()) {
-//                dbObjects.add(cursor.next());
-//          }
-//        }
         DBCursor cursor = dbCollection.find();
         dbObjects = cursor.toArray();
         Ingredient ingredient;
         for (DBObject obj : dbObjects) {
-
             ingredient = new Ingredient();
             ingredient.setName(obj.get("name").toString());
             ingredient.setIngredientId(obj.get("ingredientID").toString());
@@ -411,9 +551,7 @@ public class InventoryTrackerController {
             loader.setLocation(getClass().getResource("/MainStage.fxml"));
             BorderPane root = loader.load();
             MainStageController c = loader.getController();
-
             Scene scene = new Scene(root, 400, 400);
-
             c.setPrimaryStage(primaryStage, scene);
             primaryStage.setTitle("Restaurant Inventory Manager");
             primaryStage.setScene(scene);

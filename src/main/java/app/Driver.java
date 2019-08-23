@@ -23,13 +23,11 @@ public class Driver extends Application {
             BorderPane root = loader.load();
             MainStageController c = loader.getController();
 
-            Scene scene = new Scene(root, 400, 300);
+            Scene scene = new Scene(root, 500, 250);
 
             c.setPrimaryStage(primaryStage, scene);
             primaryStage.setTitle("Restaurant Inventory Manager");
             primaryStage.setScene(scene);
-            primaryStage.setMinWidth(530);
-            primaryStage.setMinHeight(300);
             primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("../icon/icon2.png")));
             primaryStage.show();
         } catch (NumberFormatException | IOException e) {
