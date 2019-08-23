@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 
 @SuppressWarnings("DuplicatedCode")
 public class InventoryTrackerController {
@@ -386,8 +387,11 @@ public class InventoryTrackerController {
 
     private void addIngredient(Ingredient ingredient) {
         try {
-            if (ingredient.getName().equalsIgnoreCase("")){
-                throw new NumberFormatException();
+            if (ingredient.getName().matches("^([0-9])*$")){
+                throw new IllegalArgumentException();
+            }
+            if (ingredient.getName().isEmpty() || ingredient.getIngredientId().isEmpty() || ingredient.getCostPerIngredient().isEmpty() || ingredient.getAmount().isEmpty() || ingredient.getCaloriePerServing().isEmpty() || ingredient.getBulkCost().isEmpty()){
+                throw new NullPointerException();
             }
             collection.insertOne(new Document("name", ingredient.getName()).append("ingredientID", Integer.parseInt(ingredient.getIngredientId()))
                     .append("caloriePerServing", Integer.parseInt(ingredient.getCaloriePerServing())).append("amount", Integer.parseInt(ingredient.getAmount())).append("individualCost", Integer.parseInt(ingredient.getCostPerIngredient())).append("bulkCost", Integer.parseInt(ingredient.getBulkCost())));
@@ -397,7 +401,15 @@ public class InventoryTrackerController {
             ingredientTable.getItems().addAll(data);
         } catch (NumberFormatException ex){
             showAlertFillInfo();
+        } catch (IllegalArgumentException ex){
+            showAlertNumericName();
         }
+    }
+
+    private void showAlertNumericName() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Name of ingridient cannot be only numbers", ButtonType.OK);
+        alert.setTitle("Name not valid");
+        alert.show();
     }
 
     private void showAlertFillInfo() {

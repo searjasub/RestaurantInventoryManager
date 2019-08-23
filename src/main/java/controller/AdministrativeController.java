@@ -476,7 +476,7 @@ public class AdministrativeController {
 
     private void AddEmployee(Employee e) {
         try {
-            collection.insertOne(new Document("name", e.getName()).append("weeklyHours", Integer.parseInt(e.getWeeklyHours())).append("employeeID", Integer.parseInt(e.getId())).append("password", e.getPassword())
+            collection.insertOne(new Document("name", e.getName()).append("weeklyHours", Integer.parseInt(e.getWeeklyHours())).append("employeeID", Integer.parseInt(e.getId()) + 100000).append("password", e.getPassword())
                     .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
             empsTable.getItems().clear();
             data = null;
