@@ -306,7 +306,7 @@ public class POSController {
         name.setCellFactory(TextFieldTableCell.forTableColumn());
 
         TableColumn<Meal, String> mealID = new TableColumn<>("Meal ID");
-        mealID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        mealID.setCellValueFactory(new PropertyValueFactory<>("Id"));
         mealID.setCellFactory(TextFieldTableCell.forTableColumn());
 
         TableColumn<Meal, String> cost = new TableColumn<>("Cost");
@@ -341,6 +341,7 @@ public class POSController {
     private ObservableList<Meal> fillMealCollection() {
         ObservableList<Meal> data = FXCollections.observableArrayList();
         List<DBObject> dbObjects = new ArrayList<>();
+
         DBCursor cursor = dbCollection.find();
         dbObjects = cursor.toArray();
 

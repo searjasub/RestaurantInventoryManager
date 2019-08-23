@@ -4,6 +4,7 @@ import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -215,6 +216,140 @@ public class InventoryTrackerController {
             data = fillIngredientCollection();
             ingredientTable.getItems().addAll(data);
 
+        });
+
+        updateIngredient.setOnAction(event -> {
+            Dialog<Ingredient> dialog = new Dialog<>();
+            dialog.setTitle("Contact Dialog");
+            dialog.setHeaderText("Please Input Employee Data To Update");
+
+            ButtonType updateButtonType = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            TextField name = new TextField();
+            name.setPromptText("name");
+            TextField id = new TextField();
+            id.setPromptText("ingredientID");
+            TextField caloriePerServing = new TextField();
+            caloriePerServing.setPromptText("caloriePerServing");
+            TextField amount = new TextField();
+            amount.setPromptText("amount");
+            TextField individualCost = new TextField();
+            individualCost.setPromptText("individualCost");
+            TextField bulkCost = new TextField();
+            bulkCost.setPromptText("bulkCost");
+
+            ObservableList<String> options =
+                    FXCollections.observableArrayList(
+                            "Name",
+                            "ingredientID",
+                            "caloriePerServings",
+                            "amount",
+                            "individualCost",
+                            "bulkCost"
+                    );
+            final ComboBox comboBox = new ComboBox(options);
+
+            grid.add(new Label("ingredientID:"), 0, 0);
+            grid.add(id, 1, 0);
+            grid.add(comboBox, 1, 1);
+
+            comboBox.valueProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                if (newValue.equals("name")) {
+                    grid.add(new Label("name"), 0, 1);
+                    grid.add(name, 1, 1);
+                }
+                if (newValue.equals("ingredientID")) {
+                    grid.add(new Label("IngredientID"), 0, 1);
+                    grid.add(id, 1, 1);
+                }
+                if (newValue.equals("caloriePerServings")) {
+                    grid.add(new Label("caloriePerServings"), 0, 1);
+                    grid.add(caloriePerServing, 1, 1);
+                }
+                if (newValue.equals("amount")) {
+                    grid.add(new Label("amount"), 0, 1);
+                    grid.add(amount, 1, 1);
+                }
+                if (newValue.equals("individualCost")) {
+                    grid.add(new Label("individualCost"), 0, 1);
+                    grid.add(individualCost, 1, 1);
+                }
+                if (newValue.equals("bulkCost")) {
+                    grid.add(new Label("bulkCost"), 0, 1);
+                    grid.add(bulkCost, 1, 1);
+                }
+            });
+
+
+            Node updateButton = dialog.getDialogPane().lookupButton(updateButtonType);
+            updateButton.setDisable(true);
+
+            name.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            amount.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            caloriePerServing.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            individualCost.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            bulkCost.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+            id.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+
+
+            dialog.getDialogPane().setContent(grid);
+
+            Platform.runLater(name::requestFocus);
+
+            Ingredient i = new Ingredient();
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == updateButtonType) {
+
+                    i.setName(name.getText().trim());
+                    i.setIngredientId(id.getText().trim());
+                    int ids = Integer.parseInt(i.getIngredientId());
+                    i.setCaloriePerServing(caloriePerServing.getText().trim());
+                    i.setAmount(amount.getText().trim());
+                    i.setCostPerIngredient(individualCost.getText().trim());
+                    i.setBulkCost(bulkCost.getText().trim());
+
+                    if(!name.getText().isEmpty()){
+                        updateItem(ids, "name", i.getName());
+                    }
+                    if(!id.getText().isEmpty()){
+                        updateItem(ids, "ID", i.getIngredientId());
+                    }
+                    if(!caloriePerServing.getText().isEmpty()){
+                        updateItem(ids, "caloriePerServing", i.getCaloriePerServing());
+                    }
+                    if(!amount.getText().isEmpty()){
+                        updateItem(ids, "amount", i.getAmount());
+                    }
+                    if(!individualCost.getText().isEmpty()){
+                        updateItem(ids, "individualCost", i.getCostPerIngredient());
+                    }
+                    if(!bulkCost.getText().isEmpty()){
+                        updateItem(ids, "bulkCost", i.getBulkCost());
+                    }
+
+                    return i;
+                }
+                return null;
+            });
+
+            Optional<Ingredient> result = dialog.showAndWait();
+
+            ingredientTable.getItems().clear();
+            ingredientTable.refresh();
+            data = null;
+            data = fillIngredientCollection();
+            ingredientTable.getItems().addAll(data);
+
+            //TODO what's next?
+            if (result.isPresent()) {
+                //deleteEmployee(result.get());
+            }
         });
 
         admin.setOnAction(event -> {
