@@ -4,6 +4,7 @@ import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -72,8 +73,8 @@ public class POSController {
         this.currentSession = currentSession;
         this.primaryStage.setTitle("Inventory Tracker Manager - POS");
 
-        if (data.size() > 100) {
-            paginationPOS.setPageCount((data.size() / 100) + 1);
+        if (data.size() > 10) {
+            paginationPOS.setPageCount((data.size() / 10) + 1);
         } else {
             paginationPOS.setPageCount(1);
         }
@@ -162,7 +163,7 @@ public class POSController {
 
                         Platform.runLater(name::requestFocus);
 
-                        String mealID = Long.toString(collection.countDocuments())+1;
+                        String mealID = Long.toString(collection.countDocuments()+1);
                         dialog.setResultConverter(dialogButton -> {
                             if (dialogButton == loginButtonType) {
                                 Meal m = new Meal();
@@ -182,7 +183,147 @@ public class POSController {
 
                 result.ifPresent(meal -> addMeal(meal.getName(), Integer.parseInt(meal.getMealId()), Double.parseDouble(meal.getTotalCalorieCount()),
                         (meal.isVeganFriendly()), Double.parseDouble(meal.getCost())));
+
+                mealTable.getItems().clear();
+                mealTable.refresh();
+                data = null;
+                data = fillMealCollection();
+                mealTable.getItems().addAll(data);
                     });
+
+            updateMeal.setOnAction(event -> {
+                Dialog<Meal> dialog = new Dialog<>();
+                dialog.setTitle("Meal Dialog");
+                dialog.setHeaderText("Please Input Meal Data To Update");
+
+                ButtonType updateButtonType = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                TextField name = new TextField();
+                name.setPromptText("Name");
+                TextField mealId = new TextField();
+                mealId.setPromptText("mealID");
+                TextField totalCalorie = new TextField();
+                totalCalorie.setPromptText("totalCalorie");
+                ComboBox<String> veganFriendly = new ComboBox<>();
+                veganFriendly.getItems().add("true");
+                veganFriendly.getItems().add("false");
+                TextField cost = new TextField();
+                cost.setPromptText("cost");
+
+                ObservableList<String> options =
+                        FXCollections.observableArrayList(
+                                "Name",
+                                "Cost",
+                                "Total Calorie Count",
+                                "mealID",
+                                "veganFriendly"
+                        );
+                final ComboBox comboBox = new ComboBox(options);
+
+                grid.add(new Label("mealID:"), 0, 0);
+                grid.add(mealId, 1, 0);
+                grid.add(comboBox, 1, 1);
+
+                comboBox.valueProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                            if (newValue.equals("Name")) {
+                                grid.add(new Label("name"), 0, 1);
+                                grid.add(name, 1, 1);
+                                veganFriendly.setDisable(true);
+                            }
+                            if (newValue.equals("mealID")) {
+                                grid.add(new Label("name"), 0, 1);
+                                  grid.add(name, 1, 1);
+                                veganFriendly.setDisable(true);
+                            }
+                            if (newValue.equals("cost")) {
+                                grid.add(new Label("cost"), 0, 1);
+                                grid.add(cost, 1, 1);
+                                veganFriendly.setDisable(true);
+                            }
+                            if (newValue.equals("totalCalorieCount")) {
+                                grid.add(new Label("totalCalorieCount"), 0, 1);
+                                grid.add(totalCalorie, 1, 1);
+                                veganFriendly.setDisable(true);
+                            }
+                            if (newValue.equals("veganFriendly")) {
+                                grid.getChildren().remove(comboBox);
+                                veganFriendly.setDisable(false);
+                                grid.add(new Label("veganFriendly"), 0, 1);
+                                grid.add(veganFriendly, 1, 1);
+                            }
+//                        grid.getChildren().add(comboBox);
+                        });
+                    Node updateButton = dialog.getDialogPane().lookupButton(updateButtonType);
+                    updateButton.setDisable(true);
+
+                    name.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+                    cost.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+//                    veganFriendly.getSelectionModel().getSelectedItem().toString().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+                    totalCalorie.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+                    mealId.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+
+
+                    dialog.getDialogPane().setContent(grid);
+
+                    Platform.runLater(name::requestFocus);
+
+                    Meal e = new Meal();
+                    dialog.setResultConverter(dialogButton -> {
+                        if (dialogButton == updateButtonType) {
+
+                            e.setName(name.getText().trim());
+                            e.setMealId(mealId.getText());
+                            e.setTotalCalorieCount(totalCalorie.getText().trim());
+                            e.setCost(cost.getText().trim());
+                            e.setVeganFriendly(veganFriendly.getSelectionModel().getSelectedItem());
+                            System.out.println(e.getMealId());
+                            int id = Integer.parseInt(e.getMealId());
+                            if (!name.getText().isEmpty()) {
+                                updateMeal(id, "name", e.getName());
+                            }
+                            if (!cost.getText().isEmpty()) {
+                                updateMeal(id, "cost", e.getCost());
+                            }
+                            if (!totalCalorie.getText().isEmpty()) {
+                                updateMeal(id, "totalCalorie", e.getTotalCalorieCount());
+                            }
+//                            if (!mealId.getText().isEmpty()) {
+//                                updateMeal(id, "mealID", e.getMealId());
+//                            }
+                            System.out.println(e.isVeganFriendly());
+                            if(!veganFriendly.isDisabled()) {
+
+                                if (!veganFriendly.getSelectionModel().getSelectedItem().isEmpty()) {
+                                    updateMeal(id, "veganFriendly", e.isVeganFriendly());
+                                }
+                            }
+
+                            return e;
+
+                        }
+                        return null;
+                    });
+                    Optional<Meal> result = dialog.showAndWait();
+
+                    mealTable.getItems().clear();
+                    mealTable.refresh();
+                    data = null;
+                    data = fillMealCollection();
+                    mealTable.getItems().addAll(data);
+                    mealTable.refresh();
+
+                    //TODO what's next?
+                    if (result.isPresent()) {
+                        //deleteEmployee(result.get());
+                    }
+                });
+
 
             deleteMeal.setOnAction(event -> {
                 Dialog<Ingredient> dialog = new Dialog<>();
@@ -226,7 +367,7 @@ public class POSController {
                 //TODO What are we doing with this?
                 Optional<Ingredient> result = dialog.showAndWait();
 
-                mealTable.getItems().removeAll();
+                mealTable.getItems().clear();
                 mealTable.refresh();
                 data = null;
                 data = fillMealCollection();
@@ -284,8 +425,9 @@ public class POSController {
 
     private void addMeal(String mealName, int mealID, double totalCalorieCount, String veganFriendly, double cost) {
         collection.insertOne(new Document("name", mealName).append("mealID", mealID)
-                .append("totalCalorieCount", totalCalorieCount).append("veganFriendly", veganFriendly).append("cost", cost));
+                .append("totalCalorie", totalCalorieCount).append("veganFriendly", veganFriendly).append("cost", cost));
     }
+
 
     private TableView<Meal> createTable() {
 
@@ -296,8 +438,8 @@ public class POSController {
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         name.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        TableColumn<Meal, String> mealID = new TableColumn<>("Meal ID");
-        mealID.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        TableColumn<Meal, String> mealID = new TableColumn<>("mealID");
+        mealID.setCellValueFactory(new PropertyValueFactory<>("mealID"));
         mealID.setCellFactory(TextFieldTableCell.forTableColumn());
 
         TableColumn<Meal, String> cost = new TableColumn<>("Cost");
@@ -309,7 +451,7 @@ public class POSController {
         veganFriendly.setCellFactory(TextFieldTableCell.forTableColumn());
 
         TableColumn<Meal, String> calorieCount = new TableColumn<>("Total Calorie Count");
-        calorieCount.setCellValueFactory(new PropertyValueFactory<>("totalCalorie"));
+        calorieCount.setCellValueFactory(new PropertyValueFactory<>("totalCalorieCount"));
         calorieCount.setCellFactory(TextFieldTableCell.forTableColumn());
 
 //        TableColumn<Employee, String> occupation = new TableColumn<>("Ingredient List");
@@ -334,6 +476,9 @@ public class POSController {
         List<DBObject> dbObjects;
         DBCursor cursor = dbCollection.find();
         dbObjects = cursor.toArray();
+
+        System.out.println(dbObjects);
+
         Meal meal;
         for (DBObject obj: dbObjects) {
             meal = new Meal();
@@ -342,8 +487,10 @@ public class POSController {
             meal.setVeganFriendly(obj.get("veganFriendly").toString());
             meal.setMealId(obj.get("mealID").toString());
             meal.setCost(obj.get("cost").toString());
+
             data.add(meal);
         }
+
         return data;
     }
 

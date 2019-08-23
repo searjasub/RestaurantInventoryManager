@@ -11,7 +11,7 @@ public class Meal {
     private StringProperty name;
     private StringProperty cost;
     private StringProperty veganFriendly;
-    private StringProperty totalCalorieCount;
+    private StringProperty totalCalorie;
     private StringProperty mealId;
 
     public Meal(){
@@ -99,10 +99,10 @@ public class Meal {
     }
 
     private StringProperty totalCalorieCountProperty(){
-        if (totalCalorieCount == null) {
-            totalCalorieCount = new SimpleStringProperty(this, "totalCalorie");
+        if (totalCalorie == null) {
+            totalCalorie = new SimpleStringProperty(this, "totalCalorie");
         }
-        return totalCalorieCount;
+        return totalCalorie;
     }
 
     public String getMealId() {return mealIdProperty().get(); }
