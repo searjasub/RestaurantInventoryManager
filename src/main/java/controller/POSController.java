@@ -167,7 +167,6 @@ public class POSController {
                         dialog.setResultConverter(dialogButton -> {
                             if (dialogButton == loginButtonType) {
                                 Meal m = new Meal();
-
                                 m.setName(name.getText().trim());
                                 m.setMealId(mealID);
                                 m.setCost(cost.getText().trim());

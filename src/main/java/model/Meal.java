@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Meal {
 
-    ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
+    ArrayList<Ingredient> ingredients = new ArrayList<>();
     private StringProperty name;
     private StringProperty cost;
     private StringProperty veganFriendly;
@@ -17,14 +17,6 @@ public class Meal {
     public Meal(){
 
     }
-
-    public Meal(String name, String mealId) {
-        setName(name);
-        setMealId(mealId);
-        setVeganFriendly(determineIfVF());
-        setCost(calculateTotalCost());
-    }
-
 
     public String determineIfVF() {
         String returnVal = "true";

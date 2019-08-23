@@ -23,7 +23,7 @@ public class Driver extends Application {
             BorderPane root = loader.load();
             MainStageController c = loader.getController();
 
-            Scene scene = new Scene(root, 600, 300);
+            Scene scene = new Scene(root, 500, 250);
 
             c.setPrimaryStage(primaryStage, scene);
             primaryStage.setTitle("Restaurant Inventory Manager");

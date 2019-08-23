@@ -5,9 +5,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Employee;
@@ -39,10 +37,6 @@ public class MainStageController {
     private DBCollection adminDbCollection = db.getCollection("Administrators");
     private CurrentSession currentSession = new CurrentSession();
 
-    public MainStageController() {
-
-    }
-
     public void setPrimaryStage(Stage primaryStage, Scene scene) {
         this.primaryStage = primaryStage;
         this.scene = scene;
@@ -51,28 +45,24 @@ public class MainStageController {
 
         passwordTextField.setManaged(false);
         passwordTextField.setVisible(false);
-
         passwordField.managedProperty().bind(checkbox.selectedProperty());
         passwordField.visibleProperty().bind(checkbox.selectedProperty());
-
         passwordTextField.managedProperty().bind(checkbox.selectedProperty().not());
         passwordTextField.visibleProperty().bind(checkbox.selectedProperty().not());
-
         passwordTextField.textProperty().bindBidirectional(passwordField.textProperty());
-    }
-
-    public void onMenuItemExit() {
-        primaryStage.close();
     }
 
     public void login() throws IOException {
 
         Employee employee;
-
         if (usernameTextField.getText().startsWith("3")) {
-
-            employee = adminMap.get(Integer.parseInt(usernameTextField.getText()));
-
+            int id = 0;
+            try {
+                id = Integer.parseInt(usernameTextField.getText());
+            } catch (NumberFormatException ex) {
+                showAlertInvalidInput();
+            }
+            employee = adminMap.get(id);
             if (employee != null) {
                 if (passwordTextField.getText().equals(employee.getPassword())) {
                     currentSession.setAdmin(true);
@@ -87,11 +77,17 @@ public class MainStageController {
                     primaryStage.setMaxHeight(600);
                     primaryStage.setScene(administrativeScene);
                 } else {
-                    //Dialog telling user password is incorrect
+                    showAlertInvalidInput();
                 }
             }
         } else {
-            employee = employeeCollection.get(Integer.parseInt(usernameTextField.getText()));
+            int id = 0;
+            try {
+                id = Integer.parseInt(usernameTextField.getText());
+            } catch (NumberFormatException ex) {
+                showAlertInvalidInput();
+            }
+            employee = employeeCollection.get(id);
             if (employee != null) {
                 if (passwordTextField.getText().equals(employee.getPassword())) {
                     currentSession.setAdmin(false);
@@ -106,10 +102,16 @@ public class MainStageController {
                     primaryStage.setMaxHeight(600);
                     primaryStage.setScene(posScene);
                 } else {
-                    //Dialog telling user password is incorrect
+                    showAlertInvalidInput();
                 }
             }
         }
+    }
+
+    private void showAlertInvalidInput() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid ID/Password, please try again.", ButtonType.OK);
+        alert.setTitle("Invalid Input");
+        alert.show();
     }
 
     private HashMap<Integer, Employee> fillEmpCollection() {

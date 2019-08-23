@@ -62,7 +62,6 @@ public class InventoryTrackerController {
         inventoryPagination.setPageFactory(this::createPage);
 
 
-
         Menu viewMenu = new Menu("View");
         RadioMenuItem admin = new RadioMenuItem("Admin");
         RadioMenuItem inventory = new RadioMenuItem("Inventory");
@@ -154,7 +153,7 @@ public class InventoryTrackerController {
                     return e;
 
                 }
-                    return null;
+                return null;
             });
             Optional<Ingredient> result = dialog.showAndWait();
 
@@ -162,11 +161,11 @@ public class InventoryTrackerController {
             result.ifPresent(ingredient -> addIngredient(ingredient.getName(), Integer.parseInt(ingredient.getIngredientId()), Integer.parseInt(ingredient.getCaloriePerServing()),
                     Integer.parseInt(ingredient.getAmount()), Integer.parseInt(ingredient.getCostPerIngredient()), Integer.parseInt(ingredient.getBulkCost())));
 
-                    ingredientTable.getItems().clear();
-                    ingredientTable.refresh();
-                    data = null;
-                    data = fillIngredientCollection();
-                    ingredientTable.getItems().addAll(data);
+            ingredientTable.getItems().clear();
+            ingredientTable.refresh();
+            data = null;
+            data = fillIngredientCollection();
+            ingredientTable.getItems().addAll(data);
         });
 
         deleteIngredient.setOnAction(event -> {
@@ -286,7 +285,6 @@ public class InventoryTrackerController {
                 }
             });
 
-
             Node updateButton = dialog.getDialogPane().lookupButton(updateButtonType);
             updateButton.setDisable(true);
 
@@ -297,11 +295,8 @@ public class InventoryTrackerController {
             bulkCost.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
             id.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
 
-
             dialog.getDialogPane().setContent(grid);
-
             Platform.runLater(name::requestFocus);
-
             Ingredient i = new Ingredient();
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == updateButtonType) {
@@ -314,22 +309,22 @@ public class InventoryTrackerController {
                     i.setCostPerIngredient(individualCost.getText().trim());
                     i.setBulkCost(bulkCost.getText().trim());
 
-                    if(!name.getText().isEmpty()){
+                    if (!name.getText().isEmpty()) {
                         updateItem(ids, "name", i.getName());
                     }
-                    if(!id.getText().isEmpty()){
+                    if (!id.getText().isEmpty()) {
                         updateItem(ids, "ID", i.getIngredientId());
                     }
-                    if(!caloriePerServing.getText().isEmpty()){
+                    if (!caloriePerServing.getText().isEmpty()) {
                         updateItem(ids, "caloriePerServing", i.getCaloriePerServing());
                     }
-                    if(!amount.getText().isEmpty()){
+                    if (!amount.getText().isEmpty()) {
                         updateItem(ids, "amount", i.getAmount());
                     }
-                    if(!individualCost.getText().isEmpty()){
+                    if (!individualCost.getText().isEmpty()) {
                         updateItem(ids, "individualCost", i.getCostPerIngredient());
                     }
-                    if(!bulkCost.getText().isEmpty()){
+                    if (!bulkCost.getText().isEmpty()) {
                         updateItem(ids, "bulkCost", i.getBulkCost());
                     }
 
@@ -444,10 +439,6 @@ public class InventoryTrackerController {
         return null;
     }
 
-    public void onMenuItemExit() {
-
-    }
-
     private TableView<Ingredient> createTable() {
 
         ingredientTable = new TableView<>();
@@ -470,9 +461,7 @@ public class InventoryTrackerController {
                 .get(event.getTablePosition().getRow()).setAmount(event.getNewValue()));
 
 //        TableColumn<Ingredient, String> prepDate = new TableColumn<>("Prep Date");
-//
 //        TableColumn<Ingredient, String> expiredDate = new TableColumn<>("Expired Date");
-//
 //        TableColumn<Ingredient, String> veganFriendly = new TableColumn<>("Vegan Friendly");
 
         TableColumn<Ingredient, String> caloriePerServing = new TableColumn<>("Calories Per Serving");
@@ -492,8 +481,6 @@ public class InventoryTrackerController {
         bulkCost.setCellFactory(TextFieldTableCell.forTableColumn());
         bulkCost.setOnEditCommit(event -> event.getTableView().getItems()
                 .get(event.getTablePosition().getRow()).setBulkCost(event.getNewValue()));
-
-
         ingredientTable.getColumns().setAll(name, ingredientId, amount,/* prepDate, expiredDate, veganFriendly,*/ caloriePerServing, costPerIngredient, bulkCost);
 
         return ingredientTable;
@@ -511,20 +498,12 @@ public class InventoryTrackerController {
     private ObservableList<Ingredient> fillIngredientCollection() {
         ObservableList<Ingredient> data = FXCollections.observableArrayList();
 
-        List<DBObject> dbObjects = new ArrayList<>();
+        List<DBObject> dbObjects;
 
-//        int id = 500001;
-//        for (int i = 0; i < collection.countDocuments(); i++) {
-//            DBObject query = BasicDBObjectBuilder.start().add("ingredientID", id + i).get();//           DBCursor cursor = dbCollection.find(query);
-//            while (cursor.hasNext()) {
-//                dbObjects.add(cursor.next());
-//          }
-//        }
         DBCursor cursor = dbCollection.find();
         dbObjects = cursor.toArray();
         Ingredient ingredient;
         for (DBObject obj : dbObjects) {
-
             ingredient = new Ingredient();
             ingredient.setName(obj.get("name").toString());
             ingredient.setIngredientId(obj.get("ingredientID").toString());
@@ -546,9 +525,7 @@ public class InventoryTrackerController {
             loader.setLocation(getClass().getResource("/MainStage.fxml"));
             BorderPane root = loader.load();
             MainStageController c = loader.getController();
-
             Scene scene = new Scene(root, 400, 400);
-
             c.setPrimaryStage(primaryStage, scene);
             primaryStage.setTitle("Restaurant Inventory Manager");
             primaryStage.setScene(scene);
