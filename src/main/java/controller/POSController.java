@@ -287,7 +287,6 @@ public class POSController {
                 .append("totalCalorieCount", totalCalorieCount).append("veganFriendly", veganFriendly).append("cost", cost));
     }
 
-
     private TableView<Meal> createTable() {
 
         mealTable = new TableView<>();
@@ -332,13 +331,9 @@ public class POSController {
 
     private ObservableList<Meal> fillMealCollection() {
         ObservableList<Meal> data = FXCollections.observableArrayList();
-        List<DBObject> dbObjects = new ArrayList<>();
-
+        List<DBObject> dbObjects;
         DBCursor cursor = dbCollection.find();
         dbObjects = cursor.toArray();
-
-        System.out.println(dbObjects);
-
         Meal meal;
         for (DBObject obj: dbObjects) {
             meal = new Meal();
@@ -347,10 +342,8 @@ public class POSController {
             meal.setVeganFriendly(obj.get("veganFriendly").toString());
             meal.setMealId(obj.get("mealID").toString());
             meal.setCost(obj.get("cost").toString());
-
             data.add(meal);
         }
-
         return data;
     }
 
