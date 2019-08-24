@@ -57,8 +57,8 @@ public class AdministrativeController {
         primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
 
 
-        if (data.size() > 100) {
-            pagination.setPageCount((data.size() / 100) + 1);
+        if (data.size() > 10) {
+            pagination.setPageCount((data.size() / 10) + 1);
         } else {
             pagination.setPageCount(1);
         }
