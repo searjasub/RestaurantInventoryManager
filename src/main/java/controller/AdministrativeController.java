@@ -65,22 +65,22 @@ public class AdministrativeController {
         pagination.setPageFactory(this::createPage);
 
         Menu viewMenu = new Menu("View");
-        RadioMenuItem admin = new RadioMenuItem("Admin");
+        RadioMenuItem employees = new RadioMenuItem("Employees");
         RadioMenuItem inventory = new RadioMenuItem("Inventory");
         RadioMenuItem pos = new RadioMenuItem("POS");
 //        RadioMenuItem finance = new RadioMenuItem("Finance");
 
-        viewMenu.getItems().add(admin);
+        viewMenu.getItems().add(employees);
         viewMenu.getItems().add(inventory);
         viewMenu.getItems().add(pos);
 //        viewMenu.getItems().add(finance);
 
         ToggleGroup toggleGroup = new ToggleGroup();
-        toggleGroup.getToggles().add(admin);
+        toggleGroup.getToggles().add(employees);
         toggleGroup.getToggles().add(inventory);
         toggleGroup.getToggles().add(pos);
 //        toggleGroup.getToggles().add(finance);
-        admin.setSelected(true);
+        employees.setSelected(true);
 
         Menu employeesMenu = new Menu("Employees");
         MenuItem addEmployee = new Menu("Add");
