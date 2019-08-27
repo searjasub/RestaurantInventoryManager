@@ -6,6 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -27,8 +28,7 @@ public class FinanceController {
 
     private MenuBar menuBar;
     private TableView table = initTable();
-    private ObservableList<FinanceItem> master = observableArrayList();
-    private ObservableList<OrderedItem> ordered = observableArrayList();
+    private ObservableList<FinanceItem> master = getFinances();
     private InventoryTrackerController tracker = new InventoryTrackerController();
     private MongoClient mc = new MongoClient("localHost");
     private MongoDatabase database = mc.getDatabase("Restaurants");
@@ -45,6 +45,8 @@ public class FinanceController {
     private MainStageController mainStageController;
     private Pagination myPagination;
     private CurrentSession currentSession;
+    @FXML
+    Pagination pagination;
 
     void setPrimaryStage(Stage primaryStage, Scene financeScene, MainStageController mainStageController,
                          HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
@@ -53,6 +55,13 @@ public class FinanceController {
         this.mainStageController = mainStageController;
         this.currentSession = currentSession;
         this.primaryStage.setTitle("Restaurant Inventory Manager - Finance");
+
+        if (master.size() > 10) {
+            pagination.setPageCount((master.size() / 10) + 1);
+        } else {
+            pagination.setPageCount(1);
+        }
+        pagination.setPageFactory(this::createPage);
 
         Menu viewMenu = new Menu("View");
         RadioMenuItem administrators = new RadioMenuItem("Administrators");
@@ -158,6 +167,7 @@ public class FinanceController {
             table.getItems().addAll(master);
             table.refresh();
 
+
         });
 
         liabilities.setOnAction(event -> {
@@ -219,12 +229,6 @@ public class FinanceController {
 
 
         return table;
-    }
-
-    public void init() {
-        // Method to get all inventory items and set them to the ObservableList needed
-        ordered = tracker.reviewOrderedItems();
-        myPagination.setPageFactory(this::createPage);
     }
 
     public ObservableList<FinanceItem> getFinances(){
