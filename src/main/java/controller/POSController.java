@@ -337,7 +337,7 @@ public class POSController {
                 grid.setPadding(new Insets(20, 150, 10, 10));
 
                 TextField id = new TextField();
-                id.setPromptText("MealID");
+                id.setPromptText("mealID");
 
                 grid.add(new Label("mealID:"), 0, 1);
                 grid.add(id, 1, 1);
@@ -563,8 +563,8 @@ public class POSController {
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         name.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        TableColumn<Meal, String> mealID = new TableColumn<>("Meal ID");
-        mealID.setCellValueFactory(new PropertyValueFactory<>("mealID"));
+        TableColumn<Meal, String> mealID = new TableColumn<>("mealID");
+        mealID.setCellValueFactory(new PropertyValueFactory<>("id"));
         mealID.setCellFactory(TextFieldTableCell.forTableColumn());
 
         TableColumn<Meal, String> cost = new TableColumn<>("Cost");
