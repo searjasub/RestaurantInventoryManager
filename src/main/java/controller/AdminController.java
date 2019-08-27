@@ -11,7 +11,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -21,40 +20,41 @@ import javafx.stage.Stage;
 import model.Employee;
 import org.bson.Document;
 
-import javax.swing.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 
-@SuppressWarnings("unused")
-public class AdministrativeController {
+public class AdminController {
 
-    public MenuBar menuBar = new MenuBar();
+
     public Pagination pagination;
+    public MenuBar menuBar;
+    private TableView<Employee> adminTable = createTable();
+    private Stage primaryStage;
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
-    private MongoCollection<Document> collection = database.getCollection("Employees");
+    private MongoCollection<Document> collection = database.getCollection("Administrators");
     private HashMap<Integer, Employee> employeeHashMap;
-    private Stage primaryStage;
     private Scene adminScene;
-    private MainStageController mainController;
-    private TableView<Employee> empsTable = createTable();
+    private MainStageController mainStageController;
+    private HashMap<Integer, Employee> employeesCollection;
     private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
     private DB db = mongoC.getDB("Restaurants");
-    private DBCollection dbCollection = db.getCollection("Employees");
-    private ObservableList<Employee> data = fillEmpCollection();
+    private DBCollection dbCollection = db.getCollection("Administrators");
+    private ObservableList<Employee> data = fillAdminCollection();
     private CurrentSession currentSession;
 
-    void setPrimaryStage(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
+    public void setPrimaryStage(Stage primaryStage, Scene adminScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
+        this.currentSession = currentSession;
         this.primaryStage = primaryStage;
         this.adminScene = adminScene;
-        this.mainController = mainStageController;
-        this.employeeHashMap = employeesCollection;
-        this.currentSession = currentSession;
-        primaryStage.setTitle("Restaurant Inventory Manager - Administrator");
+        this.mainStageController = mainStageController;
+        this.employeesCollection = employeesCollection;
+
+        primaryStage.setTitle("Restaurant Inventory Manager - Administrators");
 
 
         if (data.size() > 100) {
@@ -65,24 +65,27 @@ public class AdministrativeController {
         pagination.setPageFactory(this::createPage);
 
         Menu viewMenu = new Menu("View");
+        RadioMenuItem administrators = new RadioMenuItem("Administrators");
         RadioMenuItem employees = new RadioMenuItem("Employees");
         RadioMenuItem inventory = new RadioMenuItem("Inventory");
         RadioMenuItem pos = new RadioMenuItem("POS");
-//        RadioMenuItem finance = new RadioMenuItem("Finance");
+        RadioMenuItem finance = new RadioMenuItem("Finance");
 
+        viewMenu.getItems().add(administrators);
         viewMenu.getItems().add(employees);
         viewMenu.getItems().add(inventory);
         viewMenu.getItems().add(pos);
-//        viewMenu.getItems().add(finance);
+        viewMenu.getItems().add(finance);
 
         ToggleGroup toggleGroup = new ToggleGroup();
+        toggleGroup.getToggles().add(administrators);
         toggleGroup.getToggles().add(employees);
         toggleGroup.getToggles().add(inventory);
         toggleGroup.getToggles().add(pos);
-//        toggleGroup.getToggles().add(finance);
-        employees.setSelected(true);
+        toggleGroup.getToggles().add(finance);
+        administrators.setSelected(true);
 
-        Menu employeesMenu = new Menu("Employees");
+        Menu employeesMenu = new Menu("Admins");
         MenuItem addEmployee = new Menu("Add");
         MenuItem deleteEmployee = new Menu("Delete");
         MenuItem updateEmployee = new Menu("Update");
@@ -90,25 +93,13 @@ public class AdministrativeController {
         employeesMenu.getItems().add(deleteEmployee);
         employeesMenu.getItems().add(updateEmployee);
 
-
-        JTree jTree = new JTree();
-        jTree.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent evt) {
-                if (evt.isControlDown() && evt.getKeyCode() == KeyEvent.VK_N) {
-
-                }
-            }
-
-        });
-
         //TODO ADD EMPLOYEE
         addEmployee.setOnAction(event -> {
             Dialog<Employee> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
-            dialog.setHeaderText("Please Input Employee Data");
+            dialog.setHeaderText("Please Input Admin Data");
 
-            ButtonType loginButtonType = new ButtonType("Add", ButtonData.OK_DONE);
+            ButtonType loginButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
             GridPane grid = new GridPane();
@@ -141,7 +132,6 @@ public class AdministrativeController {
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
             loginButton.setDisable(true);
 
-
             name.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
             weeklyHours.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
             password.textProperty().addListener((observable, oldValue, newValue) -> loginButton.setDisable(newValue.trim().isEmpty()));
@@ -153,7 +143,6 @@ public class AdministrativeController {
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == loginButtonType) {
                     Employee e = new Employee();
-
                     e.setName(name.getText().trim());
                     e.setId("" + (collection.countDocuments() + 1));
                     e.setWeeklyHours(weeklyHours.getText().trim());
@@ -167,14 +156,14 @@ public class AdministrativeController {
 
             Optional<Employee> result = dialog.showAndWait();
 
-            empsTable.getItems().clear();
-            empsTable.refresh();
+            adminTable.getItems().clear();
+            adminTable.refresh();
             data = null;
-            data = fillEmpCollection();
-            empsTable.getItems().addAll(data);
-            empsTable.refresh();
+            data = fillAdminCollection();
+            adminTable.getItems().addAll(data);
+            adminTable.refresh();
 
-            result.ifPresent(this::AddEmployee);
+            result.ifPresent(this::addAdmin);
         });
 
         //TODO DELETE EMPLOYEE
@@ -183,7 +172,7 @@ public class AdministrativeController {
             dialog.setTitle("Contact Dialog");
             dialog.setHeaderText("Please Input Employee Data To Delete");
 
-            ButtonType deleteButtonType = new ButtonType("Delete", ButtonData.OK_DONE);
+            ButtonType deleteButtonType = new ButtonType("Delete", ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(deleteButtonType, ButtonType.CANCEL);
 
             GridPane grid = new GridPane();
@@ -212,19 +201,19 @@ public class AdministrativeController {
 
                     e.setId(id.getText().trim());
                     int ids = Integer.parseInt(e.getId());
-                    deleteEmployee(ids);
+                    deleteAdmin(ids);
                 }
                 return null;
             });
 
             Optional<Employee> result = dialog.showAndWait();
 
-            empsTable.getItems().clear();
-            empsTable.refresh();
+            adminTable.getItems().clear();
+            adminTable.refresh();
             data = null;
-            data = fillEmpCollection();
-            empsTable.getItems().addAll(data);
-            empsTable.refresh();
+            data = fillAdminCollection();
+            adminTable.getItems().addAll(data);
+            adminTable.refresh();
         });
 
         //TODO UPDATE EMPLOYEE
@@ -233,7 +222,7 @@ public class AdministrativeController {
             dialog.setTitle("Contact Dialog");
             dialog.setHeaderText("Please Input Employee Data To Delete");
 
-            ButtonType updateButtonType = new ButtonType("Update", ButtonData.OK_DONE);
+            ButtonType updateButtonType = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
 
             GridPane grid = new GridPane();
@@ -321,22 +310,22 @@ public class AdministrativeController {
                     e.setOccupation(occupation.getText().trim());
 
                     if (!name.getText().isEmpty()) {
-                        updateEmployee(ids, "name", e.getName());
+                        updateAdmin(ids, "name", e.getName());
                     }
                     if (!password.getText().isEmpty()) {
-                        updateEmployee(ids, "password", e.getPassword());
+                        updateAdmin(ids, "password", e.getPassword());
                     }
                     if (!weeklyHours.getText().isEmpty()) {
-                        updateEmployee(ids, "weeklyHours", e.getWeeklyHours());
+                        updateAdmin(ids, "weeklyHours", e.getWeeklyHours());
                     }
                     if (!hourlyPay.getText().isEmpty()) {
-                        updateEmployee(ids, "hourlyPay", e.getHourlyPay());
+                        updateAdmin(ids, "hourlyPay", e.getHourlyPay());
                     }
                     if (!occupation.getText().isEmpty()) {
-                        updateEmployee(ids, "occupation", e.getOccupation());
+                        updateAdmin(ids, "occupation", e.getOccupation());
                     }
                     if (!id.getText().isEmpty()) {
-                        updateEmployee(ids, "employeeID", e.getId());
+                        updateAdmin(ids, "employeeID", e.getId());
                     }
                     return e;
                 }
@@ -345,12 +334,12 @@ public class AdministrativeController {
 
             Optional<Employee> result = dialog.showAndWait();
 
-            empsTable.getItems().clear();
-            empsTable.refresh();
+            adminTable.getItems().clear();
+            adminTable.refresh();
             data = null;
-            data = fillEmpCollection();
-            empsTable.getItems().addAll(data);
-            empsTable.refresh();
+            data = fillAdminCollection();
+            adminTable.getItems().addAll(data);
+            adminTable.refresh();
 
             //TODO what's next?
             if (result.isPresent()) {
@@ -360,6 +349,24 @@ public class AdministrativeController {
 
         menuBar.getMenus().add(viewMenu);
         menuBar.getMenus().add(employeesMenu);
+
+        employees.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../EmployeesView.fxml"));
+            BorderPane root;
+            Scene employeeScene = null;
+            try {
+                root = loader.load();
+                employeeScene = new Scene(root, 600, 600);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            EmployeesController employeesController = loader.getController();
+
+            employeesController.setPrimaryStage(primaryStage, employeeScene, mainStageController, employeesCollection, currentSession);
+            primaryStage.setMinHeight(600);
+            primaryStage.setMaxHeight(600);
+            primaryStage.setScene(employeeScene);
+        });
 
         inventory.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../InventoryTrackerScene.fxml"));
@@ -373,30 +380,30 @@ public class AdministrativeController {
             }
             InventoryTrackerController inventoryController = loader.getController();
 
-            inventoryController.setPrimaryScene(primaryStage, inventoryScene, mainStageController, employeesCollection, currentSession);
+            inventoryController.setPrimaryStage(primaryStage, inventoryScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMinHeight(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(inventoryScene);
         });
 
-//        finance.setOnAction(event -> {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
-//            BorderPane root;
-//            Scene financeScene = null;
-//            try {
-//                root = loader.load();
-//                financeScene = new Scene(root, 600, 600);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            FinanceController financeController = loader.getController();
-//
-//            financeController.setPrimaryScene(primaryStage, financeScene, mainStageController, employeesCollection, currentSession);
-//            primaryStage.setMaxWidth(600);
-//            primaryStage.setMaxHeight(600);
-//            primaryStage.setScene(financeScene);
-//
-//        });
+        finance.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
+            BorderPane root;
+            Scene financeScene = null;
+            try {
+                root = loader.load();
+                financeScene = new Scene(root, 600, 600);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            FinanceController financeController = loader.getController();
+
+            financeController.setPrimaryStage(primaryStage, financeScene, mainStageController, employeesCollection, currentSession);
+            primaryStage.setMaxWidth(600);
+            primaryStage.setMaxHeight(600);
+            primaryStage.setScene(financeScene);
+
+        });
 
         pos.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../POSScene.fxml"));
@@ -417,15 +424,15 @@ public class AdministrativeController {
     }
 
     private TableView<Employee> createTable() {
-        empsTable = new TableView<>();
-        empsTable.setEditable(true);
+        adminTable = new TableView<>();
+        adminTable.setEditable(true);
 
         TableColumn<Employee, String> name = new TableColumn<>("Name");
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         name.setCellFactory(TextFieldTableCell.forTableColumn());
         name.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setName(event.getNewValue()));
 
-        TableColumn<Employee, String> employeeId = new TableColumn<>("Employee ID");
+        TableColumn<Employee, String> employeeId = new TableColumn<>("Admin ID");
         employeeId.setCellValueFactory(new PropertyValueFactory<>("id"));
         employeeId.setCellFactory(TextFieldTableCell.forTableColumn());
 
@@ -448,15 +455,36 @@ public class AdministrativeController {
         occupation.setCellFactory(TextFieldTableCell.forTableColumn());
         occupation.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setOccupation(event.getNewValue()));
 
-//        TableColumn<Employee, String> clockIn = new TableColumn<>("Clock In");
-//        TableColumn<Employee, String> clockOut = new TableColumn<>("Clock Out");
-//        TableColumn<Employee, String> breakStart = new TableColumn<>("Break Start");
-//        TableColumn<Employee, String> breakEnd = new TableColumn<>("Break End");
+        adminTable.getColumns().setAll(name, employeeId, weeklyHours, password, occupation, hourlyPay);
 
-        empsTable.getColumns().setAll(name, employeeId, weeklyHours, password, occupation, hourlyPay);
+        return adminTable;
+    }
 
-        return empsTable;
+    private void addAdmin(Employee e) {
+        try {
+            collection.insertOne(new Document("name", e.getName()).append("weeklyHours", Integer.parseInt(e.getWeeklyHours())).append("employeeID", Integer.parseInt(e.getId()) + 30000).append("password", e.getPassword())
+                    .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
+            adminTable.getItems().clear();
+            data = null;
+            data = fillAdminCollection();
+            adminTable.getItems().addAll(data);
+        } catch (NumberFormatException ex) {
+            showAlertFillInfo();
+        }
+    }
 
+    private void deleteAdmin(int e) {
+        collection.deleteOne(eq("employeeID", e));
+    }
+
+    private void updateAdmin(int id, String updateField, String updateValue) {
+        collection.updateOne(eq("employeeID", id), new Document("$set", new Document(updateField, updateValue)));
+    }
+
+    private void showAlertFillInfo() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Complete all fields", ButtonType.OK);
+        alert.setTitle("Admin not completed");
+        alert.show();
     }
 
     private Node createPage(Integer pageIndex) {
@@ -464,74 +492,25 @@ public class AdministrativeController {
         int fromIndex = pageIndex * rowsPerPage;
         int toIndex = Math.min(fromIndex + rowsPerPage, (int) collection.countDocuments());
 
-        empsTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
-        return empsTable;
+        adminTable.getItems().setAll(FXCollections.observableArrayList(data.subList(fromIndex, toIndex)));
+        return adminTable;
     }
 
-    private void showAlertFillInfo() {
-        Alert alert = new Alert(Alert.AlertType.ERROR, "Complete all fields", ButtonType.OK);
-        alert.setTitle("Employee not completed");
+    private void showAlertInvalidInput() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid ID/Password, please try again.", ButtonType.OK);
+        alert.setTitle("Invalid Input");
         alert.show();
     }
 
-    private void AddEmployee(Employee e) {
-        try {
-            collection.insertOne(new Document("name", e.getName()).append("weeklyHours", Integer.parseInt(e.getWeeklyHours())).append("employeeID", Integer.parseInt(e.getId()) + 100000).append("password", e.getPassword())
-                    .append("hourlyPay", Integer.parseInt(e.getHourlyPay())).append("occupation", e.getOccupation()));
-            empsTable.getItems().clear();
-            data = null;
-            data = fillEmpCollection();
-            empsTable.getItems().addAll(data);
-        } catch (NumberFormatException ex){
-            showAlertFillInfo();
-        }
-    }
-
-    private void deleteEmployee(int e) {
-        collection.deleteOne(eq("employeeID", e));
-    }
-
-    public void updateEmployee(int id, String updateField, String updateValue) {
-        collection.updateOne(eq("employeeID", id), new Document("$set", new Document(updateField, updateValue)));
-    }
-
-    public void startBreak(Date time, int id) {
-        collection.updateOne(eq("employeeID", id), new Document("$set", new Document("breakStart", time)));
-    }
-
-    public void endBreak(Date time, int id) {
-        collection.updateOne(eq("employeeID", id), new Document("$set", new Document("breakEnd", time)));
-    }
-
-    public void clockIn(int id, Date time) {
-        collection.updateOne(eq("employeeID", id), new Document("$set", new Document("clockIn", time)));
-    }
-
-    public void clockOut(int id, Date time) {
-        collection.updateOne(eq("employeeID", id), new Document("$set", new Document("clockOut", time)));
-    }
-
-
-    public void login(int id, String password) {
-        BasicDBObject andQuery = new BasicDBObject();
-        List<BasicDBObject> obj;
-        obj = new ArrayList<>();
-
-        obj.add(new BasicDBObject("employeeID", id));
-        obj.add(new BasicDBObject("password", password));
-        andQuery.put("$and", obj);
-        collection.find(andQuery);
-    }
-
-    private ObservableList<Employee> fillEmpCollection() {
+    private ObservableList<Employee> fillAdminCollection() {
         ObservableList<Employee> data = FXCollections.observableArrayList();
         List<DBObject> dbObjects;
         DBCursor cursor = dbCollection.find();
         dbObjects = cursor.toArray();
 
         for (DBObject obj : dbObjects) {
-            Employee employee = MainStageController.getEmployee(obj);
-            data.add(employee);
+            Employee admin = MainStageController.getEmployee(obj);
+            data.add(admin);
         }
         return data;
     }
@@ -543,9 +522,7 @@ public class AdministrativeController {
             loader.setLocation(getClass().getResource("/MainStage.fxml"));
             BorderPane root = loader.load();
             MainStageController c = loader.getController();
-
             Scene scene = new Scene(root, 400, 400);
-
             c.setPrimaryStage(primaryStage, scene);
             primaryStage.setTitle("Restaurant Inventory Manager");
             primaryStage.setScene(scene);
@@ -555,12 +532,7 @@ public class AdministrativeController {
             primaryStage.setMaxWidth(530);
             primaryStage.show();
         } catch (NumberFormatException | IOException e) {
-            e.printStackTrace();
+            System.out.println("Exception caught when trying to log out");
         }
     }
-
-    public void allShow() {
-
-    }
 }
-

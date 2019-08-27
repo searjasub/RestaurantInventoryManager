@@ -42,32 +42,21 @@ public class POSController {
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Meals");
     private MongoCollection<Document> orderCollection = database.getCollection("Orders");
-    private List<Meal> meals = new ArrayList<>();
-    private double totalCost;
-    private double tip;
-    private int orderNumber;
-    private Stage primaryStage;
-    private Scene scene;
     private MainStageController mainController;
     private HashMap<Integer, Employee> empsCollection;
-    private RadioMenuItem admin;
-    private RadioMenuItem inventory;
-    private RadioMenuItem pos;
     private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
     private DB db = mongoC.getDB("Restaurants");
     private DBCollection dbCollection = db.getCollection("Meals");
     private DBCollection ordersDbCollection = db.getCollection("Orders");
     private TableView<Meal> mealTable = createTable();
     private ObservableList<Meal> data = fillMealCollection();
+    private Scene scene;
     private CurrentSession currentSession;
-
-    public static double getSalesTax() {
-        return salesTax;
-    }
-
-    public static void setSalesTax(double salesTax) {
-        POSController.salesTax = salesTax;
-    }
+    private List<Meal> meals = new ArrayList<>();
+    private double totalCost;
+    private double tip;
+    private int orderNumber;
+    private Stage primaryStage;
 
     void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
@@ -86,21 +75,24 @@ public class POSController {
 
         if (currentSession.isAdmin()) {
             Menu viewMenu = new Menu("View");
-            RadioMenuItem admin = new RadioMenuItem("Admin");
+            RadioMenuItem administrators = new RadioMenuItem("Administrators");
+            RadioMenuItem employees = new RadioMenuItem("Employees");
             RadioMenuItem inventory = new RadioMenuItem("Inventory");
             RadioMenuItem pos = new RadioMenuItem("POS");
-//            RadioMenuItem finance = new RadioMenuItem("Finance");
+            RadioMenuItem finance = new RadioMenuItem("Finance");
 
-            viewMenu.getItems().add(admin);
+            viewMenu.getItems().add(administrators);
+            viewMenu.getItems().add(employees);
             viewMenu.getItems().add(inventory);
             viewMenu.getItems().add(pos);
-//            viewMenu.getItems().add(finance);
+            viewMenu.getItems().add(finance);
 
             ToggleGroup toggleGroup = new ToggleGroup();
-            toggleGroup.getToggles().add(admin);
+            toggleGroup.getToggles().add(administrators);
+            toggleGroup.getToggles().add(employees);
             toggleGroup.getToggles().add(inventory);
             toggleGroup.getToggles().add(pos);
-//            toggleGroup.getToggles().add(finance);
+            toggleGroup.getToggles().add(finance);
 
             Menu mealMenu = new Menu("Meal Menu");
             MenuItem addMeal = new Menu("Add");
@@ -123,6 +115,7 @@ public class POSController {
             orderMenu.getItems().add(splitOrder);
             orderMenu.getItems().add(cashOut);
 
+            //TODO ADD MEAL
             addMeal.setOnAction(event -> {
                         Dialog<Meal> dialog = new Dialog<>();
                         dialog.setTitle("Contact Dialog");
@@ -195,6 +188,7 @@ public class POSController {
                 mealTable.getItems().addAll(data);
             });
 
+            //TODO UPDATE MEAL
             updateMeal.setOnAction(event -> {
                 Dialog<Meal> dialog = new Dialog<>();
                 dialog.setTitle("Meal Dialog");
@@ -328,6 +322,7 @@ public class POSController {
                 }
             });
 
+            //TODO DELETE MEAL
             deleteMeal.setOnAction(event -> {
                 Dialog<Ingredient> dialog = new Dialog<>();
                 dialog.setTitle("Contact Dialog");
@@ -470,17 +465,17 @@ public class POSController {
             menuBar.getMenus().add(mealMenu);
             menuBar.getMenus().add(orderMenu);
 
-            admin.setOnAction(event -> {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
+            employees.setOnAction(event -> {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../EmployeesView.fxml"));
                 BorderPane root = null;
                 try {
                     root = loader.load();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                AdministrativeController adminController = loader.getController();
-                admin.setSelected(true);
-                adminController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, currentSession);
+                EmployeesController employeesController = loader.getController();
+                employees.setSelected(true);
+                employeesController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, currentSession);
                 primaryStage.setMaxWidth(600);
                 primaryStage.setMaxHeight(600);
                 primaryStage.setScene(new Scene(root, 600, 600));
@@ -499,11 +494,49 @@ public class POSController {
                 InventoryTrackerController inventoryController = loader.getController();
 
                 inventory.setSelected(true);
-                inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, employeesCollection, currentSession);
+                inventoryController.setPrimaryStage(primaryStage, scene, mainStageController, employeesCollection, currentSession);
                 primaryStage.setMaxWidth(600);
                 primaryStage.setMaxHeight(600);
                 primaryStage.setScene(scene);
             });
+
+            administrators.setOnAction(event -> {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdminView.fxml"));
+                BorderPane root;
+                Scene adminScene = null;
+                try {
+                    root = loader.load();
+                    adminScene = new Scene(root, 600, 600);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                AdminController adminController = loader.getController();
+
+                adminController.setPrimaryStage(primaryStage, adminScene, mainStageController, employeesCollection, currentSession);
+                primaryStage.setMinHeight(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(adminScene);
+            });
+
+            finance.setOnAction(event -> {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
+                BorderPane root;
+                Scene financeScene = null;
+                try {
+                    root = loader.load();
+                    financeScene = new Scene(root, 600, 600);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                FinanceController financeController = loader.getController();
+
+                financeController.setPrimaryStage(primaryStage, financeScene, mainStageController, employeesCollection, currentSession);
+                primaryStage.setMaxWidth(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(financeScene);
+
+            });
+
         } else {
             System.out.println("not an admin");
         }
@@ -592,6 +625,14 @@ public class POSController {
         return data;
     }
 
+    public static double getSalesTax() {
+        return salesTax;
+    }
+
+    public static void setSalesTax(double salesTax) {
+        POSController.salesTax = salesTax;
+    }
+
     public void splitTab() {
 
     }
@@ -640,7 +681,7 @@ public class POSController {
         this.orderNumber = orderNumber;
     }
 
-    public void onMenuEndSession(ActionEvent actionEvent) {
+    public void onMenuEndSession() {
         currentSession.restartSession();
         try {
             FXMLLoader loader = new FXMLLoader();

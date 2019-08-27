@@ -1,6 +1,5 @@
 package controller;
 
-import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -33,50 +32,71 @@ public class FinanceController {
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Inventory");
     private Stage primaryStage;
-    private AdministrativeController adminCon;
+    private EmployeesController employeesController;
     private Scene financeScene;
     private MainStageController mainStageController;
     private Pagination myPagination;
     private CurrentSession currentSession;
 
-    void setPrimaryScene(Stage primaryStage, Scene administrativeScene, MainStageController mainStageController,
+    void setPrimaryStage(Stage primaryStage, Scene financeScene, MainStageController mainStageController,
                          HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
-        this.financeScene = administrativeScene;
+        this.financeScene = financeScene;
         this.mainStageController = mainStageController;
         this.currentSession = currentSession;
         this.primaryStage.setTitle("Restaurant Inventory Manager - Finance");
 
         Menu viewMenu = new Menu("View");
-        RadioMenuItem admin = new RadioMenuItem("Admin");
+        RadioMenuItem administrators = new RadioMenuItem("Administrators");
+        RadioMenuItem employees = new RadioMenuItem("Employees");
         RadioMenuItem inventory = new RadioMenuItem("Inventory");
         RadioMenuItem pos = new RadioMenuItem("POS");
         RadioMenuItem finance = new RadioMenuItem("Finance");
 
-        viewMenu.getItems().add(admin);
+        viewMenu.getItems().add(administrators);
+        viewMenu.getItems().add(employees);
         viewMenu.getItems().add(inventory);
         viewMenu.getItems().add(pos);
         viewMenu.getItems().add(finance);
 
         ToggleGroup toggleGroup = new ToggleGroup();
-        toggleGroup.getToggles().add(admin);
+        toggleGroup.getToggles().add(administrators);
+        toggleGroup.getToggles().add(employees);
         toggleGroup.getToggles().add(inventory);
         toggleGroup.getToggles().add(pos);
         toggleGroup.getToggles().add(finance);
 
         this.menuBar.getMenus().add(viewMenu);
 
-        admin.setOnAction(event -> {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
+        administrators.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdminView.fxml"));
+            BorderPane root;
+            Scene adminScene = null;
+            try {
+                root = loader.load();
+                adminScene = new Scene(root, 600, 600);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            AdminController adminController = loader.getController();
+
+            adminController.setPrimaryStage(primaryStage, adminScene, mainStageController, employeesCollection, currentSession);
+            primaryStage.setMinHeight(600);
+            primaryStage.setMaxHeight(600);
+            primaryStage.setScene(adminScene);
+        });
+
+        employees.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../EmployeesView.fxml"));
             BorderPane root = null;
             try {
                 root = loader.load();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            AdministrativeController adminController = loader.getController();
+            EmployeesController adminController = loader.getController();
             inventory.setSelected(true);
-            adminController.setPrimaryStage(primaryStage, administrativeScene, mainStageController, employeesCollection, currentSession);
+            adminController.setPrimaryStage(primaryStage, financeScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(new Scene(Objects.requireNonNull(root), 600, 600));
