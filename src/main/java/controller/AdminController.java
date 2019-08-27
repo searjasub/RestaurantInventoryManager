@@ -170,7 +170,7 @@ public class AdminController {
         deleteEmployee.setOnAction(event -> {
             Dialog<Employee> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
-            dialog.setHeaderText("Please Input Employee Data To Delete");
+            dialog.setHeaderText("Please Input Admin Data To Delete");
 
             ButtonType deleteButtonType = new ButtonType("Delete", ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(deleteButtonType, ButtonType.CANCEL);
@@ -181,9 +181,9 @@ public class AdminController {
             grid.setPadding(new Insets(20, 150, 10, 10));
 
             TextField id = new TextField();
-            id.setPromptText("EmployeeID");
+            id.setPromptText("AdminID");
 
-            grid.add(new Label("EmployeeID:"), 0, 1);
+            grid.add(new Label("AdminID:"), 0, 1);
             grid.add(id, 1, 1);
 
             Node deleteButton = dialog.getDialogPane().lookupButton(deleteButtonType);
@@ -220,7 +220,7 @@ public class AdminController {
         updateEmployee.setOnAction(event -> {
             Dialog<Employee> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
-            dialog.setHeaderText("Please Input Employee Data To Delete");
+            dialog.setHeaderText("Please Input admin Data To Delete");
 
             ButtonType updateButtonType = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
@@ -233,7 +233,7 @@ public class AdminController {
             TextField name = new TextField();
             name.setPromptText("Name");
             TextField id = new TextField();
-            id.setPromptText("EmployeeId");
+            id.setPromptText("AdminID");
             TextField weeklyHours = new TextField();
             weeklyHours.setPromptText("WeeklyHours");
             TextField password = new TextField();
@@ -250,11 +250,11 @@ public class AdminController {
                             "Password",
                             "HourlyPay",
                             "Occupation",
-                            "EmployeeID"
+                            "AdminID"
                     );
             final ComboBox comboBox = new ComboBox(options);
 
-            grid.add(new Label("EmployeeId:"), 0, 0);
+            grid.add(new Label("AdminID:"), 0, 0);
             grid.add(id, 1, 0);
             grid.add(comboBox, 1, 1);
 
@@ -279,9 +279,9 @@ public class AdminController {
                     grid.add(new Label("Occupation"), 0, 1);
                     grid.add(occupation, 1, 1);
                 }
-                if (newValue.equals("employeeID")) {
-                    grid.add(new Label("employeeID"), 0, 1);
-                    grid.add(occupation, 1, 1);
+                if (newValue.equals("AdminID")) {
+                    grid.add(new Label("AdminID"), 0, 1);
+                    grid.add(id, 1, 1);
                 }
             });
 
@@ -325,7 +325,7 @@ public class AdminController {
                         updateAdmin(ids, "occupation", e.getOccupation());
                     }
                     if (!id.getText().isEmpty()) {
-                        updateAdmin(ids, "employeeID", e.getId());
+                        updateAdmin(ids, "adminID", e.getId());
                     }
                     return e;
                 }
@@ -432,9 +432,9 @@ public class AdminController {
         name.setCellFactory(TextFieldTableCell.forTableColumn());
         name.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setName(event.getNewValue()));
 
-        TableColumn<Employee, String> employeeId = new TableColumn<>("Admin ID");
-        employeeId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        employeeId.setCellFactory(TextFieldTableCell.forTableColumn());
+        TableColumn<Employee, String> adminID = new TableColumn<>("Admin ID");
+        adminID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        adminID.setCellFactory(TextFieldTableCell.forTableColumn());
 
         TableColumn<Employee, String> weeklyHours = new TableColumn<>("Weekly Hours");
         weeklyHours.setCellValueFactory(new PropertyValueFactory<>("weeklyHours"));
@@ -455,7 +455,7 @@ public class AdminController {
         occupation.setCellFactory(TextFieldTableCell.forTableColumn());
         occupation.setOnEditCommit(event -> event.getTableView().getItems().get(event.getTablePosition().getRow()).setOccupation(event.getNewValue()));
 
-        adminTable.getColumns().setAll(name, employeeId, weeklyHours, password, occupation, hourlyPay);
+        adminTable.getColumns().setAll(name, adminID, weeklyHours, password, occupation, hourlyPay);
 
         return adminTable;
     }

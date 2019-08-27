@@ -56,7 +56,7 @@ public class InventoryTrackerController {
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
         if (data.size() > 10) {
-            inventoryPagination.setPageCount((data.size() / 17) + 1);
+            inventoryPagination.setPageCount((data.size() / 10) + 1);
         } else {
             inventoryPagination.setPageCount(1);
         }
@@ -435,7 +435,7 @@ public class InventoryTrackerController {
 
     private void showAlertFillInfo() {
         Alert alert = new Alert(Alert.AlertType.ERROR, "Complete all fields", ButtonType.OK);
-        alert.setTitle("Employee not completed");
+        alert.setTitle("Ingredient not completed");
         alert.show();
     }
 

@@ -143,7 +143,7 @@ public class EmployeesController {
                     Employee e = new Employee();
 
                     e.setName(name.getText().trim());
-                    e.setId("" + (collection.countDocuments() + 1));
+                    e.setId("" + 10000 + (collection.countDocuments() + 1));
                     e.setWeeklyHours(weeklyHours.getText().trim());
                     e.setPassword(password.getText().trim());
                     e.setHourlyPay(hourlyPay.getText().trim());
@@ -201,6 +201,7 @@ public class EmployeesController {
                     e.setId(id.getText().trim());
                     int ids = Integer.parseInt(e.getId());
                     deleteEmployee(ids);
+
                 }
                 return null;
             });
