@@ -1,8 +1,9 @@
 package controller;
 
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +18,7 @@ import org.bson.Document;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 import static javafx.collections.FXCollections.observableArrayList;
@@ -31,6 +33,12 @@ public class FinanceController {
     private MongoClient mc = new MongoClient("localHost");
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Inventory");
+    private DB db = mc.getDB("Restaurants");
+    private DBCollection empsCollection = db.getCollection("Employees");
+    private DBCollection adminCollection = db.getCollection("Administrators");
+    private DBCollection invCollection = db.getCollection("Inventory");
+    private DBCollection investCollection = db.getCollection("Investments");
+    private DBCollection expensesCollection = db.getCollection("Expenses");
     private Stage primaryStage;
     private EmployeesController employeesController;
     private Scene financeScene;
@@ -66,7 +74,17 @@ public class FinanceController {
         toggleGroup.getToggles().add(pos);
         toggleGroup.getToggles().add(finance);
 
+        Menu financeMenu = new Menu("Finance View");
+        RadioMenuItem assets = new RadioMenuItem("Assets");
+        RadioMenuItem liabilities = new RadioMenuItem("Liabilities");
+        RadioMenuItem capital = new RadioMenuItem("Capital");
+        RadioMenuItem net = new RadioMenuItem("Net Worth");
+
+        ToggleGroup financeGroup = new ToggleGroup();
+        financeGroup.getToggles().addAll(assets, liabilities, capital, net);
+
         this.menuBar.getMenus().add(viewMenu);
+        this.menuBar.getMenus().add(financeMenu);
 
         administrators.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdminView.fxml"));
@@ -122,6 +140,72 @@ public class FinanceController {
 
         });
 
+        assets.setOnAction(event -> {
+            master = getFinances();
+
+            ObservableList<FinanceItem> assetList = FXCollections.observableArrayList();
+
+            for(FinanceItem item : master){
+                if(item.getType() == FinanceItem.financeType.ASSET){
+                    assetList.add(item);
+                }
+            }
+
+            table.getItems().clear();
+            table.refresh();
+            master = null;
+            master = assetList;
+            table.getItems().addAll(master);
+            table.refresh();
+
+        });
+
+        liabilities.setOnAction(event -> {
+            master = getFinances();
+
+            ObservableList<FinanceItem> liabilityList = FXCollections.observableArrayList();
+
+            for(FinanceItem item : master){
+                if(item.getType() == FinanceItem.financeType.LIABILITY){
+                    liabilityList.add(item);
+                }
+            }
+
+            table.getItems().clear();
+            table.refresh();
+            master = null;
+            master = liabilityList;
+            table.getItems().addAll(master);
+            table.refresh();
+        });
+
+        capital.setOnAction(event -> {
+            master = getFinances();
+
+            ObservableList<FinanceItem> capitalList = FXCollections.observableArrayList();
+
+            for(FinanceItem item : master){
+                if(item.getType() == FinanceItem.financeType.CAPITAL){
+                    capitalList.add(item);
+                }
+            }
+
+            table.getItems().clear();
+            table.refresh();
+            master = null;
+            master = capitalList;
+            table.getItems().addAll(master);
+            table.refresh();
+        });
+
+        net.setOnAction(event -> {
+            table.getItems().clear();
+            table.refresh();
+            master = null;
+            master = getFinances();
+            table.getItems().addAll(master);
+            table.refresh();
+        });
     }
 
     private TableView<FinanceItem> initTable() {
@@ -141,6 +225,78 @@ public class FinanceController {
         // Method to get all inventory items and set them to the ObservableList needed
         ordered = tracker.reviewOrderedItems();
         myPagination.setPageFactory(this::createPage);
+    }
+
+    public ObservableList<FinanceItem> getFinances(){
+        ObservableList<FinanceItem> financeItems = FXCollections.observableArrayList();
+
+        DBCursor cursor = empsCollection.find();
+        List<DBObject> list = cursor.toArray();
+
+        for(DBObject obj : list){
+            FinanceItem f = new FinanceItem();
+            f.setId(obj.get("employeeID").toString());
+            f.setName(obj.get("name").toString());
+            f.setCost("8");
+            f.setAmount("1");
+            f.setType(FinanceItem.financeType.LIABILITY);
+            financeItems.add(f);
+        }
+
+
+        cursor = invCollection.find();
+        list = cursor.toArray();
+
+        for(DBObject obj : list){
+            FinanceItem f = new FinanceItem();
+            f.setId(obj.get("ingredientID").toString());
+            f.setName(obj.get("name").toString());
+            f.setCost(obj.get("wholesale").toString());
+            f.setAmount(obj.get("amount").toString());
+            f.setType(FinanceItem.financeType.ASSET);
+            financeItems.add(f);
+        }
+
+        cursor = expensesCollection.find();
+        list = cursor.toArray();
+
+        for(DBObject obj : list){
+            FinanceItem f = new FinanceItem();
+            f.setId(obj.get("expenseID").toString());
+            f.setName(obj.get("name").toString());
+            f.setCost(obj.get("cost").toString());
+            f.setAmount("1");
+            f.setType(FinanceItem.financeType.LIABILITY);
+            financeItems.add(f);
+        }
+
+       cursor = adminCollection.find();
+        list = cursor.toArray();
+
+        for(DBObject obj : list){
+            FinanceItem f = new FinanceItem();
+            f.setId(obj.get("employeeID").toString());
+            f.setName(obj.get("name").toString());
+            f.setCost("15");
+            f.setAmount("1");
+            f.setType(FinanceItem.financeType.LIABILITY);
+            financeItems.add(f);
+        }
+
+      cursor = investCollection.find();
+        list = cursor.toArray();
+
+        for(DBObject obj : list){
+            FinanceItem f = new FinanceItem();
+            f.setId(obj.get("investmentID").toString());
+            f.setName(obj.get("name").toString());
+            f.setCost(obj.get("cost").toString());
+            f.setAmount("1");
+            f.setType(FinanceItem.financeType.CAPITAL);
+            financeItems.add(f);
+        }
+
+        return financeItems;
     }
 
     private Node createPage(int pageIndex) {
@@ -169,16 +325,25 @@ public class FinanceController {
 
     //TODO MAKE CLASSES FOR THIS
     public static class FinanceItem {
-        private int id;
+        private String id;
         private String name;
-        private int amount;
+        private String amount;
+        private String cost;
         private financeType type;
 
-        public int getId() {
+        public String getCost() {
+            return cost;
+        }
+
+        public void setCost(String cost) {
+            this.cost = cost;
+        }
+
+        public String getId() {
             return id;
         }
 
-        public void setId(int id) {
+        public void setId(String id) {
             this.id = id;
         }
 
@@ -190,11 +355,11 @@ public class FinanceController {
             this.name = name;
         }
 
-        public int getAmount() {
+        public String getAmount() {
             return amount;
         }
 
-        public void setAmount(int amount) {
+        public void setAmount(String amount) {
             this.amount = amount;
         }
 
