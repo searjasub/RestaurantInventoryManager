@@ -42,6 +42,7 @@ public class POSController {
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Meals");
     private MongoCollection<Document> orderCollection = database.getCollection("Orders");
+    private MongoCollection<Document> pastOrderCollection = database.getCollection("Past Orders");
     private MainStageController mainController;
     private HashMap<Integer, Employee> empsCollection;
     private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
@@ -419,9 +420,17 @@ public class POSController {
                 }
                 for(Order o : fillOrderCollection()){
                     if(o.getOrderID().equals(orderIdString)){
-                        o.addMealCost(Integer.parseInt(mealIdString),mealPrice);
+                        System.out.println(mealPrice);
+                        System.out.println(o.orderCost());
+                        double orderCost = Double.parseDouble(o.orderCost());
+                        orderCost += mealPrice;
+                        o.setOrderCost(Double.toString(orderCost));
+                        System.out.println(o.orderCost());
+                        updateOrder(Integer.parseInt(o.getOrderID()),"cost",o.orderCost());
                     }
                 }
+
+
 
             });
 
@@ -458,6 +467,181 @@ public class POSController {
                 loginButton.setDisable(false);
                 dialog.getDialogPane().setContent(grid);
 //                Optional<Meal> result = dialog.showAndWait();
+            });
+
+            removeMeal.setOnAction(event -> {
+                Dialog<Meal> dialog = new Dialog<>();
+                dialog.setTitle("Remove Meal Dialog");
+                dialog.setHeaderText("Please Input Data");
+
+                ButtonType loginButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                ComboBox<String> orderSelection = new ComboBox<>();
+                ComboBox<String> mealSelection = new ComboBox<>();
+                Button submit = new Button("Submit");
+
+                for(Meal m : fillMealCollection()){
+                    mealSelection.getItems().add(m.getMealId());
+                }
+
+                for(Order o : fillOrderCollection()){
+                    orderSelection.getItems().add(o.getOrderID());
+                }
+
+                grid.add(new Label("Order Selection:"), 0, 0);
+                grid.add(orderSelection, 1, 0);
+                grid.add(new Label("Meal Selection:"), 0, 2);
+                grid.add(( mealSelection), 1, 2);
+                grid.add(( submit), 1, 3);
+
+                Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+                loginButton.setDisable(false);
+
+                dialog.getDialogPane().setContent(grid);
+                Optional<Meal> result = dialog.showAndWait();
+                String orderIdString = orderSelection.getSelectionModel().getSelectedItem();
+                String mealIdString = mealSelection.getSelectionModel().getSelectedItem();
+                List meals = fillMealCollection();
+                double mealPrice = 0;
+                for(Meal m : fillMealCollection()){
+                    if(m.getMealId().equals(mealIdString)){
+                        System.out.println(m.getMealId());
+                        mealPrice = Double.parseDouble(m.getCost());
+                        break;
+                    }
+                }
+                for(Order o : fillOrderCollection()){
+                    if(o.getOrderID().equals(orderIdString)){
+                        System.out.println(mealPrice);
+                        double temp = Double.parseDouble(o.orderCost());
+                        o.setOrderCost(Double.toString(temp-mealPrice));
+                        updateOrder(Integer.parseInt(o.getOrderID()),"cost",o.orderCost());
+                    }
+                }
+
+
+
+            });
+
+            splitOrder.setOnAction(event -> {
+                Dialog<Meal> dialog = new Dialog<>();
+                dialog.setTitle("Meal Dialog");
+                dialog.setHeaderText("Please Input Meal Data To Update");
+
+                ButtonType updateButtonType = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                ComboBox orderSelection = new ComboBox();
+
+                for(Order o : fillOrderCollection()){
+                    orderSelection.getItems().add(o.getOrderID());
+                }
+
+                TextField tabs = new TextField();
+                tabs.setPromptText("Number of Tabs");
+
+                 ComboBox mealSelection = new ComboBox();
+                for(Meal m : fillMealCollection()){
+                    mealSelection.getItems().add(m.getMealId());
+                }
+
+                grid.add(new Label("Order Selection:"), 0, 0);
+                grid.add(orderSelection, 1, 0);
+//                grid.add(new Label("Number of Tabs"),1,1);
+                grid.add(tabs, 1, 2);
+
+                tabs.textProperty().addListener((observable, oldValue, newValue) -> {
+                    tabs.setDisable(true);
+                    grid.add(new Label(""),1,1);
+                    grid.add(mealSelection,1,2);
+                });
+                Node updateButton = dialog.getDialogPane().lookupButton(updateButtonType);
+                updateButton.setDisable(true);
+
+//                name.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+//                cost.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+//                    veganFriendly.getSelectionModel().getSelectedItem().toString().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+//                totalCalorie.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+//                mealID.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+
+
+                dialog.getDialogPane().setContent(grid);
+
+                Platform.runLater(orderSelection::requestFocus);
+
+                Meal e = new Meal();
+                Optional<Meal> result = dialog.showAndWait();
+
+
+
+
+            });
+
+            cashOut.setOnAction(event -> {
+                Dialog<Meal> dialog = new Dialog<>();
+                dialog.setTitle("Cash Out Dialog");
+                dialog.setHeaderText("Please Input Data");
+
+                ButtonType loginButtonType = new ButtonType("Done", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                ComboBox<String> orderSelection = new ComboBox<>();
+
+
+                for(Order o : fillOrderCollection()){
+                    orderSelection.getItems().add(o.getOrderID());
+                }
+
+                grid.add(new Label("Order Selection:"), 0, 0);
+                grid.add(orderSelection, 1, 0);
+                final String[] id = new String[1];
+                final String[] costArr = new String[1];
+//                final String[] totalCalorie = new String[1];
+                orderSelection.valueProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                    String orderIdString = orderSelection.getSelectionModel().getSelectedItem();
+                    double costTemp = 0;
+                    for(Order o : fillOrderCollection()){
+
+                        if(o.getOrderID().equals(orderIdString)){
+                            id[0] = o.getOrderID();
+                            costArr[0] = o.orderCost();
+
+                            costTemp = Double.parseDouble(o.orderCost());
+                        }
+                    }
+                    String cost = Double.toString(costTemp);
+                    orderSelection.setDisable(true);
+                    grid.getChildren().clear();
+                    grid.add(new Label("Total Cost for Order"),0,0);
+                    grid.add(new Label(cost),1,0);
+                });
+
+                Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+                loginButton.setDisable(false);
+
+                dialog.getDialogPane().setContent(grid);
+                Optional<Meal> result = dialog.showAndWait();
+            addPastOrder(Integer.parseInt(id[0]),Double.parseDouble(costArr[0]),0);
+            deleteOrder(Integer.parseInt(id[0]));
+
+
+
             });
 
             pos.setSelected(true);
@@ -552,6 +736,9 @@ public class POSController {
     private void addOrder( int orderID, double totalCalorieCount, double cost) {
         orderCollection.insertOne(new Document("orderID", orderID).append("totalCalorie", totalCalorieCount).append("cost", cost));
     }
+    private void addPastOrder( int orderID, double totalCalorieCount, double cost) {
+        pastOrderCollection.insertOne(new Document("orderID", orderID).append("totalCalorie", totalCalorieCount).append("cost", cost));
+    }
 
 
     private TableView<Meal> createTable() {
@@ -644,9 +831,15 @@ public class POSController {
     public void updateMeal(int mealId, String updateField, String updateValue) {
         collection.updateOne(eq("mealID", mealId), new Document("$set", new Document(updateField, updateValue)));
     }
+    public void updateOrder(int orderId, String updateField, String updateValue) {
+        orderCollection.updateOne(eq("orderID", orderId), new Document("$set", new Document(updateField, updateValue)));
+    }
 
     public void deleteMeal(int mealId) {
         collection.deleteOne(eq("mealID", mealId));
+    }
+    public void deleteOrder(int mealId) {
+        orderCollection.deleteOne(eq("orderID", mealId));
     }
 
     public void addMealToOrder(int mealId) {
