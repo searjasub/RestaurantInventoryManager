@@ -7,20 +7,20 @@ import java.util.ArrayList;
 
 public class Meal {
 
-    ArrayList<Ingredient> ingredients = new ArrayList<>();
+    private ArrayList<Ingredient> ingredients = new ArrayList<>();
     private StringProperty name;
     private StringProperty cost;
     private StringProperty veganFriendly;
     private StringProperty totalCalorie;
-    private StringProperty mealID;
+    private StringProperty id;
 
     public Meal(){
 
     }
 
-    public Meal(String name, String mealID) {
+    public Meal(String name, String id) {
         setName(name);
-        setMealID(mealID);
+        setId(id);
         setVeganFriendly(determineIfVF());
         setCost(calculateTotalCost());
     }
@@ -105,17 +105,17 @@ public class Meal {
         return totalCalorie;
     }
 
-    public String getMealId() {return mealIDProperty().get(); }
+    public String getId() {return idProperty().get(); }
 
-    public void setMealID(String mealID) {
-        mealIDProperty().set(mealID);
+    public void setId(String mealID) {
+        idProperty().set(mealID);
     }
 
-    private StringProperty mealIDProperty(){
-        if (mealID == null) {
-            mealID = new SimpleStringProperty(this, "mealID");
+    private StringProperty idProperty(){
+        if (id == null) {
+            id = new SimpleStringProperty(this, "id");
         }
-        return mealID;
+        return id;
     }
 
     public String getBulkCost(){

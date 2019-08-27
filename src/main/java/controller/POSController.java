@@ -167,7 +167,7 @@ public class POSController {
                     if (dialogButton == loginButtonType) {
                         Meal m = new Meal();
                         m.setName(name.getText().trim());
-                        m.setMealID(mealID);
+                        m.setId(mealID);
                         m.setCost(cost.getText().trim());
                         m.setTotalCalorieCount(totalCalorie.getText().trim());
                         m.setVeganFriendly(veganFriendly.getSelectionModel().getSelectedItem());
@@ -179,7 +179,7 @@ public class POSController {
                 });
                 Optional<Meal> result = dialog.showAndWait();
 
-                result.ifPresent(meal -> addMeal(meal.getName(), Integer.parseInt(meal.getMealId()), Double.parseDouble(meal.getTotalCalorieCount()),
+                result.ifPresent(meal -> addMeal(meal.getName(), Integer.parseInt(meal.getId()), Double.parseDouble(meal.getTotalCalorieCount()),
                         (meal.isVeganFriendly()), Double.parseDouble(meal.getCost())));
 
                 mealTable.getItems().clear();
@@ -277,12 +277,12 @@ public class POSController {
                     if (dialogButton == updateButtonType) {
 
                             e.setName(name.getText().trim());
-                            e.setMealID(mealID.getText());
+                            e.setId(mealID.getText());
                             e.setTotalCalorieCount(totalCalorie.getText().trim());
                             e.setCost(cost.getText().trim());
                             e.setVeganFriendly(veganFriendly.getSelectionModel().getSelectedItem());
-                            System.out.println(e.getMealId());
-                            int id = Integer.parseInt(e.getMealId());
+                            System.out.println(e.getId());
+                            int id = Integer.parseInt(e.getId());
                             if (!name.getText().isEmpty()) {
                                 updateMeal(id, "name", e.getName());
                             }
@@ -356,8 +356,8 @@ public class POSController {
                 dialog.setResultConverter(dialogButton -> {
                     if (dialogButton == deleteButtonType) {
 
-                        e.setMealID(id.getText().trim());
-                        int ids = Integer.parseInt(e.getMealId());
+                        e.setId(id.getText().trim());
+                        int ids = Integer.parseInt(e.getId());
                         deleteMeal(ids);
                     }
                     return null;
@@ -390,7 +390,7 @@ public class POSController {
                 ComboBox<String> mealSelection = new ComboBox<>();
 
                 for(Meal m : fillMealCollection()){
-                    mealSelection.getItems().add(m.getMealId());
+                    mealSelection.getItems().add(m.getId());
                 }
 
                 for(Order o : fillOrderCollection()){
@@ -412,8 +412,8 @@ public class POSController {
                 List meals = fillMealCollection();
                 double mealPrice = 0;
                 for(Meal m : fillMealCollection()){
-                    if(m.getMealId().equals(mealIdString)){
-                        System.out.println(m.getMealId());
+                    if(m.getId().equals(mealIdString)){
+                        System.out.println(m.getId());
                         mealPrice = Double.parseDouble(m.getCost());
                         break;
                     }
@@ -450,7 +450,7 @@ public class POSController {
                 ComboBox<String> mealSelection = new ComboBox<>();
 
                 for(Meal m : fillMealCollection()){
-                    mealSelection.getItems().add(m.getMealId());
+                    mealSelection.getItems().add(m.getId());
                 }
 
                 long idTemp = orderCollection.countDocuments()+1;
@@ -487,7 +487,7 @@ public class POSController {
                 Button submit = new Button("Submit");
 
                 for(Meal m : fillMealCollection()){
-                    mealSelection.getItems().add(m.getMealId());
+                    mealSelection.getItems().add(m.getId());
                 }
 
                 for(Order o : fillOrderCollection()){
@@ -510,8 +510,8 @@ public class POSController {
                 List meals = fillMealCollection();
                 double mealPrice = 0;
                 for(Meal m : fillMealCollection()){
-                    if(m.getMealId().equals(mealIdString)){
-                        System.out.println(m.getMealId());
+                    if(m.getId().equals(mealIdString)){
+                        System.out.println(m.getId());
                         mealPrice = Double.parseDouble(m.getCost());
                         break;
                     }
@@ -553,7 +553,7 @@ public class POSController {
 
                  ComboBox mealSelection = new ComboBox();
                 for(Meal m : fillMealCollection()){
-                    mealSelection.getItems().add(m.getMealId());
+                    mealSelection.getItems().add(m.getId());
                 }
 
                 grid.add(new Label("Order Selection:"), 0, 0);
@@ -721,6 +721,9 @@ public class POSController {
 
             });
 
+            System.out.println(data.get(1).getName());
+
+
         } else {
             System.out.println("not an admin");
         }
@@ -750,7 +753,7 @@ public class POSController {
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         name.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        TableColumn<Meal, String> mealID = new TableColumn<>("mealID");
+        TableColumn<Meal, String> mealID = new TableColumn<>("Meal ID");
         mealID.setCellValueFactory(new PropertyValueFactory<>("id"));
         mealID.setCellFactory(TextFieldTableCell.forTableColumn());
 
@@ -790,7 +793,8 @@ public class POSController {
             meal.setName(obj.get("name").toString());
             meal.setTotalCalorieCount(obj.get("totalCalorie").toString());
             meal.setVeganFriendly(obj.get("veganFriendly").toString());
-            meal.setMealID(obj.get("mealID").toString());
+            meal.setId(obj.get("mealID").toString());
+            System.out.println(obj.get("mealID").toString());
             meal.setCost(obj.get("cost").toString());
             data.add(meal);
         }
