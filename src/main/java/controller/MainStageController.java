@@ -66,15 +66,15 @@ public class MainStageController {
                 if (passwordTextField.getText().equals(employee.getPassword())) {
                     currentSession.setAdmin(true);
                     currentSession.setLoggedIn(employee);
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdminView.fxml"));
                     BorderPane root = loader.load();
-                    AdministrativeController adminController = loader.getController();
-                    Scene administrativeScene = new Scene(root, 600, 600);
+                    AdminController adminController = loader.getController();
+                    Scene adminScene = new Scene(root, 600, 600);
 
-                    adminController.setPrimaryStage(primaryStage, scene, this, employeeCollection, currentSession);
+                    adminController.setPrimaryStage(primaryStage, adminScene, this, employeeCollection, currentSession);
                     primaryStage.setMaxWidth(600);
                     primaryStage.setMaxHeight(600);
-                    primaryStage.setScene(administrativeScene);
+                    primaryStage.setScene(adminScene);
                 } else {
                     showAlertInvalidInput();
                 }

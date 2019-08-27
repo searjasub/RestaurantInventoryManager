@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import model.Employee;
 import model.Ingredient;
 import model.Meal;
+import model.Order;
 import org.bson.Document;
 
 import java.io.IOException;
@@ -40,31 +41,22 @@ public class POSController {
     private MongoClient mc = new MongoClient();
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Meals");
+    private MongoCollection<Document> orderCollection = database.getCollection("Orders");
+    private MainStageController mainController;
+    private HashMap<Integer, Employee> empsCollection;
+    private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
+    private DB db = mongoC.getDB("Restaurants");
+    private DBCollection dbCollection = db.getCollection("Meals");
+    private DBCollection ordersDbCollection = db.getCollection("Orders");
+    private TableView<Meal> mealTable = createTable();
+    private ObservableList<Meal> data = fillMealCollection();
+    private Scene scene;
+    private CurrentSession currentSession;
     private List<Meal> meals = new ArrayList<>();
     private double totalCost;
     private double tip;
     private int orderNumber;
     private Stage primaryStage;
-    private Scene scene;
-    private MainStageController mainController;
-    private HashMap<Integer, Employee> empsCollection;
-    private RadioMenuItem admin;
-    private RadioMenuItem inventory;
-    private RadioMenuItem pos;
-    private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
-    private DB db = mongoC.getDB("Restaurants");
-    private DBCollection dbCollection = db.getCollection("Meals");
-    private TableView<Meal> mealTable = createTable();
-    private ObservableList<Meal> data = fillMealCollection();
-    private CurrentSession currentSession;
-
-    public static double getSalesTax() {
-        return salesTax;
-    }
-
-    public static void setSalesTax(double salesTax) {
-        POSController.salesTax = salesTax;
-    }
 
     void setPrimaryStage(Stage primaryStage, Scene posScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
@@ -83,23 +75,26 @@ public class POSController {
 
         if (currentSession.isAdmin()) {
             Menu viewMenu = new Menu("View");
-            RadioMenuItem admin = new RadioMenuItem("Admin");
+            RadioMenuItem administrators = new RadioMenuItem("Administrators");
+            RadioMenuItem employees = new RadioMenuItem("Employees");
             RadioMenuItem inventory = new RadioMenuItem("Inventory");
             RadioMenuItem pos = new RadioMenuItem("POS");
-//            RadioMenuItem finance = new RadioMenuItem("Finance");
+            RadioMenuItem finance = new RadioMenuItem("Finance");
 
-            viewMenu.getItems().add(admin);
+            viewMenu.getItems().add(administrators);
+            viewMenu.getItems().add(employees);
             viewMenu.getItems().add(inventory);
             viewMenu.getItems().add(pos);
-//            viewMenu.getItems().add(finance);
+            viewMenu.getItems().add(finance);
 
             ToggleGroup toggleGroup = new ToggleGroup();
-            toggleGroup.getToggles().add(admin);
+            toggleGroup.getToggles().add(administrators);
+            toggleGroup.getToggles().add(employees);
             toggleGroup.getToggles().add(inventory);
             toggleGroup.getToggles().add(pos);
-//            toggleGroup.getToggles().add(finance);
+            toggleGroup.getToggles().add(finance);
 
-            Menu mealMenu = new Menu("Menu");
+            Menu mealMenu = new Menu("Meal Menu");
             MenuItem addMeal = new Menu("Add");
             MenuItem deleteMeal = new Menu("Delete");
             MenuItem updateMeal = new Menu("Update");
@@ -107,19 +102,32 @@ public class POSController {
             mealMenu.getItems().add(deleteMeal);
             mealMenu.getItems().add(updateMeal);
 
+            Menu orderMenu = new Menu("Order Menu");
+            MenuItem startNewOrder = new Menu("Start New Order");
+            MenuItem includeMeal = new Menu("Add Meal");
+            MenuItem removeMeal = new Menu("Remove Meal");
+            MenuItem splitOrder = new Menu("Split Order");
+            MenuItem cashOut = new Menu("Cash Out");
 
+            orderMenu.getItems().add(startNewOrder);
+            orderMenu.getItems().add(includeMeal);
+            orderMenu.getItems().add(removeMeal);
+            orderMenu.getItems().add(splitOrder);
+            orderMenu.getItems().add(cashOut);
+
+            //TODO ADD MEAL
             addMeal.setOnAction(event -> {
-                Dialog<Meal> dialog = new Dialog<>();
-                dialog.setTitle("Contact Dialog");
-                dialog.setHeaderText("Please Input Ingredient Data");
+                        Dialog<Meal> dialog = new Dialog<>();
+                        dialog.setTitle("Contact Dialog");
+                        dialog.setHeaderText("Please Input Ingredient Data");
 
-                ButtonType loginButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
-                dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+                        ButtonType loginButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+                        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
-                GridPane grid = new GridPane();
-                grid.setHgap(10);
-                grid.setVgap(10);
-                grid.setPadding(new Insets(20, 150, 10, 10));
+                        GridPane grid = new GridPane();
+                        grid.setHgap(10);
+                        grid.setVgap(10);
+                        grid.setPadding(new Insets(20, 150, 10, 10));
 
                 TextField name = new TextField();
                 name.setPromptText("Name");
@@ -158,7 +166,7 @@ public class POSController {
                     if (dialogButton == loginButtonType) {
                         Meal m = new Meal();
                         m.setName(name.getText().trim());
-                        m.setMealId(mealID);
+                        m.setMealID(mealID);
                         m.setCost(cost.getText().trim());
                         m.setTotalCalorieCount(totalCalorie.getText().trim());
                         m.setVeganFriendly(veganFriendly.getSelectionModel().getSelectedItem());
@@ -180,6 +188,7 @@ public class POSController {
                 mealTable.getItems().addAll(data);
             });
 
+            //TODO UPDATE MEAL
             updateMeal.setOnAction(event -> {
                 Dialog<Meal> dialog = new Dialog<>();
                 dialog.setTitle("Meal Dialog");
@@ -195,8 +204,8 @@ public class POSController {
 
                 TextField name = new TextField();
                 name.setPromptText("Name");
-                TextField mealId = new TextField();
-                mealId.setPromptText("mealID");
+                TextField mealID = new TextField();
+                mealID.setPromptText("mealID");
                 TextField totalCalorie = new TextField();
                 totalCalorie.setPromptText("totalCalorie");
                 ComboBox<String> veganFriendly = new ComboBox<>();
@@ -216,7 +225,7 @@ public class POSController {
                 final ComboBox comboBox = new ComboBox(options);
 
                 grid.add(new Label("mealID:"), 0, 0);
-                grid.add(mealId, 1, 0);
+                grid.add(mealID, 1, 0);
                 grid.add(comboBox, 1, 1);
 
                 comboBox.valueProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
@@ -254,8 +263,8 @@ public class POSController {
                 name.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
                 cost.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
 //                    veganFriendly.getSelectionModel().getSelectedItem().toString().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
-                totalCalorie.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
-                mealId.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+                    totalCalorie.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
+                    mealID.textProperty().addListener((observable, oldValue, newValue) -> updateButton.setDisable(newValue.trim().isEmpty()));
 
 
                 dialog.getDialogPane().setContent(grid);
@@ -266,22 +275,22 @@ public class POSController {
                 dialog.setResultConverter(dialogButton -> {
                     if (dialogButton == updateButtonType) {
 
-                        e.setName(name.getText().trim());
-                        e.setMealId(mealId.getText());
-                        e.setTotalCalorieCount(totalCalorie.getText().trim());
-                        e.setCost(cost.getText().trim());
-                        e.setVeganFriendly(veganFriendly.getSelectionModel().getSelectedItem());
-                        System.out.println(e.getMealId());
-                        int id = Integer.parseInt(e.getMealId());
-                        if (!name.getText().isEmpty()) {
-                            updateMeal(id, "name", e.getName());
-                        }
-                        if (!cost.getText().isEmpty()) {
-                            updateMeal(id, "cost", e.getCost());
-                        }
-                        if (!totalCalorie.getText().isEmpty()) {
-                            updateMeal(id, "totalCalorie", e.getTotalCalorieCount());
-                        }
+                            e.setName(name.getText().trim());
+                            e.setMealID(mealID.getText());
+                            e.setTotalCalorieCount(totalCalorie.getText().trim());
+                            e.setCost(cost.getText().trim());
+                            e.setVeganFriendly(veganFriendly.getSelectionModel().getSelectedItem());
+                            System.out.println(e.getMealId());
+                            int id = Integer.parseInt(e.getMealId());
+                            if (!name.getText().isEmpty()) {
+                                updateMeal(id, "name", e.getName());
+                            }
+                            if (!cost.getText().isEmpty()) {
+                                updateMeal(id, "cost", e.getCost());
+                            }
+                            if (!totalCalorie.getText().isEmpty()) {
+                                updateMeal(id, "totalCalorie", e.getTotalCalorieCount());
+                            }
 //                            if (!mealId.getText().isEmpty()) {
 //                                updateMeal(id, "mealID", e.getMealId());
 //                            }
@@ -300,12 +309,12 @@ public class POSController {
                 });
                 Optional<Meal> result = dialog.showAndWait();
 
-                mealTable.getItems().clear();
-                mealTable.refresh();
-                data = null;
-                data = fillMealCollection();
-                mealTable.getItems().addAll(data);
-                mealTable.refresh();
+                    mealTable.getItems().clear();
+                    mealTable.refresh();
+                    data = null;
+                    data = fillMealCollection();
+                    mealTable.getItems().addAll(data);
+                    mealTable.refresh();
 
                 //TODO what's next?
                 if (result.isPresent()) {
@@ -313,7 +322,7 @@ public class POSController {
                 }
             });
 
-
+            //TODO DELETE MEAL
             deleteMeal.setOnAction(event -> {
                 Dialog<Ingredient> dialog = new Dialog<>();
                 dialog.setTitle("Contact Dialog");
@@ -328,7 +337,7 @@ public class POSController {
                 grid.setPadding(new Insets(20, 150, 10, 10));
 
                 TextField id = new TextField();
-                id.setPromptText("MealId");
+                id.setPromptText("MealID");
 
                 grid.add(new Label("mealID:"), 0, 1);
                 grid.add(id, 1, 1);
@@ -346,14 +355,13 @@ public class POSController {
                 dialog.setResultConverter(dialogButton -> {
                     if (dialogButton == deleteButtonType) {
 
-                        e.setMealId(id.getText().trim());
+                        e.setMealID(id.getText().trim());
                         int ids = Integer.parseInt(e.getMealId());
                         deleteMeal(ids);
                     }
                     return null;
                 });
 
-                //TODO What are we doing with this?
                 Optional<Ingredient> result = dialog.showAndWait();
 
                 mealTable.getItems().clear();
@@ -364,21 +372,110 @@ public class POSController {
 
             });
 
+            includeMeal.setOnAction(event -> {
+                Dialog<Meal> dialog = new Dialog<>();
+                dialog.setTitle("Order Dialog");
+                dialog.setHeaderText("Please Input Order Data");
+
+                ButtonType loginButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                ComboBox<String> orderSelection = new ComboBox<>();
+                ComboBox<String> mealSelection = new ComboBox<>();
+
+                for(Meal m : fillMealCollection()){
+                    mealSelection.getItems().add(m.getMealId());
+                }
+
+                for(Order o : fillOrderCollection()){
+                    orderSelection.getItems().add(o.getOrderID());
+                }
+
+                grid.add(new Label("Order Selection:"), 0, 0);
+                grid.add(orderSelection, 1, 0);
+                grid.add(new Label("Meal Selection:"), 0, 2);
+                grid.add(( mealSelection), 1, 2);
+
+                Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+                loginButton.setDisable(false);
+
+                dialog.getDialogPane().setContent(grid);
+                Optional<Meal> result = dialog.showAndWait();
+                String orderIdString = orderSelection.getSelectionModel().getSelectedItem();
+                String mealIdString = mealSelection.getSelectionModel().getSelectedItem();
+                List meals = fillMealCollection();
+                double mealPrice = 0;
+                for(Meal m : fillMealCollection()){
+                    if(m.getMealId().equals(mealIdString)){
+                        System.out.println(m.getMealId());
+                        mealPrice = Double.parseDouble(m.getCost());
+                        break;
+                    }
+                }
+                for(Order o : fillOrderCollection()){
+                    if(o.getOrderID().equals(orderIdString)){
+                        o.addMealCost(Integer.parseInt(mealIdString),mealPrice);
+                    }
+                }
+
+            });
+
+            startNewOrder.setOnAction(event -> {
+                Dialog<Meal> dialog = new Dialog<>();
+                dialog.setTitle(" New Order Dialog");
+                dialog.setHeaderText("Please Input Order Data");
+
+                ButtonType loginButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                ComboBox<String> mealSelection = new ComboBox<>();
+
+                for(Meal m : fillMealCollection()){
+                    mealSelection.getItems().add(m.getMealId());
+                }
+
+                long idTemp = orderCollection.countDocuments()+1;
+                String idString = Long.toString(idTemp);
+                System.out.println(idString);
+                addOrder(Integer.parseInt(idString),0,0);
+
+
+
+                grid.add(new Label("Meal Selection:"), 0, 2);
+                grid.add(( mealSelection), 1, 2);
+
+                Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+                loginButton.setDisable(false);
+                dialog.getDialogPane().setContent(grid);
+//                Optional<Meal> result = dialog.showAndWait();
+            });
+
             pos.setSelected(true);
             menuBar.getMenus().add(viewMenu);
             menuBar.getMenus().add(mealMenu);
+            menuBar.getMenus().add(orderMenu);
 
-            admin.setOnAction(event -> {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
+            employees.setOnAction(event -> {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../EmployeesView.fxml"));
                 BorderPane root = null;
                 try {
                     root = loader.load();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                AdministrativeController adminController = loader.getController();
-                admin.setSelected(true);
-                adminController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, currentSession);
+                EmployeesController employeesController = loader.getController();
+                employees.setSelected(true);
+                employeesController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, currentSession);
                 primaryStage.setMaxWidth(600);
                 primaryStage.setMaxHeight(600);
                 primaryStage.setScene(new Scene(root, 600, 600));
@@ -397,11 +494,49 @@ public class POSController {
                 InventoryTrackerController inventoryController = loader.getController();
 
                 inventory.setSelected(true);
-                inventoryController.setPrimaryScene(primaryStage, scene, mainStageController, employeesCollection, currentSession);
+                inventoryController.setPrimaryStage(primaryStage, scene, mainStageController, employeesCollection, currentSession);
                 primaryStage.setMaxWidth(600);
                 primaryStage.setMaxHeight(600);
                 primaryStage.setScene(scene);
             });
+
+            administrators.setOnAction(event -> {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdminView.fxml"));
+                BorderPane root;
+                Scene adminScene = null;
+                try {
+                    root = loader.load();
+                    adminScene = new Scene(root, 600, 600);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                AdminController adminController = loader.getController();
+
+                adminController.setPrimaryStage(primaryStage, adminScene, mainStageController, employeesCollection, currentSession);
+                primaryStage.setMinHeight(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(adminScene);
+            });
+
+            finance.setOnAction(event -> {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
+                BorderPane root;
+                Scene financeScene = null;
+                try {
+                    root = loader.load();
+                    financeScene = new Scene(root, 600, 600);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                FinanceController financeController = loader.getController();
+
+                financeController.setPrimaryStage(primaryStage, financeScene, mainStageController, employeesCollection, currentSession);
+                primaryStage.setMaxWidth(600);
+                primaryStage.setMaxHeight(600);
+                primaryStage.setScene(financeScene);
+
+            });
+
         } else {
             System.out.println("not an admin");
         }
@@ -414,6 +549,10 @@ public class POSController {
         collection.insertOne(new Document("name", mealName).append("mealID", mealID)
                 .append("totalCalorie", totalCalorieCount).append("veganFriendly", isVegan).append("cost", cost));
     }
+    private void addOrder( int orderID, double totalCalorieCount, double cost) {
+        orderCollection.insertOne(new Document("orderID", orderID).append("totalCalorie", totalCalorieCount).append("cost", cost));
+    }
+
 
     private TableView<Meal> createTable() {
 
@@ -464,11 +603,34 @@ public class POSController {
             meal.setName(obj.get("name").toString());
             meal.setTotalCalorieCount(obj.get("totalCalorie").toString());
             meal.setVeganFriendly(obj.get("veganFriendly").toString());
-            meal.setMealId(obj.get("mealID").toString());
+            meal.setMealID(obj.get("mealID").toString());
             meal.setCost(obj.get("cost").toString());
             data.add(meal);
         }
         return data;
+    }
+
+    private ObservableList<Order> fillOrderCollection() {
+        ObservableList<Order> data = FXCollections.observableArrayList();
+        List<DBObject> dbObjects;
+        DBCursor cursor = ordersDbCollection.find();
+        dbObjects = cursor.toArray();
+        Order o;
+        for (DBObject obj : dbObjects) {
+            o = new Order();
+            o.setOrderCost(obj.get("cost").toString());
+            o.setOrderID(obj.get("orderID").toString());
+            data.add(o);
+        }
+        return data;
+    }
+
+    public static double getSalesTax() {
+        return salesTax;
+    }
+
+    public static void setSalesTax(double salesTax) {
+        POSController.salesTax = salesTax;
     }
 
     public void splitTab() {
@@ -488,9 +650,11 @@ public class POSController {
     }
 
     public void addMealToOrder(int mealId) {
+
     }
 
     public void calculateFinalCost() {
+
     }
 
     public double getTotalCost() {
@@ -517,7 +681,7 @@ public class POSController {
         this.orderNumber = orderNumber;
     }
 
-    public void onMenuEndSession(ActionEvent actionEvent) {
+    public void onMenuEndSession() {
         currentSession.restartSession();
         try {
             FXMLLoader loader = new FXMLLoader();

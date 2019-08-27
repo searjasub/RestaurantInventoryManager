@@ -37,10 +37,10 @@ public class InventoryTrackerController {
     private MongoDatabase database = mc.getDatabase("Restaurants");
     private MongoCollection<Document> collection = database.getCollection("Inventory");
     private Block<Document> printBlock = System.out::println;
-    private AdministrativeController controller;
+    private EmployeesController controller;
     private Stage primaryStage;
     private Scene inventoryScene;
-    private MainStageController mainController;
+    private MainStageController mainStageController;
     private MongoClient mongoC = new MongoClient(new ServerAddress("Localhost", 27017));
     private DB db = mongoC.getDB("Restaurants");
     private DBCollection dbCollection = db.getCollection("Inventory");
@@ -48,10 +48,10 @@ public class InventoryTrackerController {
     private TableView<Ingredient> ingredientTable = createTable();
     private CurrentSession currentSession;
 
-    void setPrimaryScene(Stage primaryStage, Scene inventoryScene, MainStageController mainController, HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
+    void setPrimaryStage(Stage primaryStage, Scene inventoryScene, MainStageController mainStageController, HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
         this.primaryStage = primaryStage;
         this.inventoryScene = inventoryScene;
-        this.mainController = mainController;
+        this.mainStageController = mainStageController;
         this.currentSession = currentSession;
         primaryStage.setTitle("Restaurant Inventory Manager - Inventory Tracker");
 
@@ -64,23 +64,26 @@ public class InventoryTrackerController {
 
 
         Menu viewMenu = new Menu("View");
-        RadioMenuItem admin = new RadioMenuItem("Admin");
+        RadioMenuItem administrators = new RadioMenuItem("Administrators");
+        RadioMenuItem employees = new RadioMenuItem("Employees");
         RadioMenuItem inventory = new RadioMenuItem("Inventory");
         RadioMenuItem pos = new RadioMenuItem("POS");
-//        RadioMenuItem finance = new RadioMenuItem("Finance");
+        RadioMenuItem finance = new RadioMenuItem("Finance");
 
-        viewMenu.getItems().add(admin);
+        viewMenu.getItems().add(administrators);
+        viewMenu.getItems().add(employees);
         viewMenu.getItems().add(inventory);
         viewMenu.getItems().add(pos);
-//        viewMenu.getItems().add(finance);
+        viewMenu.getItems().add(finance);
 
         menu.getMenus().add(viewMenu);
 
         ToggleGroup toggleGroup = new ToggleGroup();
-        toggleGroup.getToggles().add(admin);
+        toggleGroup.getToggles().add(administrators);
+        toggleGroup.getToggles().add(employees);
         toggleGroup.getToggles().add(inventory);
         toggleGroup.getToggles().add(pos);
-//        toggleGroup.getToggles().add(finance);
+        toggleGroup.getToggles().add(finance);
 
         inventory.setSelected(true);
 
@@ -94,6 +97,7 @@ public class InventoryTrackerController {
 
         menu.getMenus().add(ingredientsMenu);
 
+        //TODO ADD
         addIngredient.setOnAction(event -> {
             Dialog<Ingredient> dialog = new Dialog<>();
             dialog.setTitle("Contact Dialog");
@@ -348,18 +352,35 @@ public class InventoryTrackerController {
             }
         });
 
-        admin.setOnAction(event -> {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdministrativeScene.fxml"));
+        administrators.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdminView.fxml"));
+            BorderPane root;
+            Scene adminScene = null;
+            try {
+                root = loader.load();
+                adminScene = new Scene(root, 600, 600);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            AdminController adminController = loader.getController();
+
+            adminController.setPrimaryStage(primaryStage, adminScene, mainStageController, employeesCollection, currentSession);
+            primaryStage.setMinHeight(600);
+            primaryStage.setMaxHeight(600);
+            primaryStage.setScene(adminScene);
+        });
+
+        employees.setOnAction(event -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../EmployeesView.fxml"));
             BorderPane root = null;
             try {
                 root = loader.load();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            AdministrativeController adminController = loader.getController();
+            EmployeesController employeesController = loader.getController();
             inventory.setSelected(true);
-            adminController.setPrimaryStage(primaryStage, inventoryScene, mainController, employeesCollection, currentSession);
+            employeesController.setPrimaryStage(primaryStage, inventoryScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(800);
             primaryStage.setMaxHeight(800);
             primaryStage.setScene(new Scene(Objects.requireNonNull(root), 600, 600));
@@ -377,7 +398,7 @@ public class InventoryTrackerController {
             }
             POSController posController = loader.getController();
             pos.setSelected(true);
-            posController.setPrimaryStage(primaryStage, posScene, mainController, employeesCollection, currentSession);
+            posController.setPrimaryStage(primaryStage, posScene, mainStageController, employeesCollection, currentSession);
             primaryStage.setMaxWidth(600);
             primaryStage.setMaxHeight(600);
             primaryStage.setScene(posScene);

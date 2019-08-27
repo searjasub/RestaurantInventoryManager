@@ -12,11 +12,19 @@ public class Meal {
     private StringProperty cost;
     private StringProperty veganFriendly;
     private StringProperty totalCalorie;
-    private StringProperty mealId;
+    private StringProperty mealID;
 
     public Meal(){
 
     }
+
+    public Meal(String name, String mealID) {
+        setName(name);
+        setMealID(mealID);
+        setVeganFriendly(determineIfVF());
+        setCost(calculateTotalCost());
+    }
+
 
     public String determineIfVF() {
         String returnVal = "true";
@@ -97,17 +105,17 @@ public class Meal {
         return totalCalorie;
     }
 
-    public String getMealId() {return mealIdProperty().get(); }
+    public String getMealId() {return mealIDProperty().get(); }
 
-    public void setMealId(String mealId) {
-        mealIdProperty().set(mealId);
+    public void setMealID(String mealID) {
+        mealIDProperty().set(mealID);
     }
 
-    private StringProperty mealIdProperty(){
-        if (mealId == null) {
-            mealId = new SimpleStringProperty(this, "mealID");
+    private StringProperty mealIDProperty(){
+        if (mealID == null) {
+            mealID = new SimpleStringProperty(this, "mealID");
         }
-        return mealId;
+        return mealID;
     }
 
     public String getBulkCost(){
