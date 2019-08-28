@@ -387,7 +387,7 @@ public class AdminController {
         });
 
         finance.setOnAction(event -> {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceView.fxml"));
             BorderPane root;
             Scene financeScene = null;
             try {
@@ -395,7 +395,9 @@ public class AdminController {
                 financeScene = new Scene(root, 600, 600);
             } catch (IOException e) {
                 e.printStackTrace();
+                System.out.println("error in loader.load");
             }
+
             FinanceController financeController = loader.getController();
 
             financeController.setPrimaryStage(primaryStage, financeScene, mainStageController, employeesCollection, currentSession);
