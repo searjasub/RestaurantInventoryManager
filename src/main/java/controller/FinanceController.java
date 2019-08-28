@@ -12,6 +12,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Employee;
@@ -31,7 +33,7 @@ public class FinanceController {
     private Pagination pagination;
     @FXML
     private MenuBar menuBar;
-    private TableView table = createTable();
+    private TableView<FinanceItem> table = createTable();
     private InventoryTrackerController tracker = new InventoryTrackerController();
     private MongoClient mc = new MongoClient("localHost");
     private MongoDatabase database = mc.getDatabase("Restaurants");
@@ -221,13 +223,27 @@ public class FinanceController {
     }
 
     private TableView<FinanceItem> createTable() {
-        table = new TableView<FinanceItem>();
-        table.setEditable(true);
+        table = new TableView<>();
+        table.setEditable(false);
 
-        TableColumn<FinanceItem, Integer> id = new TableColumn<>();
-        id.setText("ID");
+        TableColumn<FinanceItem, String> id = new TableColumn<>("ID");
+        id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        id.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        //TableColumn<FinanceItem, String> name = new TableColumn<>();
+        TableColumn<FinanceItem, String> name = new TableColumn<>("Name");
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        name.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        TableColumn<FinanceItem, String> cost = new TableColumn<>("Cost");
+        cost.setCellValueFactory(new PropertyValueFactory<>("cost"));
+        cost.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        TableColumn<FinanceItem, String> amount = new TableColumn<>("Amount");
+        amount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        amount.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        table.getColumns().setAll(name,id,cost,amount);
+
         return table;
     }
 
@@ -308,7 +324,7 @@ public class FinanceController {
         int pageSize = 50;
         int first = pageIndex * pageSize;
         int last = Math.min(first + pageSize, master.size());
-        table.getItems().add(observableArrayList(master.subList(first, last)));
+        table.getItems().setAll(FXCollections.observableArrayList(master.subList(first, last)));
 
         return table;
     }

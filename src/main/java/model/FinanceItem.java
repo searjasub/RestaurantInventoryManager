@@ -1,45 +1,75 @@
 package model;
 
 import enums.FinanceType;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class FinanceItem {
 
-    private String id;
-    private String name;
-    private String amount;
-    private String cost;
+    private StringProperty id;
+    private StringProperty name;
+    private StringProperty amount;
+    private StringProperty cost;
     private FinanceType type;
 
     public String getCost() {
-        return cost;
+        return costProperty().get();
     }
 
     public void setCost(String cost) {
-        this.cost = cost;
+        costProperty().set(cost);
+    }
+
+    private StringProperty costProperty() {
+        if (cost == null) {
+            cost = new SimpleStringProperty(this, "cost");
+        }
+        return cost;
     }
 
     public String getId() {
-        return id;
+        return idProperty().get();
     }
 
     public void setId(String id) {
-        this.id = id;
+        idProperty().set(id);
+    }
+
+    private StringProperty idProperty() {
+        if (id == null) {
+            id = new SimpleStringProperty(this, "id");
+        }
+        return id;
     }
 
     public String getName() {
-        return name;
+        return nameProperty().get();
     }
 
     public void setName(String name) {
-        this.name = name;
+        nameProperty().set(name);
+    }
+
+    private StringProperty nameProperty() {
+        if (name == null) {
+            name = new SimpleStringProperty(this, "name");
+        }
+        return name;
     }
 
     public String getAmount() {
-        return amount;
+        return amountProperty().get();
     }
 
     public void setAmount(String amount) {
-        this.amount = amount;
+        amountProperty().set(amount);
+    }
+
+    private StringProperty amountProperty() {
+        if (amount == null) {
+            amount = new SimpleStringProperty(this, "amount");
+        }
+        return amount;
     }
 
     public FinanceType getType() {

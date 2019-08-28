@@ -427,7 +427,7 @@ public class AdminController {
 
     private TableView<Employee> createTable() {
         adminTable = new TableView<>();
-        adminTable.setEditable(true);
+        adminTable.setEditable(false);
 
         TableColumn<Employee, String> name = new TableColumn<>("Name");
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
