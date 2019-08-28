@@ -17,7 +17,7 @@
                 <MenuItem onAction="#onMenuEndSession" text="Log out"/>
             </Menu>
         </MenuBar>
-            <Label fx:id="countLabel">Text</Label>
+            <Label fx:id="countLabel"> </Label>
         </HBox>
     </top>
     <center>

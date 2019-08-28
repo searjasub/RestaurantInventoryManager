@@ -103,6 +103,8 @@ public class FinanceController {
         this.menuBar.getMenus().add(viewMenu);
         this.menuBar.getMenus().add(financeMenu);
 
+        financeGroup.selectToggle(net);
+
         administrators.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdminView.fxml"));
             BorderPane root;
