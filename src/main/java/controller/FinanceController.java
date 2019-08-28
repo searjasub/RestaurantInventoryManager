@@ -33,6 +33,8 @@ public class FinanceController {
     private Pagination pagination;
     @FXML
     private MenuBar menuBar;
+    @FXML
+    private Label countLabel;
     private TableView<FinanceItem> table = createTable();
     private InventoryTrackerController tracker = new InventoryTrackerController();
     private MongoClient mc = new MongoClient("localHost");
@@ -61,7 +63,7 @@ public class FinanceController {
         this.primaryStage.setTitle("Restaurant Inventory Manager - Finance");
 
         if (master.size() > 10) {
-            pagination.setPageCount((master.size() / 10) + 1);
+            pagination.setPageCount((master.size() / 10));
         } else {
             pagination.setPageCount(1);
         }
@@ -92,6 +94,8 @@ public class FinanceController {
         RadioMenuItem liabilities = new RadioMenuItem("Liabilities");
         RadioMenuItem capital = new RadioMenuItem("Capital");
         RadioMenuItem net = new RadioMenuItem("Net Worth");
+
+        financeMenu.getItems().addAll(assets, liabilities, capital, net);
 
         ToggleGroup financeGroup = new ToggleGroup();
         financeGroup.getToggles().addAll(assets, liabilities, capital, net);
@@ -158,11 +162,17 @@ public class FinanceController {
 
             ObservableList<FinanceItem> assetList = FXCollections.observableArrayList();
 
+            int value = 0;
+
             for (FinanceItem item : master) {
                 if (item.getType() == FinanceType.ASSET) {
                     assetList.add(item);
+
+                    value += Integer.parseInt(item.getCost());
                 }
             }
+
+            this.countLabel.setText("Total Asset Value: " + value);
 
             table.getItems().clear();
             table.refresh();
@@ -179,11 +189,16 @@ public class FinanceController {
 
             ObservableList<FinanceItem> liabilityList = FXCollections.observableArrayList();
 
+            int value = 0;
             for (FinanceItem item : master) {
                 if (item.getType() == FinanceType.LIABILITY) {
                     liabilityList.add(item);
+
+                    value += Integer.parseInt(item.getCost());
                 }
             }
+
+            this.countLabel.setText("Total Value of Liabilities: " + value);
 
             table.getItems().clear();
             table.refresh();
@@ -198,12 +213,16 @@ public class FinanceController {
 
             ObservableList<FinanceItem> capitalList = FXCollections.observableArrayList();
 
+            int value = 0;
             for (FinanceItem item : master) {
                 if (item.getType() == FinanceType.CAPITAL) {
                     capitalList.add(item);
+
+                    value += Integer.parseInt(item.getCost());
                 }
             }
 
+            this.countLabel.setText("Total Capital: " + value);
             table.getItems().clear();
             table.refresh();
             master = null;
@@ -217,6 +236,16 @@ public class FinanceController {
             table.refresh();
             master = null;
             master = getFinances();
+            int value = 0;
+            for(FinanceItem item : master){
+                if(item.getType() == FinanceType.LIABILITY){
+                    value -= Integer.parseInt(item.getCost());
+                }
+                else {
+                    value += Integer.parseInt(item.getCost());
+                }
+            }
+            this.countLabel.setText("Total Net Worth: " + value);
             table.getItems().addAll(master);
             table.refresh();
         });
@@ -242,7 +271,11 @@ public class FinanceController {
         amount.setCellValueFactory(new PropertyValueFactory<>("amount"));
         amount.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        table.getColumns().setAll(name,id,cost,amount);
+        TableColumn<FinanceItem, String> type = new TableColumn<>("Type");
+        type.setCellValueFactory(new PropertyValueFactory<>("stringType"));
+        type.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        table.getColumns().setAll(name,id,cost,amount, type);
 
         return table;
     }
@@ -321,7 +354,7 @@ public class FinanceController {
     }
 
     private Node createPage(int pageIndex) {
-        int pageSize = 50;
+        int pageSize = 10;
         int first = pageIndex * pageSize;
         int last = Math.min(first + pageSize, master.size());
         table.getItems().setAll(FXCollections.observableArrayList(master.subList(first, last)));

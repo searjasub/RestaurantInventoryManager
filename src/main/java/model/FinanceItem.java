@@ -10,6 +10,7 @@ public class FinanceItem {
     private StringProperty name;
     private StringProperty amount;
     private StringProperty cost;
+    private StringProperty stringType;
     private FinanceType type;
 
     public String getCost() {
@@ -20,12 +21,26 @@ public class FinanceItem {
         costProperty().set(cost);
     }
 
+
     private StringProperty costProperty() {
         if (cost == null) {
             cost = new SimpleStringProperty(this, "cost");
         }
         return cost;
     }
+
+    public String getStringType() { return typeProperty().get(); }
+
+    public void setStringType(String type) { typeProperty().set(type.toString()); }
+
+    private StringProperty typeProperty(){
+        if(stringType == null){
+            String v = this.type.toString();
+            this.stringType = new SimpleStringProperty(v);
+        }
+        return stringType;
+    }
+
 
     public String getId() {
         return idProperty().get();
