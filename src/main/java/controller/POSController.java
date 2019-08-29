@@ -113,7 +113,7 @@ public class POSController {
             orderMenu.getItems().add(startNewOrder);
             orderMenu.getItems().add(includeMeal);
             orderMenu.getItems().add(removeMeal);
-            orderMenu.getItems().add(splitOrder);
+//            orderMenu.getItems().add(splitOrder);
             orderMenu.getItems().add(cashOut);
 
             //TODO ADD MEAL
