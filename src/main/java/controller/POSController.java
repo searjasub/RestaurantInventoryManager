@@ -703,7 +703,7 @@ public class POSController {
             });
 
             finance.setOnAction(event -> {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceView.fxml"));
                 BorderPane root;
                 Scene financeScene = null;
                 try {
@@ -720,14 +720,9 @@ public class POSController {
                 primaryStage.setScene(financeScene);
 
             });
-
-            System.out.println(data.get(1).getName());
-
-
         } else {
             System.out.println("not an admin");
         }
-
     }
 
     private void addMeal(String mealName, int mealID, double totalCalorieCount, String veganFriendly, double cost) {
@@ -742,7 +737,6 @@ public class POSController {
     private void addPastOrder( int orderID, double totalCalorieCount, double cost) {
         pastOrderCollection.insertOne(new Document("orderID", orderID).append("totalCalorie", totalCalorieCount).append("cost", cost));
     }
-
 
     private TableView<Meal> createTable() {
 

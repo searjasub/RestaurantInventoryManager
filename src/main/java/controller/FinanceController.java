@@ -3,6 +3,7 @@ package controller;
 import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import enums.FinanceType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -11,10 +12,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.Employee;
-import model.OrderedItem;
+import model.FinanceItem;
 import org.bson.Document;
 
 import java.io.IOException;
@@ -26,9 +29,13 @@ import static javafx.collections.FXCollections.observableArrayList;
 
 public class FinanceController {
 
+    @FXML
+    private Pagination pagination;
+    @FXML
     private MenuBar menuBar;
-    private TableView table = initTable();
-    private ObservableList<FinanceItem> master = getFinances();
+    @FXML
+    private Label countLabel;
+    private TableView<FinanceItem> table = createTable();
     private InventoryTrackerController tracker = new InventoryTrackerController();
     private MongoClient mc = new MongoClient("localHost");
     private MongoDatabase database = mc.getDatabase("Restaurants");
@@ -39,14 +46,13 @@ public class FinanceController {
     private DBCollection invCollection = db.getCollection("Inventory");
     private DBCollection investCollection = db.getCollection("Investments");
     private DBCollection expensesCollection = db.getCollection("Expenses");
+    private ObservableList<FinanceItem> master = getFinances();
     private Stage primaryStage;
     private EmployeesController employeesController;
     private Scene financeScene;
     private MainStageController mainStageController;
     private Pagination myPagination;
     private CurrentSession currentSession;
-    @FXML
-    Pagination pagination;
 
     void setPrimaryStage(Stage primaryStage, Scene financeScene, MainStageController mainStageController,
                          HashMap<Integer, Employee> employeesCollection, CurrentSession currentSession) {
@@ -57,7 +63,7 @@ public class FinanceController {
         this.primaryStage.setTitle("Restaurant Inventory Manager - Finance");
 
         if (master.size() > 10) {
-            pagination.setPageCount((master.size() / 10) + 1);
+            pagination.setPageCount((master.size() / 10));
         } else {
             pagination.setPageCount(1);
         }
@@ -89,11 +95,15 @@ public class FinanceController {
         RadioMenuItem capital = new RadioMenuItem("Capital");
         RadioMenuItem net = new RadioMenuItem("Net Worth");
 
+        financeMenu.getItems().addAll(assets, liabilities, capital, net);
+
         ToggleGroup financeGroup = new ToggleGroup();
         financeGroup.getToggles().addAll(assets, liabilities, capital, net);
 
         this.menuBar.getMenus().add(viewMenu);
         this.menuBar.getMenus().add(financeMenu);
+
+        financeGroup.selectToggle(net);
 
         administrators.setOnAction(event -> {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../AdminView.fxml"));
@@ -154,11 +164,17 @@ public class FinanceController {
 
             ObservableList<FinanceItem> assetList = FXCollections.observableArrayList();
 
-            for(FinanceItem item : master){
-                if(item.getType() == FinanceItem.financeType.ASSET){
+            int value = 0;
+
+            for (FinanceItem item : master) {
+                if (item.getType() == FinanceType.ASSET) {
                     assetList.add(item);
+
+                    value += Integer.parseInt(item.getCost());
                 }
             }
+
+            this.countLabel.setText("Total Asset Value: " + value);
 
             table.getItems().clear();
             table.refresh();
@@ -175,11 +191,16 @@ public class FinanceController {
 
             ObservableList<FinanceItem> liabilityList = FXCollections.observableArrayList();
 
-            for(FinanceItem item : master){
-                if(item.getType() == FinanceItem.financeType.LIABILITY){
+            int value = 0;
+            for (FinanceItem item : master) {
+                if (item.getType() == FinanceType.LIABILITY) {
                     liabilityList.add(item);
+
+                    value += Integer.parseInt(item.getCost());
                 }
             }
+
+            this.countLabel.setText("Total Value of Liabilities: " + value);
 
             table.getItems().clear();
             table.refresh();
@@ -194,12 +215,16 @@ public class FinanceController {
 
             ObservableList<FinanceItem> capitalList = FXCollections.observableArrayList();
 
-            for(FinanceItem item : master){
-                if(item.getType() == FinanceItem.financeType.CAPITAL){
+            int value = 0;
+            for (FinanceItem item : master) {
+                if (item.getType() == FinanceType.CAPITAL) {
                     capitalList.add(item);
+
+                    value += Integer.parseInt(item.getCost());
                 }
             }
 
+            this.countLabel.setText("Total Capital: " + value);
             table.getItems().clear();
             table.refresh();
             master = null;
@@ -213,90 +238,117 @@ public class FinanceController {
             table.refresh();
             master = null;
             master = getFinances();
+            int value = 0;
+            for(FinanceItem item : master){
+                if(item.getType() == FinanceType.LIABILITY){
+                    value -= Integer.parseInt(item.getCost());
+                }
+                else {
+                    value += Integer.parseInt(item.getCost());
+                }
+            }
+            this.countLabel.setText("Total Net Worth: " + value);
             table.getItems().addAll(master);
             table.refresh();
         });
     }
 
-    private TableView<FinanceItem> initTable() {
-        table = new TableView<FinanceItem>();
-        table.setEditable(true);
+    private TableView<FinanceItem> createTable() {
+        table = new TableView<>();
+        table.setEditable(false);
 
-        TableColumn<FinanceItem, Integer> id = new TableColumn<>();
-        id.setText("ID");
+        TableColumn<FinanceItem, String> id = new TableColumn<>("ID");
+        id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        id.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        //TableColumn<FinanceItem, String> name = new TableColumn<>();
+        TableColumn<FinanceItem, String> name = new TableColumn<>("Name");
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        name.setCellFactory(TextFieldTableCell.forTableColumn());
 
+        TableColumn<FinanceItem, String> cost = new TableColumn<>("Cost");
+        cost.setCellValueFactory(new PropertyValueFactory<>("cost"));
+        cost.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        TableColumn<FinanceItem, String> amount = new TableColumn<>("Amount");
+        amount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        amount.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        TableColumn<FinanceItem, String> type = new TableColumn<>("Type");
+        type.setCellValueFactory(new PropertyValueFactory<>("stringType"));
+        type.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        table.getColumns().setAll(name,id,cost,amount, type);
 
         return table;
     }
 
-    public ObservableList<FinanceItem> getFinances(){
+    private ObservableList<FinanceItem> getFinances() {
         ObservableList<FinanceItem> financeItems = FXCollections.observableArrayList();
 
         DBCursor cursor = empsCollection.find();
-        List<DBObject> list = cursor.toArray();
+        List<DBObject> dbObjectsEmp = cursor.toArray();
 
-        for(DBObject obj : list){
+
+        for (DBObject obj : dbObjectsEmp) {
             FinanceItem f = new FinanceItem();
             f.setId(obj.get("employeeID").toString());
             f.setName(obj.get("name").toString());
             f.setCost("8");
             f.setAmount("1");
-            f.setType(FinanceItem.financeType.LIABILITY);
+            f.setType(FinanceType.LIABILITY);
             financeItems.add(f);
         }
 
 
         cursor = invCollection.find();
-        list = cursor.toArray();
+        List<DBObject> dbObjectsInventory = cursor.toArray();
 
-        for(DBObject obj : list){
+        for (DBObject obj : dbObjectsInventory) {
             FinanceItem f = new FinanceItem();
             f.setId(obj.get("ingredientID").toString());
             f.setName(obj.get("name").toString());
             f.setCost(obj.get("wholesale").toString());
             f.setAmount(obj.get("amount").toString());
-            f.setType(FinanceItem.financeType.ASSET);
+            f.setType(FinanceType.ASSET);
             financeItems.add(f);
         }
 
         cursor = expensesCollection.find();
-        list = cursor.toArray();
+        List<DBObject> dbObjectsExpense = cursor.toArray();
 
-        for(DBObject obj : list){
+        for (DBObject obj : dbObjectsExpense) {
             FinanceItem f = new FinanceItem();
             f.setId(obj.get("expenseID").toString());
             f.setName(obj.get("name").toString());
             f.setCost(obj.get("cost").toString());
             f.setAmount("1");
-            f.setType(FinanceItem.financeType.LIABILITY);
+            f.setType(FinanceType.LIABILITY);
             financeItems.add(f);
         }
 
-       cursor = adminCollection.find();
-        list = cursor.toArray();
+        cursor = adminCollection.find();
+        List<DBObject> dbObjectsAdmin = cursor.toArray();
 
-        for(DBObject obj : list){
+        for (DBObject obj : dbObjectsAdmin) {
             FinanceItem f = new FinanceItem();
             f.setId(obj.get("employeeID").toString());
             f.setName(obj.get("name").toString());
             f.setCost("15");
             f.setAmount("1");
-            f.setType(FinanceItem.financeType.LIABILITY);
+            f.setType(FinanceType.LIABILITY);
             financeItems.add(f);
         }
 
-      cursor = investCollection.find();
-        list = cursor.toArray();
+        cursor = investCollection.find();
+        List<DBObject> dbObjectsInvest = cursor.toArray();
 
-        for(DBObject obj : list){
+        for (DBObject obj : dbObjectsInvest) {
             FinanceItem f = new FinanceItem();
             f.setId(obj.get("investmentID").toString());
-            f.setName(obj.get("name").toString());
+            f.setName(obj.get("investorName").toString());
             f.setCost(obj.get("cost").toString());
             f.setAmount("1");
-            f.setType(FinanceItem.financeType.CAPITAL);
+            f.setType(FinanceType.CAPITAL);
             financeItems.add(f);
         }
 
@@ -304,16 +356,17 @@ public class FinanceController {
     }
 
     private Node createPage(int pageIndex) {
-        int pageSize = 50;
+        int pageSize = 10;
         int first = pageIndex * pageSize;
         int last = Math.min(first + pageSize, master.size());
-        table.getItems().add(observableArrayList(master.subList(first, last)));
+        table.getItems().setAll(FXCollections.observableArrayList(master.subList(first, last)));
 
         return table;
     }
 
-    public void onMenuItemExit(ActionEvent actionEvent) {
-        primaryStage.close();
+
+    public void onMenuEndSession(ActionEvent actionEvent) {
+
     }
 
     // Methods to add:
@@ -327,59 +380,5 @@ public class FinanceController {
     // all items of that type along with their asset/liability values and the dates
     // they were put in and their expiration date
 
-    //TODO MAKE CLASSES FOR THIS
-    public static class FinanceItem {
-        private String id;
-        private String name;
-        private String amount;
-        private String cost;
-        private financeType type;
-
-        public String getCost() {
-            return cost;
-        }
-
-        public void setCost(String cost) {
-            this.cost = cost;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getAmount() {
-            return amount;
-        }
-
-        public void setAmount(String amount) {
-            this.amount = amount;
-        }
-
-        public financeType getType() {
-            return type;
-        }
-
-        public void setType(financeType type) {
-            this.type = type;
-        }
-
-        public enum financeType {
-            ASSET, LIABILITY, CAPITAL
-        }
-
-
-    }
 
 }

@@ -387,7 +387,7 @@ public class EmployeesController {
         });
 
         finance.setOnAction(event -> {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceScene.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../FinanceView.fxml"));
             BorderPane root;
             Scene financeScene = null;
             try {

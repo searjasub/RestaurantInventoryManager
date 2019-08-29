@@ -122,6 +122,7 @@ public class InventoryTrackerController {
             costPerIngredient.setPromptText("CostPerIngredient");
             TextField bulkCost = new TextField();
             bulkCost.setPromptText("BulkCost");
+            TextField wholesale = new TextField();
 
             grid.add(new Label("Name:"), 0, 0);
             grid.add(name, 1, 0);
@@ -133,6 +134,9 @@ public class InventoryTrackerController {
             grid.add(costPerIngredient, 1, 3);
             grid.add(new Label("BulkCost:"), 0, 4);
             grid.add(bulkCost, 1, 4);
+            grid.add(new Label("Wholesale:"), 0, 5);
+            grid.add(bulkCost, 1, 5);
+
 
             Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
             loginButton.setDisable(true);
@@ -154,6 +158,7 @@ public class InventoryTrackerController {
                     e.setCaloriePerServing(caloriePerServing.getText().trim());
                     e.setCostPerIngredient(costPerIngredient.getText().trim());
                     e.setBulkCost(bulkCost.getText().trim());
+                    e.setWholesale(wholesale.getText().trim());
 
                     return e;
 
@@ -415,7 +420,7 @@ public class InventoryTrackerController {
                 throw new NullPointerException();
             }
             collection.insertOne(new Document("name", ingredient.getName()).append("ingredientID", Integer.parseInt(ingredient.getIngredientId()))
-                    .append("caloriePerServing", Integer.parseInt(ingredient.getCaloriePerServing())).append("amount", Integer.parseInt(ingredient.getAmount())).append("individualCost", Integer.parseInt(ingredient.getCostPerIngredient())).append("bulkCost", Integer.parseInt(ingredient.getBulkCost())));
+                    .append("caloriePerServing", Integer.parseInt(ingredient.getCaloriePerServing())).append("amount", Integer.parseInt(ingredient.getAmount())).append("individualCost", Integer.parseInt(ingredient.getCostPerIngredient())).append("bulkCost", Integer.parseInt(ingredient.getBulkCost())).append("wholesale", Integer.parseInt(ingredient.getWholesale())));
             ingredientTable.getItems().clear();
             data = null;
             data = fillIngredientCollection();
@@ -428,7 +433,7 @@ public class InventoryTrackerController {
     }
 
     private void showAlertNumericName() {
-        Alert alert = new Alert(Alert.AlertType.ERROR, "Name of ingridient cannot be only numbers", ButtonType.OK);
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Name of ingredient cannot be only numbers", ButtonType.OK);
         alert.setTitle("Name not valid");
         alert.show();
     }

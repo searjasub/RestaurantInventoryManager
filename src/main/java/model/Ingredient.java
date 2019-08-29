@@ -16,10 +16,11 @@ public class Ingredient {
     private StringProperty name;
     private StringProperty ingredientId;
     private StringProperty amount;
+    private StringProperty wholesale;
 
     public Ingredient(){};
 
-    public Ingredient(String ingredientID, String name, boolean veganFriendly, Date prepDate, Date expiredDate, String caloriePerServing, String costPerIngredient, String amount) {
+    public Ingredient(String ingredientID, String name, boolean veganFriendly, Date prepDate, Date expiredDate, String caloriePerServing, String costPerIngredient, String amount, String wholesale) {
         setVeganFriendly(veganFriendly);
         setPrepDate(prepDate);
         setExpiredDate(expiredDate);
@@ -28,6 +29,7 @@ public class Ingredient {
         setName(name);
         setIngredientId(ingredientID);
         setAmount(amount);
+        setWholesale(wholesale);
     }
 
     public boolean isVeganFriendly() {
@@ -68,12 +70,16 @@ public class Ingredient {
     public void setCaloriePerServing(String caloriePerServing){
         calorieProperty().set(caloriePerServing);
     }
+
     private StringProperty costProperty(){
         if (costPerIngredient == null) {
             costPerIngredient = new SimpleStringProperty(this, "costPerIngredient");
         }
         return costPerIngredient;
     }
+
+
+
 
     public String getCostPerIngredient() {
         return costProperty().get();
@@ -138,6 +144,22 @@ public class Ingredient {
 
     public void setAmount(String amount) {
         amountProperty().set(amount);
+    }
+
+
+    private StringProperty wholesale(){
+        if (wholesale == null) {
+            wholesale = new SimpleStringProperty(this, "wholesale");
+        }
+        return wholesale;
+    }
+
+    public String getWholesale() {
+        return wholesale().get();
+    }
+
+    public void setWholesale(String wholesale){
+        wholesale().set(wholesale);
     }
 
 

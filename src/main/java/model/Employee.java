@@ -6,10 +6,6 @@ import java.util.Date;
 
 public class Employee {
 
-    private Date clockIn;
-    private Date clockOut;
-    private Date breakStart;
-    private Date breakEnd;
     private StringProperty hourlyPay;
     private StringProperty name;
     private StringProperty password;
@@ -26,38 +22,6 @@ public class Employee {
         setPassword(password);
         setOccupation(occupation);
         setHourlyPay(hourlyPay);
-    }
-
-    public Date getClockIn() {
-        return clockIn;
-    }
-
-    public void setClockIn(Date clockIn) {
-        this.clockIn = clockIn;
-    }
-
-    public Date getClockOut() {
-        return clockOut;
-    }
-
-    public void setClockOut(Date clockOut) {
-        this.clockOut = clockOut;
-    }
-
-    public Date getBreakStart() {
-        return breakStart;
-    }
-
-    public void setBreakStart(Date breakStart) {
-        this.breakStart = breakStart;
-    }
-
-    public Date getBreakEnd() {
-        return breakEnd;
-    }
-
-    public void setBreakEnd(Date breakEnd) {
-        this.breakEnd = breakEnd;
     }
 
     public String getName() {

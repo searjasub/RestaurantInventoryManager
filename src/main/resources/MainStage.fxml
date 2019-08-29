@@ -1,63 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuItem?>
-
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainStageController">
-   <children>
-   
-       <Button text="TESTING" />
-   </children>
-
-    <top>
-        <MenuBar fx:id="topMenu">
-
-        </MenuBar>
-    </top>
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.MainStageController">
     <center>
-
+       <VBox prefWidth="200.0" BorderPane.alignment="CENTER">
+          <BorderPane.margin>
+             <Insets left="50.0" right="50.0" top="50.0"/>
+          </BorderPane.margin>
+          <TextField fx:id="usernameTextField" prefWidth="541.0" promptText="Username">
+             <VBox.margin>
+                <Insets bottom="10.0" left="30.0" right="30.0"/>
+             </VBox.margin>
+          </TextField>
+          <TextField fx:id="passwordTextField" promptText="Password">
+             <VBox.margin>
+                <Insets bottom="10.0" left="30.0" right="30.0"/>
+             </VBox.margin>
+          </TextField>
+          <PasswordField fx:id="passwordField" promptText="Password">
+             <VBox.margin>
+                <Insets bottom="10.0" left="30.0" right="30.0"/>
+             </VBox.margin>
+          </PasswordField>
+          <CheckBox fx:id="checkbox" mnemonicParsing="false" prefHeight="17.0" prefWidth="157.0"
+                    text="Hide/Show Password">
+             <VBox.margin>
+                <Insets bottom="10.0" left="30.0" right="30.0"/>
+             </VBox.margin>
+          </CheckBox>
+          <Button fx:id="loginBtn" onAction="#login" prefHeight="25.0" prefWidth="51.0" text="Login">
+             <VBox.margin>
+                <Insets left="30.0"/>
+             </VBox.margin>
+          </Button>
+       </VBox>
     </center>
-   <center>
-      <VBox prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <TextField fx:id="usernameTextField" prefWidth="541.0" promptText="Username">
-               <VBox.margin>
-                  <Insets bottom="10.0" left="30.0" right="30.0" />
-               </VBox.margin>
-            </TextField>
-            <TextField fx:id="passwordTextField" promptText="Password">
-               <VBox.margin>
-                  <Insets bottom="10.0" left="30.0" right="30.0" />
-               </VBox.margin>
-            </TextField>
-            <PasswordField fx:id="passwordField" promptText="Password">
-               <VBox.margin>
-                  <Insets bottom="10.0" left="30.0" right="30.0" />
-               </VBox.margin>
-            </PasswordField>
-            <CheckBox fx:id="checkbox" mnemonicParsing="false" prefHeight="17.0" prefWidth="157.0" text="Hide/Show Password">
-               <VBox.margin>
-                  <Insets bottom="10.0" left="30.0" right="30.0" />
-               </VBox.margin>
-            </CheckBox>
-            <Button fx:id="loginBtn" onAction="#login" prefHeight="25.0" prefWidth="51.0" text="Login">
-               <VBox.margin>
-                  <Insets left="30.0" />
-               </VBox.margin>
-            </Button>
-         </children>
-         <BorderPane.margin>
-            <Insets left="50.0" right="50.0" top="50.0" />
-         </BorderPane.margin>
-      </VBox>
-   </center>
 
 </BorderPane>
