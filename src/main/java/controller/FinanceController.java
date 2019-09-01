@@ -81,6 +81,7 @@ public class FinanceController {
         viewMenu.getItems().add(inventory);
         viewMenu.getItems().add(pos);
         viewMenu.getItems().add(finance);
+        finance.setSelected(true);
 
         ToggleGroup toggleGroup = new ToggleGroup();
         toggleGroup.getToggles().add(administrators);
